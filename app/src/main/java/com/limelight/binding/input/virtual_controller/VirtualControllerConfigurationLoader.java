@@ -8,7 +8,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 
+import com.limelight.binding.input.KeyboardTranslator;
 import com.limelight.nvstream.input.ControllerPacket;
 import com.limelight.preferences.PreferenceConfiguration;
 
@@ -17,6 +19,11 @@ import org.json.JSONObject;
 
 public class VirtualControllerConfigurationLoader {
     public static final String OSC_PREFERENCE = "OSC";
+
+    // Used to translate the Android keycodes of on-screen keyboard keys into the GFE
+    // keycodes the host expects. The virtual device that delivers OSC key events has
+    // no key layout, so this only ever performs the fixed QWERTY mapping.
+    private static final KeyboardTranslator keyboardTranslator = new KeyboardTranslator();
 
     private static int getPercent(
             int percent,
@@ -118,6 +125,60 @@ public class VirtualControllerConfigurationLoader {
         return button;
     }
 
+    /**
+     * Creates an on-screen button that is delivered to the host as a keyboard key press
+     * rather than as a gamepad button.
+     *
+     * @param elementId the unique on-screen controller element ID used to persist the layout
+     * @param androidKeyCode an Android KeyEvent.KEYCODE_* value to translate and send
+     */
+    private static DigitalButton createKeyboardButton(
+            final int elementId,
+            final int androidKeyCode,
+            final int layer,
+            final String text,
+            final int icon,
+            final VirtualController controller,
+            final Context context) {
+        // Translating here keeps the keycode in one place: the button draws the text,
+        // but the host receives the GFE keycode that KeyboardTranslator produces for
+        // the equivalent hardware key event.
+        final short keyCode = keyboardTranslator.translate(androidKeyCode, -1);
+
+        // A keycode that can't be translated would silently send nothing to the host,
+        // so fail loudly instead of adding a dead button to the layout.
+        if (keyCode == 0) {
+            throw new IllegalArgumentException(
+                    "Android keycode " + androidKeyCode + " has no GFE keycode mapping");
+        }
+
+        DigitalButton button = new DigitalButton(controller, elementId, layer, context);
+        button.setText(text);
+        button.setIcon(icon);
+
+        button.addDigitalButtonListener(new DigitalButton.DigitalButtonListener() {
+            @Override
+            public void onClick() {
+                // Don't alter inputMap here. Its bits are gamepad buttons only, so a
+                // value that doesn't match any ControllerPacket flag would make the
+                // host see a gamepad button that is never released.
+                controller.updateKeyboardKeyState(keyCode, true);
+            }
+
+            @Override
+            public void onLongClick() {
+                // Keyboard keys have no long press behaviour
+            }
+
+            @Override
+            public void onRelease() {
+                controller.updateKeyboardKeyState(keyCode, false);
+            }
+        });
+
+        return button;
+    }
+
     private static DigitalButton createLeftTrigger(
             final int layer,
             final String text,
@@ -188,6 +249,12 @@ public class VirtualControllerConfigurationLoader {
     // Make the Guide Menu be in the center of START and BACK menu
     private static final int GUIDE_X = START_X-BACK_X;
     private static final int GUIDE_Y = START_BACK_Y;
+
+    // On-screen keyboard keys sit above the START/BACK row, in the gap between the
+    // right analog stick and the bottom edge of the screen.
+    private static final int KEYBOARD_BASE_X = 118;
+    private static final int KEYBOARD_BASE_Y = 56;
+    private static final int KEYBOARD_KEY_SIZE = 7;
 
     public static void createDefaultLayout(final VirtualController controller, final Context context) {
 
@@ -346,6 +413,17 @@ public class VirtualControllerConfigurationLoader {
                     screenScale(START_BACK_HEIGHT, height)
             );
         }
+
+        // On-screen keyboard keys. These are sent to the host as keyboard events,
+        // so they work even for games that ignore gamepad input.
+        controller.addElement(createKeyboardButton(
+                VirtualControllerElement.EID_KEY_R,
+                KeyEvent.KEYCODE_R, 1, "R", -1, controller, context),
+                screenScale(KEYBOARD_BASE_X, height) + rightDisplacement,
+                screenScale(KEYBOARD_BASE_Y, height),
+                screenScale(KEYBOARD_KEY_SIZE, height),
+                screenScale(KEYBOARD_KEY_SIZE, height)
+        );
 
         controller.setOpacity(config.oscOpacity);
     }

@@ -37,6 +37,10 @@ public abstract class VirtualControllerElement extends View {
     public static final int EID_RSB = 15;
     public static final int EID_GDB = 16;
 
+    // On-screen keyboard keys. These are not gamepad buttons: they are sent to the
+    // host as keyboard packets by VirtualController.updateKeyboardKeyState().
+    public static final int EID_KEY_R = 17;
+
     protected VirtualController virtualController;
     protected final int elementId;
 

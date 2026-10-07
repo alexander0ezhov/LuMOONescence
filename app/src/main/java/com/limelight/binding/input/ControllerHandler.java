@@ -41,6 +41,7 @@ import com.limelight.binding.input.driver.UsbDriverListener;
 import com.limelight.binding.input.driver.UsbDriverService;
 import com.limelight.nvstream.NvConnection;
 import com.limelight.nvstream.input.ControllerPacket;
+import com.limelight.nvstream.input.KeyboardPacket;
 import com.limelight.nvstream.input.MouseButtonPacket;
 import com.limelight.nvstream.jni.MoonBridge;
 import com.limelight.preferences.PreferenceConfiguration;
@@ -2800,6 +2801,22 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         defaultContext.inputMap = buttonFlags;
 
         sendControllerInputPacket(defaultContext);
+    }
+
+    /**
+     * Sends a keyboard event originating from the on-screen controller (OSC).
+     *
+     * @param keyCode GFE keycode, as produced by KeyboardTranslator.translate(int, int)
+     * @param keyDirection KeyboardPacket.KEY_DOWN or KeyboardPacket.KEY_UP
+     * @param modifier bitmask of KeyboardPacket.MODIFIER_* values
+     * @param flags MoonBridge.SS_KBE_FLAG_* values
+     */
+    public void reportOscKeyboardState(short keyCode, byte keyDirection, byte modifier, byte flags) {
+        if (keyCode == 0) {
+            return;
+        }
+
+        conn.sendKeyboardInput(keyCode, keyDirection, modifier, flags);
     }
 
     @Override
