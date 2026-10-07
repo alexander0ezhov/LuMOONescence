@@ -191,6 +191,19 @@
             android:positiveButtonText="@string/yes"
             android:negativeButtonText="@string/no"
             />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="checkbox_show_universal_layout"
+            android:summary="@string/summary_checkbox_show_universal_layout"
+            android:title="@string/title_checkbox_show_universal_layout" />
+        <com.limelight.preferences.ConfirmDeleteUniversalLayoutPreference
+            android:title="@string/title_reset_universal_layout"
+            android:summary="@string/summary_reset_universal_layout"
+            android:dialogTitle="@string/dialog_title_reset_universal_layout"
+            android:dialogMessage="@string/dialog_text_reset_universal_layout"
+            android:positiveButtonText="@string/yes"
+            android:negativeButtonText="@string/no"
+            />
 
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/category_host_settings">

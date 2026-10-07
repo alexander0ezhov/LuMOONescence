@@ -13,6 +13,7 @@ import com.limelight.binding.input.driver.UsbDriverService;
 import com.limelight.binding.input.evdev.EvdevListener;
 import com.limelight.binding.input.touch.TouchContext;
 import com.limelight.binding.input.virtual_controller.VirtualController;
+import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualController;
 import com.limelight.binding.video.CrashListener;
 import com.limelight.binding.video.MediaCodecDecoderRenderer;
 import com.limelight.binding.video.MediaCodecHelper;
@@ -112,6 +113,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     private ControllerHandler controllerHandler;
     private KeyboardTranslator keyboardTranslator;
     private VirtualController virtualController;
+    private UniversalVirtualController universalVirtualController;
 
     private PreferenceConfiguration prefConfig;
     private SharedPreferences tombstonePrefs;
@@ -431,8 +433,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             // of gamepads removed and replugged at runtime.
             gamepadMask = 1;
         }
-        if (prefConfig.onscreenController) {
-            // If we're using OSC, always set at least gamepad 1.
+        if (prefConfig.onscreenController || prefConfig.universalLayout) {
+            // If we're using an on-screen layout, always set at least gamepad 1.
             gamepadMask |= 1;
         }
 
@@ -513,6 +515,15 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             virtualController.show();
         }
 
+        if (prefConfig.universalLayout) {
+            // create the customizable on-screen layout. It is shown as soon as it is
+            // created, so no explicit show() call is needed here.
+            universalVirtualController = new UniversalVirtualController(controllerHandler,
+                    (FrameLayout)streamView.getParent(),
+                    this);
+            universalVirtualController.refreshLayout();
+        }
+
         if (prefConfig.usbDriver) {
             // Start the USB driver
             bindService(new Intent(this, UsbDriverService.class),
@@ -542,8 +553,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         if (PreferenceConfiguration.isSquarishScreen(display)) {
             int desiredOrientation = Configuration.ORIENTATION_UNDEFINED;
 
-            // OSC doesn't properly support portrait displays, so don't use it in portrait mode by default
-            if (prefConfig.onscreenController) {
+            // On-screen layouts don't properly support portrait displays, so don't use them in portrait mode by default
+            if (prefConfig.onscreenController || prefConfig.universalLayout) {
                 desiredOrientation = Configuration.ORIENTATION_LANDSCAPE;
             }
 
@@ -586,6 +597,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             virtualController.refreshLayout();
         }
 
+        if (universalVirtualController != null) {
+            // Refresh the universal layout for the possible new screen size
+            universalVirtualController.refreshLayout();
+        }
+
         // Hide on-screen overlays in PiP mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (isInPictureInPictureMode()) {
@@ -593,6 +609,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
                 if (virtualController != null) {
                     virtualController.hide();
+                }
+
+                if (universalVirtualController != null) {
+                    universalVirtualController.hide();
                 }
 
                 performanceOverlayView.setVisibility(View.GONE);
@@ -611,6 +631,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
                 if (virtualController != null) {
                     virtualController.show();
+                }
+
+                if (universalVirtualController != null) {
+                    universalVirtualController.show();
                 }
 
                 if (prefConfig.enablePerfOverlay) {
@@ -1036,6 +1060,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     protected void onDestroy() {
         super.onDestroy();
 
+        if (universalVirtualController != null) {
+            universalVirtualController.destroy();
+            universalVirtualController = null;
+        }
+
         if (controllerHandler != null) {
             controllerHandler.destroy();
         }
@@ -1084,6 +1113,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         if (virtualController != null) {
             virtualController.hide();
+        }
+
+        if (universalVirtualController != null) {
+            universalVirtualController.hide();
         }
 
         if (conn != null) {
@@ -1780,6 +1813,31 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         }
     }
 
+    /**
+     * Returns true while the user is moving or resizing the controls of an on-screen
+     * layout. Touch input must not reach the stream in that state, otherwise the
+     * touches that manipulate the controls would also be sent to the host.
+     */
+    private boolean isOnScreenLayoutBeingConfigured() {
+        if (virtualController != null) {
+            VirtualController.ControllerMode mode = virtualController.getControllerMode();
+            if (mode == VirtualController.ControllerMode.MoveButtons ||
+                    mode == VirtualController.ControllerMode.ResizeButtons) {
+                return true;
+            }
+        }
+
+        if (universalVirtualController != null) {
+            UniversalVirtualController.ControllerMode mode = universalVirtualController.getControllerMode();
+            if (mode == UniversalVirtualController.ControllerMode.MoveButtons ||
+                    mode == UniversalVirtualController.ControllerMode.ResizeButtons) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // Returns true if the event was consumed
     // NB: View is only present if called from a view callback
     private boolean handleMotionEvent(View view, MotionEvent event) {
@@ -1993,10 +2051,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             // This case is for fingers
             else
             {
-                if (virtualController != null &&
-                        (virtualController.getControllerMode() == VirtualController.ControllerMode.MoveButtons ||
-                         virtualController.getControllerMode() == VirtualController.ControllerMode.ResizeButtons)) {
-                    // Ignore presses when the virtual controller is being configured
+                if (isOnScreenLayoutBeingConfigured()) {
+                    // Ignore presses when an on-screen layout is being configured
                     return true;
                 }
 

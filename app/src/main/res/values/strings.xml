@@ -220,6 +220,13 @@
     <string name="summary_osc_opacity">Make the on-screen controls more/less transparent</string>
     <string name="dialog_title_osc_opacity">Change opacity</string>
     <string name="suffix_osc_opacity">%</string>
+    <string name="title_checkbox_show_universal_layout">Show universal layout</string>
+    <string name="summary_checkbox_show_universal_layout">Show the customizable layout that can mix gamepad and keyboard controls</string>
+    <string name="title_reset_universal_layout">Clear saved universal layout</string>
+    <string name="summary_reset_universal_layout">Resets the universal layout controls to their default size and position</string>
+    <string name="dialog_title_reset_universal_layout">Reset Universal Layout</string>
+    <string name="dialog_text_reset_universal_layout">Are you sure you want to delete your saved universal layout?</string>
+    <string name="toast_reset_universal_layout_success">Universal layout reset to default</string>
 
     <string name="category_ui_settings">UI Settings</string>
     <string name="title_checkbox_enable_pip">Enable Picture-in-Picture observer mode</string>
