@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="10dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <FrameLayout
+        android:layout_width="140dp"
+        android:layout_height="88dp">
+
+        <ImageView
+            android:id="@+id/layoutItemImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="#28282E"
+            android:contentDescription="@string/title_layout_image"/>
+
+        <!-- Shown on the layout that the stream currently uses -->
+        <ImageView
+            android:id="@+id/layoutItemSelectedBadge"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="top|end"
+            android:padding="4dp"
+            android:visibility="gone"
+            android:background="#CC00C853"
+            android:src="@drawable/ic_check"
+            android:contentDescription="@string/msg_layout_selected"/>
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/layoutItemName"
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"/>
+
+</LinearLayout>

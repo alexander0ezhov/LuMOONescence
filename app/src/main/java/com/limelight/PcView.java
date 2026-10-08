@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 
 import com.limelight.binding.PlatformBinding;
 import com.limelight.binding.crypto.AndroidCryptoProvider;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutsActivity;
 import com.limelight.computers.ComputerManagerListener;
 import com.limelight.computers.ComputerManagerService;
 import com.limelight.grid.PcGridAdapter;
@@ -140,6 +141,7 @@ public class PcView extends Activity implements AdapterFragmentCallbacks {
         ImageButton settingsButton = findViewById(R.id.settingsButton);
         ImageButton addComputerButton = findViewById(R.id.manuallyAddPc);
         ImageButton helpButton = findViewById(R.id.helpButton);
+        ImageButton layoutsButton = findViewById(R.id.layoutsButton);
 
         settingsButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -160,12 +162,20 @@ public class PcView extends Activity implements AdapterFragmentCallbacks {
                 HelpLauncher.launchSetupGuide(PcView.this);
             }
         });
+        layoutsButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(PcView.this, UniversalLayoutsActivity.class));
+            }
+        });
 
         // Amazon review didn't like the help button because the wiki was not entirely
         // navigable via the Fire TV remote (though the relevant parts were). Let's hide
-        // it on Fire TV.
+        // it on Fire TV. The on-screen layouts are a touch feature as well, so it is
+        // hidden there too rather than overlapping the add-computer button.
         if (getPackageManager().hasSystemFeature("amazon.hardware.fire_tv")) {
             helpButton.setVisibility(View.GONE);
+            layoutsButton.setVisibility(View.GONE);
         }
 
         getFragmentManager().beginTransaction()

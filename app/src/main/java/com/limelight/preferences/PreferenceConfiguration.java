@@ -43,7 +43,7 @@ public class PreferenceConfiguration {
     private static final String USB_DRIVER_PREF_SRING = "checkbox_usb_driver";
     private static final String VIDEO_FORMAT_PREF_STRING = "video_format";
     private static final String ONSCREEN_CONTROLLER_PREF_STRING = "checkbox_show_onscreen_controls";
-    private static final String UNIVERSAL_LAYOUT_PREF_STRING = "checkbox_show_universal_layout";
+    public static final String UNIVERSAL_LAYOUT_PREF_STRING = "checkbox_show_universal_layout";
     private static final String ONLY_L3_R3_PREF_STRING = "checkbox_only_show_L3R3";
     private static final String SHOW_GUIDE_BUTTON_PREF_STRING = "checkbox_show_guide_button";
     private static final String LEGACY_DISABLE_FRAME_DROP_PREF_STRING = "checkbox_disable_frame_drop";

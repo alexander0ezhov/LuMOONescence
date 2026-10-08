@@ -13,6 +13,8 @@ import com.limelight.binding.input.driver.UsbDriverService;
 import com.limelight.binding.input.evdev.EvdevListener;
 import com.limelight.binding.input.touch.TouchContext;
 import com.limelight.binding.input.virtual_controller.VirtualController;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutStore;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualController;
 import com.limelight.binding.video.CrashListener;
 import com.limelight.binding.video.MediaCodecDecoderRenderer;
@@ -515,12 +517,15 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             virtualController.show();
         }
 
-        if (prefConfig.universalLayout) {
+        UniversalLayoutDefinition universalLayoutDefinition =
+                prefConfig.universalLayout ? UniversalLayoutStore.getInstance(this).getSelectedLayout() : null;
+        if (universalLayoutDefinition != null) {
             // create the customizable on-screen layout. It is shown as soon as it is
             // created, so no explicit show() call is needed here.
             universalVirtualController = new UniversalVirtualController(controllerHandler,
                     (FrameLayout)streamView.getParent(),
-                    this);
+                    this,
+                    universalLayoutDefinition.getId());
             universalVirtualController.refreshLayout();
         }
 

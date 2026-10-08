@@ -13,8 +13,8 @@ import com.limelight.R;
 import static com.limelight.binding.input.virtual_controller.VirtualControllerConfigurationLoader.OSC_PREFERENCE;
 
 /**
- * Clears the saved geometry of a layout. Subclasses only need to override
- * {@link #getPreferencesName()} to target a different layout.
+ * Clears the saved geometry of a layout. Subclasses override {@link #getPreferencesName()}
+ * for a single preferences file, or {@link #clearSavedGeometry()} to reset more than one.
  */
 public class ConfirmDeleteOscPreference extends DialogPreference {
     public ConfirmDeleteOscPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -49,8 +49,16 @@ public class ConfirmDeleteOscPreference extends DialogPreference {
 
     public void onClick(DialogInterface dialog, int which) {
         if (which == DialogInterface.BUTTON_POSITIVE) {
-            getContext().getSharedPreferences(getPreferencesName(), Context.MODE_PRIVATE).edit().clear().apply();
+            clearSavedGeometry();
             Toast.makeText(getContext(), getResetSuccessMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Removes the saved geometry. The default implementation clears the single file
+     * returned by {@link #getPreferencesName()}.
+     */
+    protected void clearSavedGeometry() {
+        getContext().getSharedPreferences(getPreferencesName(), Context.MODE_PRIVATE).edit().clear().apply();
     }
 }

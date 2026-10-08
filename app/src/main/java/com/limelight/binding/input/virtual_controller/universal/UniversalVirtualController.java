@@ -66,6 +66,7 @@ public class UniversalVirtualController {
     private final ControllerHandler controllerHandler;
     private final Context context;
     private final Handler handler;
+    private final String layoutId;
 
     private final Runnable delayedRetransmitRunnable = new Runnable() {
         @Override
@@ -92,12 +93,22 @@ public class UniversalVirtualController {
     // doesn't require an explicit show() call.
     private boolean visible = true;
     private boolean destroyed = false;
+    private boolean configurationButtonEnabled = true;
     private VisibilityListener visibilityListener;
 
-    public UniversalVirtualController(final ControllerHandler controllerHandler, FrameLayout layout, final Context context) {
+    /**
+     * @param layoutId ID of the universal layout this controller shows. The geometry of
+     *                 the controls is stored per layout, so this decides which saved
+     *                 arrangement is loaded and where edits are saved.
+     */
+    public UniversalVirtualController(final ControllerHandler controllerHandler,
+                                      FrameLayout layout,
+                                      final Context context,
+                                      final String layoutId) {
         this.controllerHandler = controllerHandler;
         this.frame_layout = layout;
         this.context = context;
+        this.layoutId = layoutId;
         this.handler = new Handler(Looper.getMainLooper());
 
         buttonConfigure = new Button(context);
@@ -117,7 +128,7 @@ public class UniversalVirtualController {
                     message = "Entering configuration mode (Resize buttons)";
                 } else {
                     currentMode = ControllerMode.Active;
-                    UniversalLayoutConfigurationLoader.saveProfile(UniversalVirtualController.this, context);
+                    saveLayoutConfiguration();
                     message = "Exiting configuration mode";
                 }
 
@@ -150,6 +161,15 @@ public class UniversalVirtualController {
 
     public void setVisibilityListener(VisibilityListener listener) {
         this.visibilityListener = listener;
+    }
+
+    /**
+     * Shows or hides the floating configuration button. The layout editor provides its
+     * own controls, so it hides this button to avoid two ways of doing the same thing.
+     */
+    public void setConfigurationButtonVisible(boolean visible) {
+        configurationButtonEnabled = visible;
+        buttonConfigure.setVisibility(visible && this.visible ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -203,6 +223,22 @@ public class UniversalVirtualController {
         return destroyed;
     }
 
+    /**
+     * Returns the ID of the layout this controller shows.
+     */
+    public String getLayoutId() {
+        return layoutId;
+    }
+
+    /**
+     * Writes the current geometry of every element to the layout preferences. This is
+     * what the configuration button does when leaving configuration mode; callers that
+     * edit a layout outside a stream (the layout editor) use it as well.
+     */
+    public void saveLayoutConfiguration() {
+        UniversalLayoutConfigurationLoader.saveProfile(this, context, layoutId);
+    }
+
     private void setVisible(boolean visible) {
         if (destroyed || this.visible == visible) {
             return;
@@ -210,7 +246,7 @@ public class UniversalVirtualController {
 
         this.visible = visible;
 
-        buttonConfigure.setVisibility(getViewVisibility());
+        buttonConfigure.setVisibility(getConfigurationButtonVisibility());
 
         for (UniversalVirtualControllerElement element : elements) {
             element.setVisibility(getViewVisibility());
@@ -223,6 +259,14 @@ public class UniversalVirtualController {
 
     private int getViewVisibility() {
         return visible ? View.VISIBLE : View.INVISIBLE;
+    }
+
+    private int getConfigurationButtonVisibility() {
+        if (!configurationButtonEnabled) {
+            return View.GONE;
+        }
+
+        return getViewVisibility();
     }
 
     public void removeElements() {
@@ -281,14 +325,26 @@ public class UniversalVirtualController {
         params.leftMargin = 15;
         params.topMargin = 15;
         frame_layout.addView(buttonConfigure, params);
-        buttonConfigure.setVisibility(getViewVisibility());
+        buttonConfigure.setVisibility(getConfigurationButtonVisibility());
 
         UniversalLayoutConfigurationLoader.createDefaultLayout(this, context);
-        UniversalLayoutConfigurationLoader.loadFromPreferences(this, context);
+        UniversalLayoutConfigurationLoader.loadFromPreferences(this, context, layoutId);
     }
 
     public ControllerMode getControllerMode() {
         return currentMode;
+    }
+
+    /**
+     * Switches between normal operation and the configuration modes. The layout editor
+     * uses this to enter and leave editing, just as the configuration button does.
+     */
+    public void setControllerMode(ControllerMode mode) {
+        currentMode = mode;
+
+        for (UniversalVirtualControllerElement element : elements) {
+            element.invalidate();
+        }
     }
 
     public ControllerInputContext getControllerInputContext() {

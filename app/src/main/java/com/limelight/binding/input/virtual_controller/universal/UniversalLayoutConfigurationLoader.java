@@ -21,9 +21,19 @@ import org.json.JSONObject;
 
 public class UniversalLayoutConfigurationLoader {
     /**
-     * Preferences file that holds the geometry of the universal layout.
+     * Prefix of the preferences file that holds the geometry of a single universal
+     * layout. The layout ID is appended to it, so every layout keeps its own
+     * arrangement of controls and editing one never disturbs another.
      */
-    public static final String UNIVERSAL_LAYOUT_PREFERENCE = "OSC_UNIVERSAL";
+    private static final String LAYOUT_PREFERENCE_PREFIX = "OSC_UNIVERSAL_";
+
+    /**
+     * Returns the name of the preferences file that holds the geometry of the given
+     * layout.
+     */
+    public static String getLayoutPreferenceFileName(String layoutId) {
+        return LAYOUT_PREFERENCE_PREFIX + layoutId;
+    }
 
     // The default controls are specified using a grid of 128*72 cells at 16:9
     private static int screenScale(int units, int height) {
@@ -415,9 +425,16 @@ public class UniversalLayoutConfigurationLoader {
         throw new IllegalArgumentException("Unsupported on-screen key character: " + character);
     }
 
+    /**
+     * Saves the geometry of every element of the given layout.
+     *
+     * @param layoutId the layout that was edited
+     */
     public static void saveProfile(final UniversalVirtualController controller,
-                                   final Context context) {
-        SharedPreferences.Editor prefEditor = context.getSharedPreferences(UNIVERSAL_LAYOUT_PREFERENCE, Activity.MODE_PRIVATE).edit();
+                                   final Context context,
+                                   final String layoutId) {
+        SharedPreferences.Editor prefEditor = context.getSharedPreferences(
+                getLayoutPreferenceFileName(layoutId), Activity.MODE_PRIVATE).edit();
 
         for (UniversalVirtualControllerElement element : controller.getElements()) {
             try {
@@ -430,8 +447,15 @@ public class UniversalLayoutConfigurationLoader {
         prefEditor.apply();
     }
 
-    public static void loadFromPreferences(final UniversalVirtualController controller, final Context context) {
-        SharedPreferences pref = context.getSharedPreferences(UNIVERSAL_LAYOUT_PREFERENCE, Activity.MODE_PRIVATE);
+    /**
+     * Applies the geometry the user saved for the given layout on top of the default
+     * arrangement.
+     */
+    public static void loadFromPreferences(final UniversalVirtualController controller,
+                                           final Context context,
+                                           final String layoutId) {
+        SharedPreferences pref = context.getSharedPreferences(
+                getLayoutPreferenceFileName(layoutId), Activity.MODE_PRIVATE);
 
         for (UniversalVirtualControllerElement element : controller.getElements()) {
             String prefKey = element.getPreferenceKey();

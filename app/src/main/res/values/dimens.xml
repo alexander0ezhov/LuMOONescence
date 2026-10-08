@@ -6,4 +6,10 @@
     <dimen name="tv_channel_logo_width">80dp</dimen>
     <dimen name="tv_channel_logo_height">80dp</dimen>
 
+    <!-- Universal layout artwork -->
+    <dimen name="layout_item_image_width">140dp</dimen>
+    <dimen name="layout_item_image_height">88dp</dimen>
+    <dimen name="layout_picker_item_image_height">90dp</dimen>
+    <dimen name="layout_picker_item_image_width">160dp</dimen>
+
 </resources>

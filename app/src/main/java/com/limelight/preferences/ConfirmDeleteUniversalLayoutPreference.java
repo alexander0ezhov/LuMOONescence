@@ -4,12 +4,12 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 import com.limelight.R;
-
-import static com.limelight.binding.input.virtual_controller.universal.UniversalLayoutConfigurationLoader.UNIVERSAL_LAYOUT_PREFERENCE;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutStore;
 
 /**
- * Clears the saved geometry of the universal layout without touching the layout saved
- * by the legacy OSC layout.
+ * Resets the geometry of every universal layout back to its default arrangement,
+ * without touching the layout saved by the legacy OSC layout.
  */
 public class ConfirmDeleteUniversalLayoutPreference extends ConfirmDeleteOscPreference {
     public ConfirmDeleteUniversalLayoutPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -29,12 +29,16 @@ public class ConfirmDeleteUniversalLayoutPreference extends ConfirmDeleteOscPref
     }
 
     @Override
-    protected String getPreferencesName() {
-        return UNIVERSAL_LAYOUT_PREFERENCE;
+    protected int getResetSuccessMessage() {
+        return R.string.toast_reset_universal_layout_success;
     }
 
     @Override
-    protected int getResetSuccessMessage() {
-        return R.string.toast_reset_universal_layout_success;
+    protected void clearSavedGeometry() {
+        // Every layout keeps its geometry in its own file, so all of them are cleared.
+        // The layouts themselves and their artwork are left alone.
+        for (UniversalLayoutDefinition layout : UniversalLayoutStore.getInstance(getContext()).getLayouts()) {
+            getContext().deleteSharedPreferences(layout.getPreferenceFileName());
+        }
     }
 }
