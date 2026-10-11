@@ -208,27 +208,13 @@ public class UniversalLayoutEditorActivity extends Activity
             }
         });
 
-        panelContainer.findViewById(R.id.layoutEditorMenuButton).setOnClickListener(new View.OnClickListener() {
+        // The header carries the type of the control being edited and the way to stop
+        // editing it. Everything that acts on the whole layout is asked for by holding a
+        // control, which is also where the control menu is.
+        findViewById(R.id.layoutEditorPanelClose).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showGeneralMenu();
-            }
-        });
-
-        panelContainer.findViewById(R.id.layoutEditorResetButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showResetDialog();
-            }
-        });
-
-        panelContainer.findViewById(R.id.layoutEditorImageButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(UniversalLayoutEditorActivity.this,
-                        UniversalLayoutImagePickerActivity.class);
-                intent.putExtra(UniversalLayoutImagePickerActivity.EXTRA_LAYOUT_ID, layout.getId());
-                startActivity(intent);
+                selectElement(null);
             }
         });
 
@@ -443,6 +429,31 @@ public class UniversalLayoutEditorActivity extends Activity
         return findViewById(R.id.layoutEditorFrame);
     }
 
+    /**
+     * The name of the kind of control, shown in the drawer header.
+     */
+    private String controlTypeName(UniversalVirtualControllerElement element) {
+        String type = element.getElementTypeName();
+
+        if (UniversalElementTypes.ELEMENT_STICK.equals(type)) {
+            return getString(R.string.control_type_stick);
+        }
+
+        if (UniversalElementTypes.ELEMENT_DPAD.equals(type)) {
+            return getString(R.string.control_type_dpad);
+        }
+
+        if (UniversalElementTypes.ELEMENT_TRIGGER.equals(type)) {
+            return getString(R.string.control_type_trigger);
+        }
+
+        if (UniversalElementTypes.ELEMENT_BUTTON.equals(type)) {
+            return getString(R.string.control_type_button);
+        }
+
+        return getString(R.string.control_type_element);
+    }
+
     private void selectElement(UniversalVirtualControllerElement element) {
         if (selectedElement == element) {
             return;
@@ -475,6 +486,11 @@ public class UniversalLayoutEditorActivity extends Activity
         if (selectedElement == null) {
             return;
         }
+
+        // The header says what kind of control is being edited, which is what tells the
+        // drawer apart from the layout behind it
+        ((TextView) panelContainer.findViewById(R.id.layoutEditorPanelTitle))
+                .setText(controlTypeName(selectedElement));
 
         editorBuilder.build(selectedElement, new UniversalElementEditorBuilder.Callbacks() {
             @Override

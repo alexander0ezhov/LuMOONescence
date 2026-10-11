@@ -337,6 +337,17 @@ public class LayoutSmokeActivity extends Activity {
         check("tapping empty space hides the drawer",
                 drawer != null && drawer.getVisibility() != View.VISIBLE);
 
+        // The same, but through the touch handling the overlay uses, so the handler that
+        // closes the drawer is exercised rather than only the method it calls
+        editor.onElementTapped(target);
+        dispatchOverlayTouch(MotionEvent.ACTION_DOWN, 4000, 900);
+        dispatchOverlayTouch(MotionEvent.ACTION_UP, 4000, 900);
+
+        check("a touch on empty space clears the selection",
+                editor.getSelectedElementForTesting() == null);
+        check("a touch on empty space hides the drawer",
+                drawer != null && drawer.getVisibility() != View.VISIBLE);
+
         // A drag must move the control
         int startLeft = UniversalGeometry.of(target).getLeft();
         int startTop = UniversalGeometry.of(target).getTop();
@@ -390,6 +401,29 @@ public class LayoutSmokeActivity extends Activity {
      */
     private int drawerId() {
         return getResources().getIdentifier("layoutEditorPanel", "id", getPackageName());
+    }
+
+    /**
+     * Sends a touch to the arrangement rather than to a control, which is the case a tap on
+     * empty space makes.
+     */
+    private void dispatchOverlayTouch(int action, float x, float y) {
+        View overlay = editor.getEditorRootView() == null
+                ? null
+                : editor.getEditorRootView().findViewById(overlayId());
+
+        if (overlay == null) {
+            return;
+        }
+
+        long now = SystemClock.uptimeMillis();
+        MotionEvent event = MotionEvent.obtain(now, now, action, x, y, 0);
+        overlay.dispatchTouchEvent(event);
+        event.recycle();
+    }
+
+    private int overlayId() {
+        return getResources().getIdentifier("layoutEditorOverlay", "id", getPackageName());
     }
 
     /**

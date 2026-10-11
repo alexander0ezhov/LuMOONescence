@@ -40,37 +40,28 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:background="#F028282E"
-            android:paddingStart="8dp"
+            android:paddingStart="12dp"
             android:paddingEnd="4dp">
 
-            <ImageButton
-                android:id="@+id/layoutEditorMenuButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_layouts"
-                android:scaleType="fitCenter"
-                android:padding="10dp"
-                android:contentDescription="@string/title_layout_settings"
-                style="?android:attr/borderlessButtonStyle"/>
+            <TextView
+                android:id="@+id/layoutEditorPanelTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:paddingEnd="4dp"
+                android:textColor="#E0E0E6"
+                android:textSize="16sp"/>
 
             <ImageButton
-                android:id="@+id/layoutEditorImageButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_add"
+                android:id="@+id/layoutEditorPanelClose"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@drawable/ic_close"
                 android:scaleType="fitCenter"
-                android:padding="10dp"
-                android:contentDescription="@string/title_pick_image"
-                style="?android:attr/borderlessButtonStyle"/>
-
-            <ImageButton
-                android:id="@+id/layoutEditorResetButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_pc_offline"
-                android:scaleType="fitCenter"
-                android:padding="10dp"
-                android:contentDescription="@string/title_reset_controls"
+                android:padding="12dp"
+                android:contentDescription="@string/menu_dont_save"
                 style="?android:attr/borderlessButtonStyle"/>
 
         </LinearLayout>
