@@ -232,16 +232,11 @@ public class UniversalLayoutEditorActivity extends Activity
             }
         });
 
-        panelContainer.findViewById(R.id.layoutEditorCloseButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestExit();
-            }
-        });
-
         createController();
 
-        updateTitle();
+        // The drawer only exists while a control is being edited, so it starts hidden
+        setPanelVisible(false);
+
         refreshPanel();
 
         // The panel's position is restored once the layout has been measured, because it is
@@ -252,6 +247,46 @@ public class UniversalLayoutEditorActivity extends Activity
                 restorePanelPosition();
             }
         });
+
+        setUpEmptySpaceHandling();
+    }
+
+    /**
+     * Makes a tap on an empty part of the arrangement put the drawer away and clear the
+     * selection.
+     *
+     * The overlay only receives a touch when no control took it, which is exactly the case
+     * that should close the drawer.
+     */
+    private void setUpEmptySpaceHandling() {
+        overlay.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_UP:
+                        // A hold opened the control menu, so it must not also close the drawer
+                        boolean wasHold = longPressHandled;
+                        longPressHandled = false;
+
+                        if (!wasHold) {
+                            selectElement(null);
+                        }
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+        });
+    }
+
+    private boolean longPressHandled;
+
+    /**
+     * Shows or hides the drawer. It is only on screen while a control is being edited.
+     */
+    private void setPanelVisible(boolean visible) {
+        panelContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -367,19 +402,12 @@ public class UniversalLayoutEditorActivity extends Activity
         }
     }
 
+    /**
+     * Picks up a rename made elsewhere, which is what happens when the user comes back from
+     * a screen that changed the layout.
+     */
     private void updateTitle() {
         layout = layoutStore.getLayout(layout.getId());
-
-        if (layout == null || panelContainer == null) {
-            return;
-        }
-
-        // The name lives in the drawer header, which is also the handle the drawer is dragged
-        // by, so the editor has no separate toolbar to keep.
-        TextView title = panelContainer.findViewById(R.id.layoutEditorPanelTitle);
-        if (title != null) {
-            title.setText(layout.getName());
-        }
     }
 
     @Override
@@ -399,6 +427,9 @@ public class UniversalLayoutEditorActivity extends Activity
 
     @Override
     public boolean onElementLongPressed(UniversalVirtualControllerElement element) {
+        // Recorded so the release that follows a hold does not also close the drawer
+        longPressHandled = true;
+
         selectElement(element);
         showElementMenu(element);
         return true;
@@ -426,6 +457,9 @@ public class UniversalLayoutEditorActivity extends Activity
         if (selectedElement != null) {
             selectedElement.setSelected(true);
         }
+
+        // The drawer belongs to the control being edited: no control, no drawer
+        setPanelVisible(selectedElement != null);
 
         refreshPanel();
     }

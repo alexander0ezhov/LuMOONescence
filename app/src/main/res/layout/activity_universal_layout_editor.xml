@@ -36,26 +36,12 @@
             android:id="@+id/layoutEditorPanelHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="44dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:background="#F028282E"
             android:paddingStart="8dp"
             android:paddingEnd="4dp">
-
-            <TextView
-                android:id="@+id/layoutEditorPanelTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:text="@string/title_layout_settings"
-                android:textColor="#E0E0E6"
-                android:textSize="14sp"/>
 
             <ImageButton
                 android:id="@+id/layoutEditorMenuButton"
@@ -85,16 +71,6 @@
                 android:scaleType="fitCenter"
                 android:padding="10dp"
                 android:contentDescription="@string/title_reset_controls"
-                style="?android:attr/borderlessButtonStyle"/>
-
-            <ImageButton
-                android:id="@+id/layoutEditorCloseButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_back"
-                android:scaleType="fitCenter"
-                android:padding="10dp"
-                android:contentDescription="@string/back"
                 style="?android:attr/borderlessButtonStyle"/>
 
         </LinearLayout>

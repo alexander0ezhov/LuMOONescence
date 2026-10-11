@@ -156,6 +156,11 @@ public class LayoutSmokeActivity extends Activity {
         List<UniversalVirtualControllerElement> elements = universalController.getElements();
         check("the layout has controls", !elements.isEmpty());
 
+        // Nothing is selected yet, so the drawer must not be on screen
+        final View drawer = editor.findViewById(drawerId());
+        check("the drawer is hidden while nothing is selected",
+                drawer != null && drawer.getVisibility() != View.VISIBLE);
+
         boolean everyElementHasConfig = true;
         for (UniversalVirtualControllerElement element : elements) {
             if (element.getConfig() == null || element.getElementTypeName() == null) {
@@ -314,12 +319,23 @@ public class LayoutSmokeActivity extends Activity {
                     }
                 });
 
-        // A tap must select the control it landed on
-        editor.onElementTapped(null);
+        // The drawer follows the selection
+        final View drawer = editor.findViewById(drawerId());
+
         dispatchTouch(target, MotionEvent.ACTION_DOWN, 0.5f, 0.5f);
         dispatchTouch(target, MotionEvent.ACTION_UP, 0.5f, 0.5f);
 
         check("a tap on a control selects it", editor.getSelectedElementForTesting() == target);
+        check("selecting a control shows the drawer",
+                drawer != null && drawer.getVisibility() == View.VISIBLE);
+
+        // Tapping the empty part of the arrangement puts the drawer away; the overlay reports
+        // that case when no control took the touch
+        editor.onElementTapped(null);
+        check("tapping empty space clears the selection",
+                editor.getSelectedElementForTesting() == null);
+        check("tapping empty space hides the drawer",
+                drawer != null && drawer.getVisibility() != View.VISIBLE);
 
         // A drag must move the control
         int startLeft = UniversalGeometry.of(target).getLeft();
@@ -367,6 +383,14 @@ public class LayoutSmokeActivity extends Activity {
     private UniversalVirtualControllerElement holdTarget;
     private int holdStartLeft;
     private boolean holdHandled;
+
+    /**
+     * The drawer the editor puts on screen, found by name so the test does not depend on the
+     * editor's own identifiers.
+     */
+    private int drawerId() {
+        return getResources().getIdentifier("layoutEditorPanel", "id", getPackageName());
+    }
 
     /**
      * Sends one touch event to a control, at a point inside it given as a fraction of its
