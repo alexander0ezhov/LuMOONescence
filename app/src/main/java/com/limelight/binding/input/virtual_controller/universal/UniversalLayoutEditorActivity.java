@@ -1,38 +1,151 @@
 package com.limelight.binding.input.virtual_controller.universal;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.InputType;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.limelight.R;
-import com.limelight.utils.UiHelper;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
+import com.limelight.binding.input.virtual_controller.universal.editor.UniversalEditorPanel;
+import com.limelight.binding.input.virtual_controller.universal.editor.UniversalElementEditorBuilder;
 
 /**
- * Edits one universal layout: shows the real controls over a plain background and lets
- * the user move and resize them.
+ * The layout editor.
  *
- * The layout is built by the same code that draws it over the stream, so what the user
- * arranges here is exactly what appears while playing.
+ * It is built like a tablet tool: the arrangement of controls takes the middle of the
+ * screen with the editing panel docked on the left, so a control can never be hidden
+ * behind the panel. The controls are the real ones, created by the same controller the
+ * stream uses, so what is arranged here is exactly what appears while playing.
  */
-public class UniversalLayoutEditorActivity extends Activity {
+public class UniversalLayoutEditorActivity extends Activity
+        implements UniversalVirtualController.ElementInteractionListener {
     public static final String EXTRA_LAYOUT_ID = "layoutId";
+
+    /**
+     * The editor that was opened last. The debug smoke test uses this to reach the editor it
+     * started, because the device forbids injecting the touches that would otherwise select
+     * a control.
+     */
+    private static UniversalLayoutEditorActivity lastCreatedInstance;
+
+    public static UniversalLayoutEditorActivity getLastCreatedInstance() {
+        return lastCreatedInstance;
+    }
+
+    /**
+     * Returns the control the panel on the left currently describes.
+     */
+    public UniversalVirtualControllerElement getSelectedElementForTesting() {
+        return selectedElement;
+    }
+
+    /**
+     * Notified whenever this editor shows a dialog.
+     *
+     * The debug smoke test uses this to look at the dialogs the editor offers. A dialog is a
+     * window of its own, so it cannot be found by walking this activity's view tree.
+     */
+    public interface DialogListener {
+        void onDialogShown(AlertDialog dialog);
+    }
+
+    public void setDialogListener(DialogListener listener) {
+        this.dialogListener = listener;
+    }
+
+    private DialogListener dialogListener;
+    private AlertDialog lastShownDialog;
+
+    /**
+     * Shows a dialog and tells the listener about it, so the one place that puts a dialog on
+     * screen is also the one place that reports it.
+     */
+    private void showDialog(AlertDialog dialog) {
+        lastShownDialog = dialog;
+
+        if (dialogListener != null) {
+            dialogListener.onDialogShown(dialog);
+        }
+
+        dialog.show();
+    }
+
+    /**
+     * The dialog this editor showed last, while it is still on screen.
+     */
+    public AlertDialog getVisibleDialogForTesting() {
+        if (lastShownDialog != null && lastShownDialog.isShowing()) {
+            return lastShownDialog;
+        }
+
+        return null;
+    }
+
+    /**
+     * Asks the editor to leave, which is what the back button does. Used by the debug smoke
+     * test, which cannot inject the back press itself.
+     */
+    public void requestExitForTesting() {
+        requestExit();
+    }
+
+    /**
+     * True while the question about unsaved changes is on screen.
+     */
+    public boolean isSaveDialogShowingForTesting() {
+        return saveDialogShowing;
+    }
+
+    /**
+     * Where the editing drawer was left, so it comes back where the user put it.
+     */
+    private static final String KEY_PANEL_POSITION = "panelPosition";
+
+    /**
+     * An element smaller than this would be unusable, and the editor never creates one
+     * that small.
+     */
+    private static final int MIN_ELEMENT_SIZE_DP = 32;
 
     private UniversalLayoutStore layoutStore;
     private UniversalLayoutDefinition layout;
     private UniversalVirtualController controller;
 
     private FrameLayout overlay;
-    private Button moveButton;
-    private TextView hintText;
+    private View panelContainer;
 
-    private boolean editing;
+    private UniversalEditorPanel panel;
+    private UniversalElementEditorBuilder editorBuilder;
+
+    private UniversalVirtualControllerElement selectedElement;
+
+    /**
+     * Size copied from one control and waiting to be pasted onto another.
+     */
+    private UniversalGeometry copiedSize;
+
+    private boolean saveDialogShowing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,38 +166,63 @@ public class UniversalLayoutEditorActivity extends Activity {
 
         setContentView(R.layout.activity_universal_layout_editor);
 
-        // Compensates drawing under the status bar, so the toolbar is not positioned
-        // under it. Every normal activity in this app does this.
-        UiHelper.notifyNewRootView(this);
+        lastCreatedInstance = this;
+
+        // The editor is full screen like the stream, so a control sits exactly where it will
+        // sit while playing and nothing shifts it around.
+        enterFullScreen();
 
         overlay = findViewById(R.id.layoutEditorOverlay);
-        moveButton = findViewById(R.id.layoutEditorMoveButton);
-        hintText = findViewById(R.id.layoutEditorHint);
+        panelContainer = findViewById(R.id.layoutEditorPanel);
 
-        ((TextView) findViewById(R.id.layoutEditorTitle)).setText(layout.getName());
+        // The drawer and its header are in the layout itself. The panel only fills the
+        // scrolling area below the header, so the header survives a rebuild of the rows.
+        panel = new UniversalEditorPanel(this,
+                findViewById(R.id.layoutEditorPanelScroll),
+                findViewById(R.id.layoutEditorPanelContent),
+                panelContainer.findViewById(R.id.layoutEditorPanelHeader));
+        panel.applyScreenBounds(panelContainer);
 
-        findViewById(R.id.layoutEditorBackButton).setOnClickListener(new View.OnClickListener() {
+        panel.setOnCloseRequested(new Runnable() {
             @Override
-            public void onClick(View v) {
-                finish();
+            public void run() {
+                // Tapping the header puts the drawer away, which frees the whole screen
+                panelContainer.setVisibility(View.GONE);
             }
         });
 
-        moveButton.setOnClickListener(new View.OnClickListener() {
+        panel.setOnDragFinished(new Runnable() {
             @Override
-            public void onClick(View v) {
-                setEditing(!editing);
+            public void run() {
+                savePanelPosition();
             }
         });
 
-        findViewById(R.id.layoutEditorResetButton).setOnClickListener(new View.OnClickListener() {
+        editorBuilder = new UniversalElementEditorBuilder(this, panel);
+        editorBuilder.setOnRebuildRequested(new Runnable() {
+            @Override
+            public void run() {
+                // Adding or removing a step or an event changes how many rows the panel
+                // has, so the panel is rebuilt from the element's new state.
+                refreshPanel();
+            }
+        });
+
+        panelContainer.findViewById(R.id.layoutEditorMenuButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showGeneralMenu();
+            }
+        });
+
+        panelContainer.findViewById(R.id.layoutEditorResetButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showResetDialog();
             }
         });
 
-        findViewById(R.id.layoutEditorImageButton).setOnClickListener(new View.OnClickListener() {
+        panelContainer.findViewById(R.id.layoutEditorImageButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UniversalLayoutEditorActivity.this,
@@ -94,26 +232,100 @@ public class UniversalLayoutEditorActivity extends Activity {
             }
         });
 
+        panelContainer.findViewById(R.id.layoutEditorCloseButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestExit();
+            }
+        });
+
         createController();
 
-        // Opening a layout to edit it means the user wants to arrange it, so start in
-        // editing mode instead of making them press the button first.
-        setEditing(true);
+        updateTitle();
+        refreshPanel();
+
+        // The panel's position is restored once the layout has been measured, because it is
+        // clamped against the screen size
+        panelContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                restorePanelPosition();
+            }
+        });
     }
 
-    private void updateTitle() {
-        layout = layoutStore.getLayout(layout.getId());
-        if (layout != null) {
-            ((TextView) findViewById(R.id.layoutEditorTitle)).setText(layout.getName());
+    /**
+     * Hides the system bars the same way the stream does, so the editor covers the whole
+     * screen and a control can be placed right up to the edge.
+     */
+    @SuppressLint("InlinedApi")
+    private void enterFullScreen() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+
+        // Using the decor view here rather than android.R.id.content is deliberate: the
+        // content view is what notifyNewRootView() pads, and this activity must not be padded
+        getWindow().getDecorView().setSystemUiVisibility(hideSystemUiFlags());
+
+        getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(
+                new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+                        // The bars come back after a gesture or a dialog; put them away again
+                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                            rehideSystemUi(2000);
+                        }
+                    }
+                });
+    }
+
+    @SuppressLint("InlinedApi")
+    private static int hideSystemUiFlags() {
+        // In multi-window mode the layout flags must be dropped, otherwise the activity would
+        // draw underneath the system UI of the window it shares
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInMultiWindow()) {
+            return View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        }
+
+        return View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+    }
+
+    private static boolean isInMultiWindow() {
+        return multiWindowState;
+    }
+
+    /**
+     * Multi-window state, kept because the flag helper is static and this is only used to
+     * decide how the bars are hidden.
+     */
+    private static boolean multiWindowState;
+
+    private void rehideSystemUi(int delayMs) {
+        Handler handler = getWindow().getDecorView().getHandler();
+        if (handler != null) {
+            handler.removeCallbacks(rehideSystemUiRunnable);
+            handler.postDelayed(rehideSystemUiRunnable, delayMs);
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private final Runnable rehideSystemUiRunnable = new Runnable() {
+        @Override
+        public void run() {
+            getWindow().getDecorView().setSystemUiVisibility(hideSystemUiFlags());
+        }
+    };
 
-        // The artwork of this layout may have changed in the picker
-        updateTitle();
+    @Override
+    public void onMultiWindowModeChanged(boolean isInMultiWindowMode, Configuration newConfig) {
+        super.onMultiWindowModeChanged(isInMultiWindowMode, newConfig);
+
+        multiWindowState = isInMultiWindowMode;
+        getWindow().getDecorView().setSystemUiVisibility(hideSystemUiFlags());
     }
 
     private void createController() {
@@ -121,18 +333,379 @@ public class UniversalLayoutEditorActivity extends Activity {
         // touch exactly as they do in a stream, but nothing is sent to a host.
         controller = new UniversalVirtualController(null, overlay, this, layout.getId());
         controller.setConfigurationButtonVisible(false);
+        controller.setElementInteractionListener(this);
+        controller.setControllerMode(UniversalVirtualController.ControllerMode.MoveButtons);
         controller.refreshLayout();
     }
 
-    private void setEditing(boolean editing) {
-        this.editing = editing;
+    private void savePanelPosition() {
+        getEditorPreferences().edit()
+                .putString(KEY_PANEL_POSITION, panelContainer.getX() + ":" + panelContainer.getY())
+                .apply();
+    }
 
-        controller.setControllerMode(editing
-                ? UniversalVirtualController.ControllerMode.MoveButtons
-                : UniversalVirtualController.ControllerMode.Active);
+    private void restorePanelPosition() {
+        String saved = getEditorPreferences().getString(KEY_PANEL_POSITION, null);
+        if (saved == null) {
+            // Out of the way of nothing in particular: the top left corner, where the drawer
+            // covers the least of what is usually arranged
+            panelContainer.setX(0);
+            panelContainer.setY(0);
+            return;
+        }
 
-        moveButton.setText(editing ? R.string.title_finish_editing : R.string.title_edit_controls);
-        hintText.setText(editing ? R.string.msg_editor_hint_editing : R.string.msg_editor_hint_idle);
+        int separator = saved.indexOf(':');
+        if (separator <= 0) {
+            return;
+        }
+
+        try {
+            panelContainer.setX(Float.parseFloat(saved.substring(0, separator)));
+            panelContainer.setY(Float.parseFloat(saved.substring(separator + 1)));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateTitle() {
+        layout = layoutStore.getLayout(layout.getId());
+
+        if (layout == null || panelContainer == null) {
+            return;
+        }
+
+        // The name lives in the drawer header, which is also the handle the drawer is dragged
+        // by, so the editor has no separate toolbar to keep.
+        TextView title = panelContainer.findViewById(R.id.layoutEditorPanelTitle);
+        if (title != null) {
+            title.setText(layout.getName());
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // The artwork or the name of this layout may have changed elsewhere
+        updateTitle();
+    }
+
+    // ---------------------------------------------------------------- selection
+
+    @Override
+    public void onElementTapped(UniversalVirtualControllerElement element) {
+        selectElement(element);
+    }
+
+    @Override
+    public boolean onElementLongPressed(UniversalVirtualControllerElement element) {
+        selectElement(element);
+        showElementMenu(element);
+        return true;
+    }
+
+    /**
+     * Returns the view the editor is built on, so a test can look for what is on screen
+     * without having to guess at the editor's own resource identifiers.
+     */
+    public View getEditorRootView() {
+        return findViewById(R.id.layoutEditorFrame);
+    }
+
+    private void selectElement(UniversalVirtualControllerElement element) {
+        if (selectedElement == element) {
+            return;
+        }
+
+        if (selectedElement != null) {
+            selectedElement.setSelected(false);
+        }
+
+        selectedElement = element;
+
+        if (selectedElement != null) {
+            selectedElement.setSelected(true);
+        }
+
+        refreshPanel();
+    }
+
+    /**
+     * Rebuilds the editing panel for the selected control. Nothing is shown when no control
+     * is selected: the drawer is there to describe a control, and an explanation of how to
+     * use the editor would only cover the arrangement.
+     */
+    private void refreshPanel() {
+        panel.clear();
+
+        if (selectedElement == null) {
+            return;
+        }
+
+        editorBuilder.build(selectedElement, new UniversalElementEditorBuilder.Callbacks() {
+            @Override
+            public void onElementChanged() {
+                markDirty();
+                selectedElement.invalidate();
+            }
+
+            @Override
+            public void onGeometryChanged(int left, int top, int width, int height) {
+                applyGeometry(left, top, width, height);
+            }
+
+            @Override
+            public void onNameChanged(String name) {
+                selectedElement.setElementName(name);
+                markDirty();
+            }
+        });
+    }
+
+    private void applyGeometry(int left, int top, int width, int height) {
+        UniversalGeometry geometry = selectedElement.getConfig().getGeometry();
+        geometry.setLeft(left);
+        geometry.setTop(top);
+        geometry.setWidth(width);
+        geometry.setHeight(height);
+        geometry.applyTo(selectedElement);
+
+        markDirty();
+    }
+
+    private void markDirty() {
+        // The controller owns the flag, so a change it makes on its own (bringing a layout
+        // arranged on another screen back into view) counts as unsaved work too.
+        controller.markConfigurationDirty();
+    }
+
+    // ---------------------------------------------------------------- element menu
+
+    private void showElementMenu(final UniversalVirtualControllerElement element) {
+        final java.util.List<String> entries = new java.util.ArrayList<>();
+        final java.util.List<Runnable> actions = new java.util.ArrayList<>();
+
+        entries.add(getString(R.string.menu_duplicate));
+        actions.add(new Runnable() {
+            @Override
+            public void run() {
+                UniversalVirtualControllerElement copy = controller.duplicateElement(element);
+                if (copy != null) {
+                    markDirty();
+                    selectElement(copy);
+                }
+            }
+        });
+
+        entries.add(getString(R.string.menu_copy_size));
+        actions.add(new Runnable() {
+            @Override
+            public void run() {
+                copiedSize = UniversalGeometry.of(element).copy();
+                Toast.makeText(UniversalLayoutEditorActivity.this,
+                        R.string.menu_copy_size, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // "Edit" simply opens this control in the panel on the left, which is what the
+        // selected control is already shown in; it is offered so the way to edit a control
+        // is discoverable from the control itself.
+        entries.add(getString(R.string.menu_edit));
+        actions.add(new Runnable() {
+            @Override
+            public void run() {
+                selectElement(element);
+            }
+        });
+
+        if (copiedSize != null) {
+            entries.add(getString(R.string.menu_paste_size));
+            actions.add(new Runnable() {
+                @Override
+                public void run() {
+                    UniversalGeometry geometry = copiedSize.copy();
+                    element.getConfig().setGeometry(geometry);
+                    geometry.applyTo(element);
+
+                    markDirty();
+                    refreshPanel();
+                }
+            });
+        }
+
+        entries.add(getString(R.string.menu_delete));
+        actions.add(new Runnable() {
+            @Override
+            public void run() {
+                showDeleteElementDialog(element);
+            }
+        });
+
+        new AlertDialog.Builder(this)
+                .setTitle(element.getElementName())
+                .setItems(entries.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        actions.get(which).run();
+                    }
+                })
+                .create();
+    }
+
+    private void showDeleteElementDialog(final UniversalVirtualControllerElement element) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.menu_delete)
+                .setMessage(getString(R.string.dialog_text_delete_layout, element.getElementName()))
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (selectedElement == element) {
+                            selectedElement = null;
+                        }
+
+                        controller.removeElement(element);
+                        markDirty();
+                        refreshPanel();
+                    }
+                })
+                .setNegativeButton(R.string.no, null)
+                .create();
+    }
+
+    // ---------------------------------------------------------------- general menu
+
+    private SharedPreferences getEditorPreferences() {
+        return getSharedPreferences("OSC_UNIVERSAL_EDITOR", MODE_PRIVATE);
+    }
+
+    public void showGeneralMenu() {
+        String[] entries = new String[]{
+                getString(R.string.menu_add_button),
+                getString(R.string.menu_add_stick),
+                getString(R.string.menu_save),
+                getString(R.string.menu_save_as),
+                getString(R.string.menu_exit),
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.title_layout_settings)
+                .setItems(entries, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                addElement(UniversalElementTypes.ELEMENT_BUTTON);
+                                break;
+
+                            case 1:
+                                addElement(UniversalElementTypes.ELEMENT_STICK);
+                                break;
+
+                            case 2:
+                                saveLayout();
+                                break;
+
+                            case 3:
+                                showSaveAsDialog();
+                                break;
+
+                            default:
+                                requestExit();
+                                break;
+                        }
+                    }
+                })
+                .create();
+    }
+
+    /**
+     * Adds a control in the middle of the arrangement, where the user can see it and drag
+     * it into place.
+     */
+    private void addElement(String type) {
+        int minSize = (int) (MIN_ELEMENT_SIZE_DP * getResources().getDisplayMetrics().density);
+
+        // The overlay may not have been measured yet when the menu is used, so fall back to
+        // the screen size to still place the control somewhere sensible.
+        int availableWidth = overlay.getWidth() > 0
+                ? overlay.getWidth() : getResources().getDisplayMetrics().widthPixels;
+        int availableHeight = overlay.getHeight() > 0
+                ? overlay.getHeight() : getResources().getDisplayMetrics().heightPixels;
+
+        int width = Math.max(minSize, availableWidth / 8);
+        int height = Math.max(minSize, availableHeight / 8);
+
+        int x = Math.max(0, (availableWidth - width) / 2);
+        int y = Math.max(0, (availableHeight - height) / 2);
+
+        UniversalVirtualControllerElement element =
+                controller.addUserElement(type, x, y, width, height);
+        if (element == null) {
+            return;
+        }
+
+        markDirty();
+        selectElement(element);
+
+        Toast.makeText(this, R.string.toast_element_added, Toast.LENGTH_SHORT).show();
+    }
+
+    // ---------------------------------------------------------------- saving
+
+    private void saveLayout() {
+        controller.saveLayoutConfiguration();
+
+        Toast.makeText(this, R.string.toast_layout_saved, Toast.LENGTH_SHORT).show();
+    }
+
+    private void showSaveAsDialog() {
+        final EditText nameInput = new EditText(this);
+        nameInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        nameInput.setHint(R.string.hint_layout_name_new);
+        nameInput.setText(getString(R.string.menu_save_as) + " " + layout.getName());
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_title_save_layout_as)
+                .setView(nameInput)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = nameInput.getText().toString().trim();
+                        if (name.isEmpty()) {
+                            return;
+                        }
+
+                        saveLayoutAs(name);
+                    }
+                })
+                .setNegativeButton(R.string.no, null)
+                .create();
+    }
+
+    /**
+     * Saves the arrangement that is on screen as a new layout, leaving the original
+     * untouched, and continues editing the copy.
+     */
+    private void saveLayoutAs(String name) {
+        UniversalLayoutDefinition newLayout =
+                layoutStore.addLayout(layoutStore.makeUniqueName(name));
+
+        // The arrangement currently on screen belongs to the original layout, so it is
+        // written under the new layout's file. Nothing was saved for the new layout yet,
+        // which is why the elements are written directly, together with the area they were
+        // arranged in.
+        UniversalLayoutConfigurationLoader.saveProfile(controller, this, newLayout.getId(),
+                overlay.getWidth(), overlay.getHeight());
+
+        layout = newLayout;
+        layoutStore.setSelectedLayoutId(newLayout.getId());
+        controller.clearLayoutDirty();
+
+        updateTitle();
+        selectElement(null);
+
+        Toast.makeText(this, getString(R.string.toast_layout_saved_as, newLayout.getName()),
+                Toast.LENGTH_SHORT).show();
     }
 
     private void showResetDialog() {
@@ -146,29 +719,93 @@ public class UniversalLayoutEditorActivity extends Activity {
                     }
                 })
                 .setNegativeButton(R.string.no, null)
-                .show();
+                .create();
     }
 
     private void resetControls() {
-        // Forget the saved geometry, then rebuild the layout so the default arrangement
-        // comes back. The controller is reused, which keeps its element bookkeeping in
-        // step with what is inside the overlay.
-        deleteSharedPreferences(layout.getPreferenceFileName());
+        // Forget everything that was saved for this layout, then rebuild it so the
+        // built-in arrangement comes back. The controller is reused, which keeps its
+        // element bookkeeping in step with what is inside the overlay.
+        UniversalLayoutConfigurationLoader.resetLayout(this, layout.getId());
 
+        selectElement(null);
         controller.refreshLayout();
 
-        setEditing(editing);
+        markDirty();
 
         Toast.makeText(this, R.string.toast_layout_controls_reset, Toast.LENGTH_SHORT).show();
+    }
+
+    // ---------------------------------------------------------------- leaving
+
+    @Override
+    public void onBackPressed() {
+        requestExit();
+    }
+
+    /**
+     * Asks about unsaved changes before leaving. Asking again while the question is on
+     * screen does nothing, so a second press cannot dismiss it by accident.
+     */
+    private void requestExit() {
+        if (saveDialogShowing) {
+            return;
+        }
+
+        if (!controller.isLayoutDirty()) {
+            finish();
+            return;
+        }
+
+        saveDialogShowing = true;
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_title_save_changes)
+                .setMessage(R.string.dialog_text_save_changes)
+                .setPositiveButton(R.string.menu_save, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveDialogShowing = false;
+                        saveLayout();
+                        finish();
+                    }
+                })
+                .setNeutralButton(R.string.menu_save_as, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveDialogShowing = false;
+                        showSaveAsDialog();
+                    }
+                })
+                .setNegativeButton(R.string.menu_dont_save, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveDialogShowing = false;
+                        finish();
+                    }
+                })
+                .create();
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                // Back closed the question, so the editor stays open
+                saveDialogShowing = false;
+            }
+        });
+
+        showDialog(dialog);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        // Save whenever the editor leaves the foreground, so an arrangement is never
-        // lost because the user left with the home button or a notification.
-        controller.saveLayoutConfiguration();
+        // Save whenever the editor leaves the foreground, so an arrangement is never lost
+        // because the user left with the home button or a notification.
+        if (controller.isLayoutDirty()) {
+            controller.saveLayoutConfiguration();
+        }
     }
 
     @Override
@@ -178,5 +815,22 @@ public class UniversalLayoutEditorActivity extends Activity {
         if (controller != null) {
             controller.destroy();
         }
+    }
+
+    @Override
+    public void onElementGeometrySettled(UniversalVirtualControllerElement element) {
+        // A drag changed the position or the size, so the sliders are brought back in step
+        if (element == selectedElement) {
+            markDirty();
+            refreshPanel();
+        }
+    }
+
+    @Override
+    public void onLayoutAdjustedToFit() {
+        // The controls were arranged for a different screen size, so they were scaled to fit.
+        // The user is told, because the result keeps the arrangement but not the proportions
+        // and resetting is the way to get a layout made for this screen.
+        Toast.makeText(this, R.string.toast_layout_adjusted_to_fit, Toast.LENGTH_LONG).show();
     }
 }

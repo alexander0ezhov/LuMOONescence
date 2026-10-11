@@ -20,6 +20,9 @@ import com.limelight.LimeLog;
 import com.limelight.R;
 import com.limelight.binding.input.ControllerHandler;
 import com.limelight.binding.input.KeyboardTranslator;
+import com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
 import com.limelight.nvstream.input.KeyboardPacket;
 
 import java.util.ArrayList;
@@ -32,7 +35,9 @@ public class UniversalVirtualController {
     public static final int KEYBOARD_KEYS_MAX = 4;
 
     public static class ControllerInputContext {
-        public short inputMap = 0x0000;
+        // Widened to int: the extended controller flags (paddles, touchpad, share) live
+        // above bit 15, and a short would silently drop them.
+        public int inputMap = 0x0000;
         public byte leftTrigger = 0x00;
         public byte rightTrigger = 0x00;
         public short rightStickX = 0x0000;
@@ -59,6 +64,34 @@ public class UniversalVirtualController {
      */
     public interface VisibilityListener {
         void onVisibilityChanged(boolean visible);
+    }
+
+    /**
+     * Notified about gestures on the controls, which the layout editor uses to pick an
+     * element to edit.
+     */
+    public interface ElementInteractionListener {
+        /**
+         * A control was tapped. The editor selects it; a stream ignores this.
+         */
+        void onElementTapped(UniversalVirtualControllerElement element);
+
+        /**
+         * A control was pressed and held. The editor opens the element's context menu and
+         * returns true, which stops the control from also sending its action.
+         */
+        boolean onElementLongPressed(UniversalVirtualControllerElement element);
+
+        /**
+         * A control finished being moved or resized, so anything showing its geometry can
+         * refresh.
+         */
+        void onElementGeometrySettled(UniversalVirtualControllerElement element);
+
+        /**
+         * The layout was adjusted because it had been arranged for a different screen size.
+         */
+        void onLayoutAdjustedToFit();
     }
 
     private static final boolean _PRINT_DEBUG_INFORMATION = false;
@@ -95,6 +128,40 @@ public class UniversalVirtualController {
     private boolean destroyed = false;
     private boolean configurationButtonEnabled = true;
     private VisibilityListener visibilityListener;
+    private ElementInteractionListener elementInteractionListener;
+
+    /**
+     * Next element ID to hand out. Elements the editor adds get an ID from here, so they
+     * never collide with the built-in layout or with an element added earlier.
+     */
+    private int nextElementId = FIRST_DYNAMIC_ELEMENT_ID;
+
+    /**
+     * True when the layout has changes that are not saved yet, for example because it had
+     * to be brought into view after being arranged on a different screen.
+     */
+    private boolean layoutDirty;
+
+    /**
+     * IDs at or above this belong to elements the user added, which keeps them out of the
+     * way of the built-in layout's fixed IDs.
+     */
+    public static final int FIRST_DYNAMIC_ELEMENT_ID = 1000;
+
+    public int allocateElementId() {
+        return nextElementId++;
+    }
+
+    public int peekNextElementId() {
+        return nextElementId;
+    }
+
+    /**
+     * Restores the ID counter from a saved layout, so IDs stay unique across sessions.
+     */
+    public void setNextElementId(int nextElementId) {
+        this.nextElementId = Math.max(FIRST_DYNAMIC_ELEMENT_ID, nextElementId);
+    }
 
     /**
      * @param layoutId ID of the universal layout this controller shows. The geometry of
@@ -161,6 +228,56 @@ public class UniversalVirtualController {
 
     public void setVisibilityListener(VisibilityListener listener) {
         this.visibilityListener = listener;
+    }
+
+    /**
+     * Registers the listener that receives gestures on the controls. Only the layout
+     * editor uses this.
+     */
+    public void setElementInteractionListener(ElementInteractionListener listener) {
+        this.elementInteractionListener = listener;
+    }
+
+    public ElementInteractionListener getElementInteractionListener() {
+        return elementInteractionListener;
+    }
+
+    /**
+     * Tells the listener that a control was tapped, if there is one.
+     */
+    public void notifyElementTapped(UniversalVirtualControllerElement element) {
+        if (elementInteractionListener != null) {
+            elementInteractionListener.onElementTapped(element);
+        }
+    }
+
+    /**
+     * Tells the listener that a control was held, if there is one.
+     *
+     * @return true when the listener handled it, in which case the control must not send
+     *         its configured action
+     */
+    public boolean notifyElementLongPressed(UniversalVirtualControllerElement element) {
+        return elementInteractionListener != null
+                && elementInteractionListener.onElementLongPressed(element);
+    }
+
+    /**
+     * Tells the listener that a control finished being moved or resized.
+     */
+    public void notifyElementGeometrySettled(UniversalVirtualControllerElement element) {
+        if (elementInteractionListener != null) {
+            elementInteractionListener.onElementGeometrySettled(element);
+        }
+    }
+
+    /**
+     * Tells the listener that the layout had to be adjusted to fit the screen.
+     */
+    public void notifyLayoutAdjustedToFit() {
+        if (elementInteractionListener != null) {
+            elementInteractionListener.onLayoutAdjustedToFit();
+        }
     }
 
     /**
@@ -231,12 +348,64 @@ public class UniversalVirtualController {
     }
 
     /**
+     * Swaps the whole set of elements at once, used when a saved layout is loaded or the
+     * layout is rebuilt. What the old elements were sending is released first, so nothing
+     * stays held on the host.
+     */
+    public void replaceElements(List<UniversalVirtualControllerElement> newElements) {
+        releaseAllInputs();
+
+        for (UniversalVirtualControllerElement element : elements) {
+            frame_layout.removeView(element);
+        }
+        elements.clear();
+
+        for (UniversalVirtualControllerElement element : newElements) {
+            UniversalGeometry geometry = element.getConfig().getGeometry();
+            addElement(element, geometry.getLeft(), geometry.getTop(),
+                    geometry.getWidth(), geometry.getHeight());
+        }
+    }
+
+    /**
+     * Releases everything the on-screen elements are sending. Called before the layout is
+     * saved, rebuilt or torn down, so a latched button or a pushed stick cannot leave a
+     * key or a button held on the host.
+     */
+    public void releaseAllInputs() {
+        for (UniversalVirtualControllerElement element : elements) {
+            element.releaseConfiguredActions();
+        }
+    }
+
+    /**
      * Writes the current geometry of every element to the layout preferences. This is
      * what the configuration button does when leaving configuration mode; callers that
      * edit a layout outside a stream (the layout editor) use it as well.
      */
     public void saveLayoutConfiguration() {
-        UniversalLayoutConfigurationLoader.saveProfile(this, context, layoutId);
+        releaseAllInputs();
+
+        UniversalLayoutConfigurationLoader.saveProfile(this, context, layoutId,
+                frame_layout.getWidth(), frame_layout.getHeight());
+
+        layoutDirty = false;
+    }
+
+    /**
+     * Marks the layout as having unsaved changes. Used by the loader when it had to adjust
+     * a layout that was arranged on a screen of a different size.
+     */
+    public void markConfigurationDirty() {
+        layoutDirty = true;
+    }
+
+    public boolean isLayoutDirty() {
+        return layoutDirty;
+    }
+
+    public void clearLayoutDirty() {
+        layoutDirty = false;
     }
 
     private void setVisible(boolean visible) {
@@ -301,6 +470,96 @@ public class UniversalVirtualController {
         return elements;
     }
 
+    /**
+     * Adds an element the user asked for, from the editor's "add button" or "add stick"
+     * actions.
+     *
+     * @param type one of UniversalElementTypes.ELEMENT_*
+     * @return the element that was added
+     */
+    public UniversalVirtualControllerElement addUserElement(String type, int x, int y, int width, int height) {
+        int elementId = allocateElementId();
+
+        UniversalVirtualControllerElement element =
+                UniversalLayoutConfigurationLoader.createElement(this, context, type, elementId);
+        if (element == null) {
+            return null;
+        }
+
+        element.setElementName(defaultNameForType(type) + " " + elementId);
+        element.getConfig().getGeometry().setLeft(x);
+        element.getConfig().getGeometry().setTop(y);
+        element.getConfig().getGeometry().setWidth(width);
+        element.getConfig().getGeometry().setHeight(height);
+
+        addElement(element, x, y, width, height);
+
+        return element;
+    }
+
+    /**
+     * Copies an element, giving the copy its own ID and configuration and nudging it so it
+     * is visible next to the original.
+     */
+    public UniversalVirtualControllerElement duplicateElement(UniversalVirtualControllerElement original) {
+        if (original == null) {
+            return null;
+        }
+
+        int elementId = allocateElementId();
+
+        UniversalVirtualControllerElement copy =
+                UniversalLayoutConfigurationLoader.createElement(this, context,
+                        original.getElementTypeName(), elementId);
+        if (copy == null) {
+            return null;
+        }
+
+        // The copy starts from the original's configuration, including its geometry, and
+        // is then moved so it does not land exactly on top of it.
+        UniversalElementConfig config = original.createConfigCopy();
+        copy.applyConfig(config);
+
+        UniversalGeometry geometry = config.getGeometry();
+        geometry.setLeft(geometry.getLeft() + DUPLICATE_OFFSET_PX);
+        geometry.setTop(geometry.getTop() + DUPLICATE_OFFSET_PX);
+        geometry.applyTo(copy);
+
+        copy.setElementName(original.getElementName());
+
+        addElement(copy, geometry.getLeft(), geometry.getTop(),
+                geometry.getWidth(), geometry.getHeight());
+
+        return copy;
+    }
+
+    private static final int DUPLICATE_OFFSET_PX = 24;
+
+    private static String defaultNameForType(String type) {
+        if (UniversalElementTypes.ELEMENT_STICK.equals(type)) {
+            return "Stick";
+        }
+
+        return "Button";
+    }
+
+    /**
+     * Removes an element from the layout. Its saved configuration is dropped as well, so
+     * the layout file does not grow with entries for elements that are gone.
+     */
+    public void removeElement(UniversalVirtualControllerElement element) {
+        if (element == null) {
+            return;
+        }
+
+        element.releaseConfiguredActions();
+
+        elements.remove(element);
+        frame_layout.removeView(element);
+
+        UniversalLayoutConfigurationLoader.forgetElement(context, layoutId, element.elementId);
+    }
+
     private static final void _DBG(String text) {
         if (_PRINT_DEBUG_INFORMATION) {
             LimeLog.info("UniversalLayout: " + text);
@@ -331,6 +590,13 @@ public class UniversalVirtualController {
         UniversalLayoutConfigurationLoader.loadFromPreferences(this, context, layoutId);
     }
 
+    /**
+     * The view the controls are laid out in. Its size is what a layout has to fit.
+     */
+    public View getLayoutArea() {
+        return frame_layout;
+    }
+
     public ControllerMode getControllerMode() {
         return currentMode;
     }
@@ -349,6 +615,135 @@ public class UniversalVirtualController {
 
     public ControllerInputContext getControllerInputContext() {
         return inputContext;
+    }
+
+    /**
+     * Entry point for the action model: an on-screen element asks the controller to send
+     * whatever its configuration describes, and the controller owns the packet state.
+     *
+     * Gamepad buttons go into the shared button mask, keyboard keys are repeated while
+     * they are held (the host can drop a packet that arrives too soon after another one),
+     * and mouse buttons are sent straight through.
+     */
+    private final ActionSequencePlayer.HostInput hostInput = new ActionSequencePlayer.HostInput() {
+        @Override
+        public void setGamepadButtons(int flagsToAdd, int flagsToRemove) {
+            if (flagsToAdd != 0) {
+                inputContext.inputMap |= flagsToAdd;
+            }
+
+            if (flagsToRemove != 0) {
+                inputContext.inputMap &= ~flagsToRemove;
+            }
+
+            sendControllerInputContext();
+        }
+
+        @Override
+        public void sendMouseButton(int button, boolean down) {
+            if (controllerHandler != null) {
+                controllerHandler.reportOscMouseButton((byte) button, down);
+            }
+        }
+
+        @Override
+        public void sendKeyboardKey(short keyCode, boolean down) {
+            updateKeyboardKeyState(keyCode, down);
+        }
+    };
+
+    public ActionSequencePlayer.HostInput getHostInput() {
+        return hostInput;
+    }
+
+    /**
+     * Mouse movement driven by an on-screen stick.
+     *
+     * The mouse takes deltas rather than absolute positions, so the stick's current value
+     * is walked forward on a short timer instead of being sent once per touch event. That
+     * keeps the pointer moving smoothly while the stick is held and stops the moment the
+     * stick is centred.
+     */
+    private static final long MOUSE_STICK_REPORT_PERIOD_MS = 16;
+
+    /**
+     * Pixels the pointer travels per second when a stick that drives the mouse is pushed
+     * all the way.
+     */
+    private static final float MOUSE_STICK_SPEED_PIXELS_PER_SECOND = 900.f;
+
+    private float mouseStickX;
+    private float mouseStickY;
+    private boolean mouseStickReporting;
+
+    private final Runnable mouseStickRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!mouseStickReporting) {
+                return;
+            }
+
+            short deltaX = mouseStickX == 0 ? 0 : (short) Math.round(
+                    mouseStickX * MOUSE_STICK_SPEED_PIXELS_PER_SECOND * MOUSE_STICK_REPORT_PERIOD_MS / 1000.f);
+            short deltaY = mouseStickY == 0 ? 0 : (short) Math.round(
+                    -mouseStickY * MOUSE_STICK_SPEED_PIXELS_PER_SECOND * MOUSE_STICK_REPORT_PERIOD_MS / 1000.f);
+
+            if (deltaX != 0 || deltaY != 0) {
+                if (controllerHandler != null) {
+                    controllerHandler.reportOscMouseMove(deltaX, deltaY);
+                }
+            }
+
+            handler.postDelayed(this, MOUSE_STICK_REPORT_PERIOD_MS);
+        }
+    };
+
+    /**
+     * Updates the share of the mouse movement that one stick contributes.
+     *
+     * @param target UniversalHostAxis.TARGET_* of the mouse axis this stick drives
+     * @param value stick position, -1..1
+     */
+    public void moveMouseByStick(UniversalVirtualControllerElement element, int target, float value) {
+        // A stick that drives the mouse contributes to the horizontal share when its own
+        // horizontal axis is bound to the mouse, and to the vertical share when its
+        // vertical axis is. The single "Mouse" entry in the editor covers both.
+        boolean vertical = false;
+
+        if (element instanceof UniversalAnalogStick) {
+            com.limelight.binding.input.virtual_controller.universal.config.UniversalStickConfig stickConfig =
+                    ((UniversalAnalogStick) element).getStickConfig();
+            vertical = stickConfig.getAxisY() == target && stickConfig.getAxisX() != target;
+        }
+
+        if (vertical) {
+            mouseStickY = value;
+        }
+        else {
+            mouseStickX = value;
+        }
+
+        boolean shouldReport = mouseStickX != 0 || mouseStickY != 0;
+
+        if (shouldReport && !mouseStickReporting) {
+            mouseStickReporting = true;
+            handler.post(mouseStickRunnable);
+        }
+        else if (!shouldReport) {
+            mouseStickReporting = false;
+            handler.removeCallbacks(mouseStickRunnable);
+        }
+    }
+
+    /**
+     * Stops the pointer movement a stick is driving, so a stick that is let go or a layout
+     * that goes away cannot leave the pointer drifting.
+     */
+    public void stopStickMouseMovement() {
+        mouseStickX = 0;
+        mouseStickY = 0;
+        mouseStickReporting = false;
+        handler.removeCallbacks(mouseStickRunnable);
     }
 
     /**

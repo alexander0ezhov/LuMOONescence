@@ -1,49 +1,24 @@
 /**
  * Universal layout: left analog stick.
+ *
+ * The stick drives whatever its configuration says; the default is the Xbox left stick.
  */
 
 package com.limelight.binding.input.virtual_controller.universal;
 
 import android.content.Context;
 
-import com.limelight.nvstream.input.ControllerPacket;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalHostAxis;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickConfig;
 
 public class UniversalLeftAnalogStick extends UniversalAnalogStick {
     public UniversalLeftAnalogStick(final UniversalVirtualController controller, final Context context) {
         super(controller, context, EID_LS);
 
-        addAnalogStickListener(new AnalogStickListener() {
-            @Override
-            public void onMovement(float x, float y) {
-                UniversalVirtualController.ControllerInputContext inputContext =
-                        controller.getControllerInputContext();
-                inputContext.leftStickX = (short) (x * 0x7FFE);
-                inputContext.leftStickY = (short) (y * 0x7FFE);
-
-                controller.sendControllerInputContext();
-            }
-
-            @Override
-            public void onClick() {
-            }
-
-            @Override
-            public void onDoubleClick() {
-                UniversalVirtualController.ControllerInputContext inputContext =
-                        controller.getControllerInputContext();
-                inputContext.inputMap |= ControllerPacket.LS_CLK_FLAG;
-
-                controller.sendControllerInputContext();
-            }
-
-            @Override
-            public void onRevoke() {
-                UniversalVirtualController.ControllerInputContext inputContext =
-                        controller.getControllerInputContext();
-                inputContext.inputMap &= ~ControllerPacket.LS_CLK_FLAG;
-
-                controller.sendControllerInputContext();
-            }
-        });
+        UniversalStickConfig config = getStickConfig();
+        config.setAxisX(UniversalHostAxis.codeOf(UniversalHostAxis.KIND_GAMEPAD,
+                UniversalHostAxis.TARGET_LEFT_X));
+        config.setAxisY(UniversalHostAxis.codeOf(UniversalHostAxis.KIND_GAMEPAD,
+                UniversalHostAxis.TARGET_LEFT_Y));
     }
 }

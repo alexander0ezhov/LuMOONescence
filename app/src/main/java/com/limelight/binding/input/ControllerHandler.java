@@ -2819,6 +2819,30 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         conn.sendKeyboardInput(keyCode, keyDirection, modifier, flags);
     }
 
+    /**
+     * Sends a mouse button event originating from the on-screen controller (OSC). The
+     * on-screen elements can bind mouse buttons, not just gamepad and keyboard inputs.
+     *
+     * @param mouseButton MouseButtonPacket.BUTTON_*
+     * @param down true for a press, false for a release
+     */
+    public void reportOscMouseButton(byte mouseButton, boolean down) {
+        if (down) {
+            conn.sendMouseButtonDown(mouseButton);
+        }
+        else {
+            conn.sendMouseButtonUp(mouseButton);
+        }
+    }
+
+    /**
+     * Moves the mouse pointer by a relative amount, driven by an on-screen stick that is
+     * configured to control the pointer.
+     */
+    public void reportOscMouseMove(short deltaX, short deltaY) {
+        conn.sendMouseMove(deltaX, deltaY);
+    }
+
     @Override
     public void reportControllerState(int controllerId, int buttonFlags,
                                       float leftStickX, float leftStickY,

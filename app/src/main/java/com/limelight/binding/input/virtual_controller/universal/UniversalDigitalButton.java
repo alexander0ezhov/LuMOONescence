@@ -12,13 +12,30 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 
+import com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalButtonConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This is a digital button on screen element. It is used to get click and double click user input.
+ *
+ * What a press sends is described by the button's configuration, so the same element
+ * covers a plain gamepad button, a keyboard key, a mouse click and a timed combination
+ * of them.
  */
-public class UniversalDigitalButton extends UniversalVirtualControllerElement {
+public class UniversalDigitalButton extends UniversalVirtualControllerElement
+        implements ActionSequencePlayer.HostInput {
+
+    /**
+     * Gamepad buttons this element currently holds down. The player reports additions and
+     * removals separately, so keeping the set here is what knows the truth.
+     */
+    private int gamepadButtonsDown;
+
+    private final ActionSequencePlayer sequencePlayer = new ActionSequencePlayer(this);
 
     /**
      * Listener interface to update registered observers.
@@ -203,6 +220,17 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement {
             case MotionEvent.ACTION_DOWN: {
                 movingButton = null;
                 setPressed(true);
+
+                // The editor uses a hold to open the context menu; during a stream nothing
+                // listens, so the action is sent as usual.
+                beginPressWatch();
+
+                if (!isLongPressHandled()) {
+                    // Pressing also drives the configured action, so a button can send a
+                    // key, a mouse click or a gamepad button without any listener of its own.
+                    pressConfiguredAction();
+                }
+
                 onClickCallback();
 
                 invalidate();
@@ -217,6 +245,13 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement {
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
                 setPressed(false);
+
+                boolean wasHold = endPressWatch(action == MotionEvent.ACTION_UP);
+
+                if (!wasHold) {
+                    releaseConfiguredAction();
+                }
+
                 onReleaseCallback();
 
                 checkMovementForAllButtons(x, y);
@@ -229,5 +264,99 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement {
             }
         }
         return true;
+    }
+
+    @Override
+    public String getElementTypeName() {
+        return UniversalElementTypes.ELEMENT_BUTTON;
+    }
+
+    @Override
+    protected UniversalElementConfig createDefaultConfig() {
+        return new UniversalButtonConfig();
+    }
+
+    public UniversalButtonConfig getButtonConfig() {
+        return (UniversalButtonConfig) getConfig();
+    }
+
+    /**
+     * True while this button is toggled on, which is only possible when it is configured
+     * as a toggle.
+     */
+    public boolean isToggledOn() {
+        return sequencePlayer.isHolding();
+    }
+
+    /**
+     * One tap of a toggle button presses, the next one releases. A plain button is held
+     * for as long as the finger is on it.
+     */
+    private void pressConfiguredAction() {
+        UniversalButtonConfig config = getButtonConfig();
+
+        if (config.isToggle()) {
+            if (isToggledOn()) {
+                sequencePlayer.release();
+            }
+            else {
+                sequencePlayer.press(config.getActionSequence());
+            }
+        }
+        else {
+            sequencePlayer.press(config.getActionSequence());
+        }
+
+        updateToggledAppearance();
+    }
+
+    private void releaseConfiguredAction() {
+        // A toggle keeps holding after the finger is lifted
+        if (getButtonConfig().isToggle()) {
+            return;
+        }
+
+        sequencePlayer.release();
+    }
+
+    private void updateToggledAppearance() {
+        // A latched button must stay visibly pressed, otherwise the user cannot tell that
+        // it is still sending input.
+        setPressed(getButtonConfig().isToggle() && isToggledOn());
+        invalidate();
+    }
+
+    /**
+     * Releases everything this button sends. Called by the layout before it goes away, so
+     * a latched button cannot leave a key held on the host.
+     */
+    @Override
+    public void releaseConfiguredActions() {
+        sequencePlayer.cancel();
+        gamepadButtonsDown = 0;
+        setPressed(false);
+    }
+
+    @Override
+    public void setGamepadButtons(int flagsToAdd, int flagsToRemove) {
+        if (flagsToAdd != 0) {
+            gamepadButtonsDown |= flagsToAdd;
+        }
+
+        if (flagsToRemove != 0) {
+            gamepadButtonsDown &= ~flagsToRemove;
+        }
+
+        controller.getHostInput().setGamepadButtons(flagsToAdd, flagsToRemove);
+    }
+
+    @Override
+    public void sendMouseButton(int button, boolean down) {
+        controller.getHostInput().sendMouseButton(button, down);
+    }
+
+    @Override
+    public void sendKeyboardKey(short keyCode, boolean down) {
+        controller.getHostInput().sendKeyboardKey(keyCode, down);
     }
 }

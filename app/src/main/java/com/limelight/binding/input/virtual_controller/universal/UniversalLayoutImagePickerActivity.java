@@ -2,8 +2,10 @@ package com.limelight.binding.input.virtual_controller.universal;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -105,10 +107,70 @@ public class UniversalLayoutImagePickerActivity extends Activity {
     }
 
     private void loadImages() {
-        // The list is filled in one go when the scan finishes, so keep it hidden until
-        // then instead of flashing an empty grid.
+        // The list is filled in one go when the scan finishes, so keep it hidden until then
+        // instead of flashing an empty grid. The "nothing found" text is cleared as well,
+        // otherwise it sits on top of the grid once the images arrive.
         imageGrid.setVisibility(View.INVISIBLE);
+        emptyText.setVisibility(View.GONE);
 
+        if (!ensureImagePermission()) {
+            // The permission question is on screen; the scan runs once it is answered
+            return;
+        }
+
+        scanImages();
+    }
+
+    /**
+     * Reading the device's images needs the media permission on Android 13 and the storage
+     * permission before that. Without it the scan legitimately finds nothing, so the user is
+     * asked rather than shown an empty grid.
+     *
+     * @return true when the permission is held and the scan can run
+     */
+    private boolean ensureImagePermission() {
+        String permission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                ? android.Manifest.permission.READ_MEDIA_IMAGES
+                : android.Manifest.permission.READ_EXTERNAL_STORAGE;
+
+        if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+
+        requestedPermission = permission;
+        requestPermissions(new String[]{permission}, REQUEST_READ_IMAGES);
+
+        return false;
+    }
+
+    private static final int REQUEST_READ_IMAGES = 1;
+
+    private String requestedPermission;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode != REQUEST_READ_IMAGES) {
+            return;
+        }
+
+        boolean granted = grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+
+        if (granted) {
+            scanImages();
+            return;
+        }
+
+        // Saying no leaves nothing to show, so the reason is stated instead of an empty grid
+        progressBar.setVisibility(View.GONE);
+        imageGrid.setVisibility(View.GONE);
+        emptyText.setText(R.string.msg_image_permission_needed);
+        emptyText.setVisibility(View.VISIBLE);
+    }
+
+    private void scanImages() {
         new AsyncTask<Void, Void, List<String>>() {
             @Override
             protected List<String> doInBackground(Void... params) {
@@ -126,6 +188,10 @@ public class UniversalLayoutImagePickerActivity extends Activity {
 
                 adapter.setImages(paths);
                 emptyText.setVisibility(paths.isEmpty() ? View.VISIBLE : View.GONE);
+
+                com.limelight.LimeLog.info("Image picker: found " + paths.size()
+                        + " images, empty notice "
+                        + (emptyText.getVisibility() == View.VISIBLE ? "shown" : "hidden"));
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

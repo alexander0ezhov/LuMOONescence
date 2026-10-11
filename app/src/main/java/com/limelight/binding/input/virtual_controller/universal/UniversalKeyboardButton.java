@@ -11,7 +11,17 @@ import android.content.Context;
 import android.view.KeyEvent;
 
 import com.limelight.binding.input.KeyboardTranslator;
+import com.limelight.binding.input.virtual_controller.universal.action.ActionSequence;
+import com.limelight.binding.input.virtual_controller.universal.action.InputEvent;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalButtonConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
 
+/**
+ * Universal layout: on-screen keyboard key.
+ *
+ * The key it sends is expressed as a configuration, so it can be renamed, retimed or
+ * combined with other inputs by the layout editor exactly like any other button.
+ */
 public class UniversalKeyboardButton extends UniversalDigitalButton {
 
     // Translating here keeps the keycode in one place: the button draws the text, but
@@ -51,29 +61,26 @@ public class UniversalKeyboardButton extends UniversalDigitalButton {
 
         this.keyCode = translated;
 
-        addDigitalButtonListener(new DigitalButtonListener() {
-            @Override
-            public void onClick() {
-                // The gamepad bitmask is deliberately left alone here. Its bits are
-                // gamepad buttons only, so setting an unrelated bit would make the
-                // host see a gamepad button that is never released.
-                controller.updateKeyboardKeyState(keyCode, true);
-            }
+        // The key becomes this element's default action, which the editor can then change
+        // like any other button's action.
+        UniversalButtonConfig config = (UniversalButtonConfig) getConfig();
+        config.setActionSequence(ActionSequence.single(
+                new InputEvent(InputEvent.KIND_KEYBOARD, translated & 0xFFFF)));
+    }
 
-            @Override
-            public void onLongClick() {
-                // Keyboard keys have no long press behaviour
-            }
+    @Override
+    public String getElementTypeName() {
+        return UniversalElementTypes.ELEMENT_BUTTON;
+    }
 
-            @Override
-            public void onRelease() {
-                controller.updateKeyboardKeyState(keyCode, false);
-            }
-        });
+    @Override
+    protected UniversalElementConfig createDefaultConfig() {
+        return new UniversalButtonConfig();
     }
 
     /**
-     * Returns the GFE keycode that this key sends to the host.
+     * Returns the GFE keycode this key was created for. The live action comes from the
+     * configuration, which the editor can change.
      */
     public short getKeyCode() {
         return keyCode;

@@ -1,91 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    The layout editor is full screen, exactly like the stream: the controls are placed in the
+    same coordinates they will have while playing, so what is arranged here is what appears
+    there.
+
+    Nothing is docked. The editing panel floats above the arrangement and its header is the
+    handle to drag it by, which is what keeps it from covering the controls being worked on.
+-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layoutEditorFrame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#101014">
+    android:background="#FF000000">
 
-    <LinearLayout
-        android:id="@+id/layoutEditorToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:background="#CC000000"
-        android:paddingEnd="8dp"
-        android:paddingRight="8dp">
-
-        <ImageButton
-            android:id="@+id/layoutEditorBackButton"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:src="@drawable/ic_back"
-            android:scaleType="fitCenter"
-            android:padding="14dp"
-            android:contentDescription="@string/back"
-            style="?android:attr/borderlessButtonStyle"/>
-
-        <TextView
-            android:id="@+id/layoutEditorTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textColor="#FFFFFF"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <Button
-            android:id="@+id/layoutEditorMoveButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:text="@string/title_edit_controls"
-            style="?android:attr/borderlessButtonStyle"
-            android:textColor="#FFFFFF"/>
-
-        <Button
-            android:id="@+id/layoutEditorImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:text="@string/title_pick_image"
-            style="?android:attr/borderlessButtonStyle"
-            android:textColor="#FFFFFF"/>
-
-        <Button
-            android:id="@+id/layoutEditorResetButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:text="@string/title_reset_controls"
-            style="?android:attr/borderlessButtonStyle"
-            android:textColor="#FFFFFF"/>
-
-    </LinearLayout>
-
-    <!--
-        The universal layout is added into this frame at runtime, exactly as it is added
-        over the stream, so the editor always shows the real controls. It sits below the
-        toolbar, otherwise the controls near the top edge would be unreachable.
-    -->
+    <!-- The controls, laid out over the whole screen exactly as over the stream -->
     <FrameLayout
         android:id="@+id/layoutEditorOverlay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/layoutEditorToolbar"/>
+        android:layout_height="match_parent"/>
 
-    <TextView
-        android:id="@+id/layoutEditorHint"
-        android:layout_width="wrap_content"
+    <!--
+        The editing panel. It is sized and positioned in code so it can be dragged, and its
+        header is the handle to drag it by. The rows are added into the scrolling area below
+        the header, which is never cleared.
+    -->
+    <LinearLayout
+        android:id="@+id/layoutEditorPanel"
+        android:layout_width="@dimen/layout_editor_panel_width"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="16dp"
-        android:padding="10dp"
-        android:background="#CC000000"
-        android:textColor="#FFFFFF"
-        android:textSize="13sp"/>
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:background="#E61C1C22">
+
+        <LinearLayout
+            android:id="@+id/layoutEditorPanelHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#F028282E"
+            android:paddingStart="8dp"
+            android:paddingEnd="4dp">
+
+            <TextView
+                android:id="@+id/layoutEditorPanelTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/title_layout_settings"
+                android:textColor="#E0E0E6"
+                android:textSize="14sp"/>
+
+            <ImageButton
+                android:id="@+id/layoutEditorMenuButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_layouts"
+                android:scaleType="fitCenter"
+                android:padding="10dp"
+                android:contentDescription="@string/title_layout_settings"
+                style="?android:attr/borderlessButtonStyle"/>
+
+            <ImageButton
+                android:id="@+id/layoutEditorImageButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_add"
+                android:scaleType="fitCenter"
+                android:padding="10dp"
+                android:contentDescription="@string/title_pick_image"
+                style="?android:attr/borderlessButtonStyle"/>
+
+            <ImageButton
+                android:id="@+id/layoutEditorResetButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_pc_offline"
+                android:scaleType="fitCenter"
+                android:padding="10dp"
+                android:contentDescription="@string/title_reset_controls"
+                style="?android:attr/borderlessButtonStyle"/>
+
+            <ImageButton
+                android:id="@+id/layoutEditorCloseButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_back"
+                android:scaleType="fitCenter"
+                android:padding="10dp"
+                android:contentDescription="@string/back"
+                style="?android:attr/borderlessButtonStyle"/>
+
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/layoutEditorPanelScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:id="@+id/layoutEditorPanelContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+        </ScrollView>
+
+    </LinearLayout>
 
 </RelativeLayout>

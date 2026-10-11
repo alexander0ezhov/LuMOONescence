@@ -12,4 +12,9 @@
     <dimen name="layout_picker_item_image_height">90dp</dimen>
     <dimen name="layout_picker_item_image_width">160dp</dimen>
 
+    <!-- Layout editor -->
+    <dimen name="layout_editor_panel_width">280dp</dimen>
+    <dimen name="layout_editor_slider_input_width">68dp</dimen>
+    <dimen name="layout_editor_panel_padding">10dp</dimen>
+
 </resources>

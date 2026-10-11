@@ -10,13 +10,47 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import com.limelight.binding.input.virtual_controller.universal.action.ActionSequence;
+import com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalHostAxis;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickButtonConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This is a analog stick on screen element. It is used to get 2-Axis user input.
+ *
+ * What the stick drives comes from its configuration: two host axes in the axes mode, or
+ * four gamepad buttons in the buttons mode.
  */
-public class UniversalAnalogStick extends UniversalVirtualControllerElement {
+public class UniversalAnalogStick extends UniversalVirtualControllerElement
+        implements ActionSequencePlayer.HostInput {
+
+    /**
+     * Fraction of the travel that counts as a deliberate push in the buttons mode. It
+     * keeps a stick that rests slightly off centre from pressing anything.
+     */
+    private static final float DIRECTION_THRESHOLD = 0.5f;
+
+    /**
+     * Gamepad buttons this stick currently holds down through its direction bindings.
+     */
+    private int gamepadButtonsDown;
+
+    /**
+     * One player per direction, so each binding keeps its own held inputs and can release
+     * exactly what it pressed.
+     */
+    private final ActionSequencePlayer[] directionPlayers = new ActionSequencePlayer[UniversalStickConfig.DIRECTION_COUNT];
+
+    /**
+     * The directions that are currently pushed, used to avoid resending the same
+     * transition on every movement event.
+     */
+    private final boolean[] directionPressed = new boolean[UniversalStickConfig.DIRECTION_COUNT];
 
     /**
      * outer radius size in percent of the ui element
@@ -164,6 +198,24 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement {
         // reset stick position
         position_stick_x = getWidth() / 2;
         position_stick_y = getHeight() / 2;
+
+        for (int i = 0; i < directionPlayers.length; i++) {
+            directionPlayers[i] = new ActionSequencePlayer(this);
+        }
+    }
+
+    @Override
+    public String getElementTypeName() {
+        return UniversalElementTypes.ELEMENT_STICK;
+    }
+
+    @Override
+    protected UniversalElementConfig createDefaultConfig() {
+        return new UniversalStickConfig();
+    }
+
+    public UniversalStickConfig getStickConfig() {
+        return (UniversalStickConfig) getConfig();
     }
 
     public void addAnalogStickListener(AnalogStickListener listener) {
@@ -172,10 +224,145 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement {
 
     private void notifyOnMovement(float x, float y) {
         _DBG("movement x: " + x + " movement y: " + y);
+
+        // The configured action is what the host actually receives
+        applyConfiguredMovement(x, y);
+
         // notify listeners
         for (AnalogStickListener listener : listeners) {
             listener.onMovement(x, y);
         }
+    }
+
+    /**
+     * Routes a stick position to whatever the configuration describes.
+     *
+     * @param x horizontal position, -1..1 with the origin in the middle
+     * @param y vertical position, -1..1 with the origin in the middle
+     */
+    protected void applyConfiguredMovement(float x, float y) {
+        UniversalStickConfig config = getStickConfig();
+
+        if (config.isAxesMode()) {
+            applyHostAxis(config.getAxisX(), x);
+            applyHostAxis(config.getAxisY(), y);
+
+            controller.sendControllerInputContext();
+        }
+        else {
+            applyButtonMovement(config, x, y);
+        }
+    }
+
+    private void applyHostAxis(int axisCode, float value) {
+        UniversalHostAxis.Option option = UniversalHostAxis.optionForCode(axisCode);
+
+        if (option.kind == UniversalHostAxis.KIND_NONE) {
+            return;
+        }
+
+        if (option.kind == UniversalHostAxis.KIND_MOUSE) {
+            // A vertical mouse axis reports its own sign, and the stick's Y already grows
+            // upwards like the mouse does.
+            controller.moveMouseByStick(this, option.target, value);
+            return;
+        }
+
+        UniversalVirtualController.ControllerInputContext inputContext = controller.getControllerInputContext();
+        short scaled = (short) (value * 0x7FFE);
+
+        switch (option.target) {
+            case UniversalHostAxis.TARGET_LEFT_X:
+                inputContext.leftStickX = scaled;
+                break;
+
+            case UniversalHostAxis.TARGET_LEFT_Y:
+                inputContext.leftStickY = scaled;
+                break;
+
+            case UniversalHostAxis.TARGET_RIGHT_X:
+                inputContext.rightStickX = scaled;
+                break;
+
+            case UniversalHostAxis.TARGET_RIGHT_Y:
+                inputContext.rightStickY = scaled;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void applyButtonMovement(UniversalStickConfig config, float x, float y) {
+        setDirectionPressed(config, UniversalStickConfig.DIRECTION_LEFT, x <= -DIRECTION_THRESHOLD);
+        setDirectionPressed(config, UniversalStickConfig.DIRECTION_RIGHT, x >= DIRECTION_THRESHOLD);
+        setDirectionPressed(config, UniversalStickConfig.DIRECTION_UP, y >= DIRECTION_THRESHOLD);
+        setDirectionPressed(config, UniversalStickConfig.DIRECTION_DOWN, y <= -DIRECTION_THRESHOLD);
+    }
+
+    private void setDirectionPressed(UniversalStickConfig config, int direction, boolean pressed) {
+        UniversalStickButtonConfig button = config.getButton(direction);
+
+        if (!button.isAssigned()) {
+            return;
+        }
+
+        // Movement events arrive continuously, so only a change of direction is a press
+        // or a release.
+        if (directionPressed[direction] == pressed) {
+            return;
+        }
+        directionPressed[direction] = pressed;
+
+        if (pressed) {
+            directionPlayers[direction].press(ActionSequence.single(
+                    new com.limelight.binding.input.virtual_controller.universal.action.InputEvent(
+                            com.limelight.binding.input.virtual_controller.universal.action.InputEvent.KIND_GAMEPAD,
+                            button.getButtonCode())));
+        }
+        else {
+            directionPlayers[direction].release();
+        }
+    }
+
+    /**
+     * Releases everything the stick sends. Called by the layout before it goes away, so a
+     * pushed stick cannot leave a button held on the host.
+     */
+    @Override
+    public void releaseConfiguredActions() {
+        for (int i = 0; i < directionPlayers.length; i++) {
+            directionPlayers[i].release();
+            directionPressed[i] = false;
+        }
+
+        gamepadButtonsDown = 0;
+
+        // Stop the pointer as well, otherwise a stick that drives the mouse keeps moving
+        controller.stopStickMouseMovement();
+    }
+
+    @Override
+    public void setGamepadButtons(int flagsToAdd, int flagsToRemove) {
+        if (flagsToAdd != 0) {
+            gamepadButtonsDown |= flagsToAdd;
+        }
+
+        if (flagsToRemove != 0) {
+            gamepadButtonsDown &= ~flagsToRemove;
+        }
+
+        controller.getHostInput().setGamepadButtons(flagsToAdd, flagsToRemove);
+    }
+
+    @Override
+    public void sendMouseButton(int button, boolean down) {
+        controller.getHostInput().sendMouseButton(button, down);
+    }
+
+    @Override
+    public void sendKeyboardKey(short keyCode, boolean down) {
+        controller.getHostInput().sendKeyboardKey(keyCode, down);
     }
 
     private void notifyOnClick() {
@@ -275,7 +462,7 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement {
         }
     }
 
-    @Override
+
     public boolean onElementTouchEvent(MotionEvent event) {
         // save last click state
         CLICK_STATE lastClickState = click_state;

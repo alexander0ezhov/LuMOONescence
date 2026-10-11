@@ -1,5 +1,8 @@
 /**
  * Universal layout: digital pad element.
+ *
+ * Each direction sends whatever its configuration says, so a pad can drive gamepad
+ * buttons, keyboard keys or a mix of them, just like a plain button can.
  */
 
 package com.limelight.binding.input.virtual_controller.universal;
@@ -10,24 +13,90 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import com.limelight.binding.input.virtual_controller.universal.action.ActionSequence;
+import com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer;
+import com.limelight.binding.input.virtual_controller.universal.action.GamepadButtons;
+import com.limelight.binding.input.virtual_controller.universal.action.InputEvent;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalPadConfig;
+import com.limelight.nvstream.input.ControllerPacket;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class UniversalDigitalPad extends UniversalVirtualControllerElement {
+public class UniversalDigitalPad extends UniversalVirtualControllerElement
+        implements ActionSequencePlayer.HostInput {
+
     public final static int DIGITAL_PAD_DIRECTION_NO_DIRECTION = 0;
     int direction = DIGITAL_PAD_DIRECTION_NO_DIRECTION;
     public final static int DIGITAL_PAD_DIRECTION_LEFT = 1;
     public final static int DIGITAL_PAD_DIRECTION_UP = 2;
     public final static int DIGITAL_PAD_DIRECTION_RIGHT = 4;
     public final static int DIGITAL_PAD_DIRECTION_DOWN = 8;
+
+    /**
+     * Number of independently bound directions of the pad.
+     */
+    public static final int DIRECTION_COUNT = UniversalPadConfig.DIRECTION_COUNT;
+
+    /**
+     * Flag of each direction, in the order the configuration stores them, so the drawing
+     * code and the configuration agree on which direction is which.
+     */
+    private static final int[] DIRECTION_FLAGS = new int[]{
+            DIGITAL_PAD_DIRECTION_UP,
+            DIGITAL_PAD_DIRECTION_DOWN,
+            DIGITAL_PAD_DIRECTION_LEFT,
+            DIGITAL_PAD_DIRECTION_RIGHT,
+    };
+
+    private static final int[] DIRECTION_GAMEPAD_FLAGS = new int[]{
+            ControllerPacket.UP_FLAG,
+            ControllerPacket.DOWN_FLAG,
+            ControllerPacket.LEFT_FLAG,
+            ControllerPacket.RIGHT_FLAG,
+    };
+
     List<DigitalPadListener> listeners = new ArrayList<>();
 
     private static final int DPAD_MARGIN = 5;
 
     private final Paint paint = new Paint();
 
-    public UniversalDigitalPad(UniversalVirtualController controller, Context context) {
-        super(controller, context, EID_DPAD);
+    /**
+     * One player per direction, so every direction releases exactly what it pressed.
+     */
+    private final ActionSequencePlayer[] directionPlayers = new ActionSequencePlayer[UniversalPadConfig.DIRECTION_COUNT];
+    private final boolean[] directionPressed = new boolean[UniversalPadConfig.DIRECTION_COUNT];
+
+    public UniversalDigitalPad(UniversalVirtualController controller, Context context, int elementId) {
+        super(controller, context, elementId);
+
+        for (int i = 0; i < directionPlayers.length; i++) {
+            directionPlayers[i] = new ActionSequencePlayer(this);
+        }
+    }
+
+    @Override
+    public String getElementTypeName() {
+        return UniversalElementTypes.ELEMENT_DPAD;
+    }
+
+    @Override
+    protected UniversalElementConfig createDefaultConfig() {
+        return new UniversalPadConfig();
+    }
+
+    public UniversalPadConfig getPadConfig() {
+        return (UniversalPadConfig) getConfig();
+    }
+
+    /**
+     * Builds the default action of a direction, which is the matching D-pad button.
+     */
+    public static ActionSequence defaultSequenceForDirection(int direction) {
+        return ActionSequence.single(new InputEvent(InputEvent.KIND_GAMEPAD,
+                GamepadButtons.codeOfFlag(DIRECTION_GAMEPAD_FLAGS[direction])));
     }
 
     public void addDigitalPadListener(DigitalPadListener listener) {
@@ -151,13 +220,46 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement {
     private void newDirectionCallback(int direction) {
         _DBG("direction: " + direction);
 
+        applyConfiguredDirections(direction);
+
         // notify listeners
         for (DigitalPadListener listener : listeners) {
             listener.onDirectionChange(direction);
         }
     }
 
+    /**
+     * Presses or releases the action bound to every direction of the pad.
+     */
+    private void applyConfiguredDirections(int direction) {
+        UniversalPadConfig config = getPadConfig();
+
+        for (int i = 0; i < directionPlayers.length; i++) {
+            boolean pressed = (direction & DIRECTION_FLAGS[i]) != 0;
+
+            if (directionPressed[i] == pressed) {
+                continue;
+            }
+            directionPressed[i] = pressed;
+
+            if (pressed) {
+                directionPlayers[i].press(config.getDirectionSequence(i));
+            }
+            else {
+                directionPlayers[i].release();
+            }
+        }
+    }
+
     @Override
+    public void releaseConfiguredActions() {
+        for (int i = 0; i < directionPlayers.length; i++) {
+            directionPlayers[i].release();
+            directionPressed[i] = false;
+        }
+    }
+
+
     public boolean onElementTouchEvent(MotionEvent event) {
         // get masked (not specific to a pointer) action
         switch (event.getActionMasked()) {
@@ -177,7 +279,17 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement {
                 if (event.getY() < getPercent(getHeight(), 33)) {
                     direction |= DIGITAL_PAD_DIRECTION_UP;
                 }
-                newDirectionCallback(direction);
+
+                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                    beginPressWatch();
+                }
+
+                // A hold is the editor's context menu gesture, so the direction is not
+                // sent while it is being watched.
+                if (!isLongPressHandled()) {
+                    newDirectionCallback(direction);
+                }
+
                 invalidate();
 
                 return true;
@@ -185,7 +297,13 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement {
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
                 direction = 0;
-                newDirectionCallback(direction);
+
+                boolean wasHold = endPressWatch(event.getActionMasked() == MotionEvent.ACTION_UP);
+
+                if (!wasHold) {
+                    newDirectionCallback(direction);
+                }
+
                 invalidate();
 
                 return true;
@@ -199,5 +317,20 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement {
 
     public interface DigitalPadListener {
         void onDirectionChange(int direction);
+    }
+
+    @Override
+    public void setGamepadButtons(int flagsToAdd, int flagsToRemove) {
+        controller.getHostInput().setGamepadButtons(flagsToAdd, flagsToRemove);
+    }
+
+    @Override
+    public void sendMouseButton(int button, boolean down) {
+        controller.getHostInput().sendMouseButton(button, down);
+    }
+
+    @Override
+    public void sendKeyboardKey(short keyCode, boolean down) {
+        controller.getHostInput().sendKeyboardKey(keyCode, down);
     }
 }

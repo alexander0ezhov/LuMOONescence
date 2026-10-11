@@ -19,6 +19,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalButtonConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalPadConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickConfig;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,6 +66,12 @@ public abstract class UniversalVirtualControllerElement extends View {
     protected UniversalVirtualController controller;
     protected final int elementId;
 
+    /**
+     * What this element is and does. Created on first use so subclasses can decide the
+     * default that fits them.
+     */
+    private UniversalElementConfig config;
+
     private final Paint paint = new Paint();
 
     private int normalColor = 0xF0888888;
@@ -67,6 +79,12 @@ public abstract class UniversalVirtualControllerElement extends View {
     private int configMoveColor = 0xF0FF0000;
     private int configResizeColor = 0xF0FF00FF;
     private int configSelectedColor = 0xF000FF00;
+    private int selectedColor = 0xF03D9BFF;
+
+    /**
+     * True while the editor is editing this element.
+     */
+    private boolean selected;
 
     protected int startSize_x;
     protected int startSize_y;
@@ -119,6 +137,18 @@ public abstract class UniversalVirtualControllerElement extends View {
     protected void onDraw(Canvas canvas) {
         onElementDraw(canvas);
 
+        if (selected) {
+            // The editor marks the control it is editing, so it is obvious which one the
+            // panel on the left belongs to.
+            paint.setColor(selectedColor);
+            paint.setStrokeWidth(getDefaultStrokeWidth());
+            paint.setStyle(Paint.Style.STROKE);
+
+            canvas.drawRect(paint.getStrokeWidth(), paint.getStrokeWidth(),
+                    getWidth()-paint.getStrokeWidth(), getHeight()-paint.getStrokeWidth(),
+                    paint);
+        }
+
         if (currentMode != Mode.Normal) {
             paint.setColor(configSelectedColor);
             paint.setStrokeWidth(getDefaultStrokeWidth());
@@ -132,6 +162,108 @@ public abstract class UniversalVirtualControllerElement extends View {
         super.onDraw(canvas);
     }
 
+    /**
+     * Marks this element as the one the editor is editing.
+     */
+    public void setSelected(boolean selected) {
+        if (this.selected == selected) {
+            return;
+        }
+
+        this.selected = selected;
+        invalidate();
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    /**
+     * A hold that is being watched. A control that is held down long enough asks the
+     * editor for its context menu; a shorter hold is just a tap.
+     */
+    private final Runnable longPressRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!longPressPending) {
+                // The press ended before the hold was long enough
+                return;
+            }
+
+            longPressPending = false;
+            longPressHandled = notifyLongPressed();
+        }
+    };
+
+    private boolean longPressPending;
+    private boolean longPressHandled;
+
+    public static final long LONG_PRESS_TIMEOUT_MS = 500;
+
+    /**
+     * Starts watching a press, so holding a control opens its context menu.
+     */
+    protected void beginPressWatch() {
+        longPressPending = true;
+        longPressHandled = false;
+
+        controller.getUiHandler().postDelayed(longPressRunnable, LONG_PRESS_TIMEOUT_MS);
+    }
+
+    /**
+     * Ends a press and returns whether it lasted long enough to be handled as a hold.
+     *
+     * The element is selected here rather than when the press starts, so a control can
+     * still be pressed and released to try it out without the selection moving under the
+     * user's finger.
+     *
+     * @param tap true when the press ended normally, false when the gesture was cancelled
+     */
+    protected boolean endPressWatch(boolean tap) {
+        controller.getUiHandler().removeCallbacks(longPressRunnable);
+
+        boolean wasPending = longPressPending;
+        longPressPending = false;
+
+        boolean handled = longPressHandled;
+        longPressHandled = false;
+
+        if (tap && wasPending && !handled) {
+            // A short press is a tap, which selects the control for editing
+            notifyTapped();
+        }
+
+        return handled;
+    }
+
+    /**
+     * True while a hold has already been handled by the editor and the control should not
+     * send anything for it.
+     */
+    protected boolean isLongPressHandled() {
+        return longPressHandled;
+    }
+
+    /**
+     * Tells the controller that this element was tapped, so the editor can select it.
+     * Nothing happens during a stream.
+     */
+    protected void notifyTapped() {
+        if (controller != null) {
+            controller.notifyElementTapped(this);
+        }
+    }
+
+    /**
+     * Tells the controller that this element was held.
+     *
+     * @return true when the editor handled the hold, in which case the element must not
+     *         send its configured action
+     */
+    protected boolean notifyLongPressed() {
+        return controller != null && controller.notifyElementLongPressed(this);
+    }
+
     protected void actionEnableMove() {
         currentMode = Mode.Move;
     }
@@ -141,8 +273,16 @@ public abstract class UniversalVirtualControllerElement extends View {
     }
 
     protected void actionCancel() {
+        boolean wasConfiguring = currentMode != Mode.Normal;
+
         currentMode = Mode.Normal;
         invalidate();
+
+        if (wasConfiguring && controller != null) {
+            // The element was just moved or resized, so anything showing its geometry can
+            // bring itself back in step.
+            controller.notifyElementGeometrySettled(this);
+        }
     }
 
     protected int getDefaultColor() {
@@ -206,10 +346,48 @@ public abstract class UniversalVirtualControllerElement extends View {
             return true;
         }
 
-        if (controller.getControllerMode() == UniversalVirtualController.ControllerMode.Active) {
-            return onElementTouchEvent(event);
+        // The press is watched around the element's own gesture handling, whichever mode the
+        // layout is in: in the editor a tap selects the control and a hold opens its context
+        // menu, and neither may be skipped just because the layout is also being arranged.
+        if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            beginPressWatch();
+            pressWatchActive = true;
+        }
+        else if (event.getActionMasked() == MotionEvent.ACTION_MOVE && pressWatchActive) {
+            // A press that has moved is a drag, not a tap, so it must not select
+            cancelPressWatch();
+            pressWatchActive = false;
         }
 
+        boolean handled;
+
+        if (controller.getControllerMode() == UniversalVirtualController.ControllerMode.Active) {
+            handled = onElementTouchEvent(event);
+        }
+        else {
+            handled = handleArrangementTouchEvent(event);
+        }
+
+        if (event.getActionMasked() == MotionEvent.ACTION_CANCEL ||
+                event.getActionMasked() == MotionEvent.ACTION_UP) {
+            if (pressWatchActive) {
+                endPressWatch(event.getActionMasked() == MotionEvent.ACTION_UP);
+            }
+            pressWatchActive = false;
+        }
+
+        return handled;
+    }
+
+    /**
+     * True while this element is watching a press that it started itself.
+     */
+    private boolean pressWatchActive;
+
+    /**
+     * Handles a touch as an arrangement gesture: moving the control, or resizing it.
+     */
+    private boolean handleArrangementTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: {
                 position_pressed_x = event.getX();
@@ -256,7 +434,17 @@ public abstract class UniversalVirtualControllerElement extends View {
             default: {
             }
         }
+
         return true;
+    }
+
+    /**
+     * Cancels a watched press without reporting it as a tap.
+     */
+    protected void cancelPressWatch() {
+        controller.getUiHandler().removeCallbacks(longPressRunnable);
+        longPressPending = false;
+        longPressHandled = false;
     }
 
     abstract protected void onElementDraw(Canvas canvas);
@@ -302,27 +490,127 @@ public abstract class UniversalVirtualControllerElement extends View {
         return "UNIVERSAL_" + elementId;
     }
 
+    /**
+     * Kind of element, stored with its configuration so a layout can be rebuilt from the
+     * saved file even when the built-in layout no longer defines the element.
+     */
+    public String getElementTypeName() {
+        return UniversalElementTypes.ELEMENT_BASE;
+    }
+
+    /**
+     * Stable ID of this element, which is also what its saved configuration is keyed by.
+     */
+    public int getElementId() {
+        return elementId;
+    }
+
+    /**
+     * Returns this element's configuration, creating the default one on first use.
+     */
+    public UniversalElementConfig getConfig() {
+        if (config == null) {
+            config = createDefaultConfig();
+            config.setName(getElementTypeName() + " " + elementId);
+        }
+
+        return config;
+    }
+
+    protected UniversalElementConfig createDefaultConfig() {
+        return new UniversalElementConfig();
+    }
+
+    /**
+     * Returns a copy of this element's configuration, used when it is duplicated.
+     */
+    public UniversalElementConfig createConfigCopy() {
+        return getConfig().copy();
+    }
+
+    /**
+     * The configuration of this element seen as a button action, or null when this element
+     * is not a button. Triggers are buttons that report through a trigger axis, so they
+     * answer here as well.
+     */
+    public UniversalButtonConfig getButtonConfigIfAny() {
+        UniversalElementConfig config = getConfig();
+        return config instanceof UniversalButtonConfig ? (UniversalButtonConfig) config : null;
+    }
+
+    /**
+     * The configuration of this element seen as a stick, or null when this element is not
+     * a stick.
+     */
+    public UniversalStickConfig getStickConfigIfAny() {
+        UniversalElementConfig config = getConfig();
+        return config instanceof UniversalStickConfig ? (UniversalStickConfig) config : null;
+    }
+
+    /**
+     * The configuration of this element seen as a D-pad, or null when this element is not
+     * a pad.
+     */
+    public UniversalPadConfig getPadConfigIfAny() {
+        UniversalElementConfig config = getConfig();
+        return config instanceof UniversalPadConfig ? (UniversalPadConfig) config : null;
+    }
+
+    /**
+     * Replaces the configuration and writes its geometry onto the view.
+     */
+    public void applyConfig(UniversalElementConfig newConfig) {
+        if (newConfig == null) {
+            return;
+        }
+
+        this.config = newConfig;
+        newConfig.getGeometry().applyTo(this);
+        invalidate();
+    }
+
+    public String getElementName() {
+        return getConfig().getName();
+    }
+
+    public void setElementName(String name) {
+        getConfig().setName(name);
+    }
+
+    /**
+     * Copies the size and position from another element, which is what the editor's
+     * "paste size" action does.
+     */
+    public void pasteGeometryFrom(UniversalVirtualControllerElement source) {
+        UniversalGeometry geometry = UniversalGeometry.of(source).copy();
+        getConfig().setGeometry(geometry);
+        geometry.applyTo(this);
+    }
+
+    /**
+     * Releases anything this element is currently sending to the host.
+     *
+     * Elements that can hold input (a latching button, a pushed stick) override this, so
+     * that saving or tearing the layout down never leaves a key held on the host.
+     */
+    public void releaseConfiguredActions() {
+    }
+
     public JSONObject getConfiguration() throws JSONException {
-        JSONObject configuration = new JSONObject();
-
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) getLayoutParams();
-
-        configuration.put("LEFT", layoutParams.leftMargin);
-        configuration.put("TOP", layoutParams.topMargin);
-        configuration.put("WIDTH", layoutParams.width);
-        configuration.put("HEIGHT", layoutParams.height);
-
+        JSONObject configuration = getConfig().toJson();
+        configuration.put(UniversalElementTypes.KEY_TYPE, getElementTypeName());
         return configuration;
     }
 
+    /**
+     * Applies a saved configuration. Configs written before the configuration model
+     * existed only carry geometry, which {@link UniversalElementConfig#loadFromJson}
+     * still understands.
+     */
     public void loadConfiguration(JSONObject configuration) throws JSONException {
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) getLayoutParams();
+        UniversalElementConfig loaded = createDefaultConfig();
+        loaded.loadFromJson(configuration);
 
-        layoutParams.leftMargin = configuration.getInt("LEFT");
-        layoutParams.topMargin = configuration.getInt("TOP");
-        layoutParams.width = configuration.getInt("WIDTH");
-        layoutParams.height = configuration.getInt("HEIGHT");
-
-        requestLayout();
+        applyConfig(loaded);
     }
 }
