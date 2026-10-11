@@ -82,4 +82,22 @@
 
     </LinearLayout>
 
+    <!--
+        The general settings button. It belongs to the editor rather than to the layout, and it
+        can be dragged anywhere so it does not sit on top of what is being arranged. It stays
+        on top of the drawer, so it is always reachable.
+    -->
+    <ImageButton
+        android:id="@+id/layoutEditorSettingsButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_settings"
+        android:scaleType="fitCenter"
+        android:padding="12dp"
+        android:alpha="0.85"
+        android:background="#88000000"
+        android:contentDescription="@string/title_layout_settings"
+        style="?android:attr/borderlessButtonStyle"/>
+
 </RelativeLayout>

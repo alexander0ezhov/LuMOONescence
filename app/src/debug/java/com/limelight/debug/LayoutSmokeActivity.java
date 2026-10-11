@@ -1,6 +1,7 @@
 package com.limelight.debug;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -56,6 +57,11 @@ public class LayoutSmokeActivity extends Activity {
      * a single one can be treated as a stray jitter by the gesture handling.
      */
     private static final int DRAG_STEPS = 6;
+
+    /**
+     * How long to wait for a dialog to appear after it was asked for.
+     */
+    private static final long DIALOG_SETTLE_MS = 800;
 
     private int failures;
     private int checks;
@@ -386,9 +392,94 @@ public class LayoutSmokeActivity extends Activity {
                 check("holding a control does not drag it",
                         UniversalGeometry.of(holdTarget).getLeft() == holdStartLeft);
 
-                report();
+                checkSettingsButton();
             }
         }, LONG_PRESS_HOLD_MS);
+    }
+
+    /**
+     * The floating settings button is always available, whatever is selected, and its menu
+     * carries the operations that act on the whole layout.
+     */
+    private void checkSettingsButton() {
+        final View button = editor.getEditorRootView().findViewById(settingsButtonId());
+        check("the floating settings button is on screen", button != null);
+
+        if (button == null) {
+            report();
+            return;
+        }
+
+        check("the floating settings button is visible", button.getVisibility() == View.VISIBLE);
+
+        dispatchTap(button);
+
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog menu = editor.getVisibleDialogForTesting();
+                check("the settings button opens the layout menu", menu != null);
+
+                if (menu != null) {
+                    String[] labels = listItemLabels(menu);
+                    check("the layout menu offers adding a button", contains(labels, "button"));
+                    check("the layout menu offers adding a stick", contains(labels, "stick"));
+                    check("the layout menu offers saving", contains(labels, "save"));
+                    check("the layout menu offers saving as", contains(labels, "save as"));
+                    check("the layout menu offers leaving", contains(labels, "exit"));
+
+                    menu.dismiss();
+                }
+
+                report();
+            }
+        }, DIALOG_SETTLE_MS);
+    }
+
+    /**
+     * Sends a tap to a view, which is how a button with a touch listener rather than a click
+     * listener is pressed.
+     */
+    private void dispatchTap(View view) {
+        long now = SystemClock.uptimeMillis();
+        float x = Math.max(1, view.getWidth() / 2f);
+        float y = Math.max(1, view.getHeight() / 2f);
+
+        MotionEvent down = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, x, y, 0);
+        view.dispatchTouchEvent(down);
+        down.recycle();
+
+        MotionEvent up = MotionEvent.obtain(now, now + 10, MotionEvent.ACTION_UP, x, y, 0);
+        view.dispatchTouchEvent(up);
+        up.recycle();
+    }
+
+    private int settingsButtonId() {
+        return getResources().getIdentifier("layoutEditorSettingsButton", "id", getPackageName());
+    }
+
+    private static String[] listItemLabels(AlertDialog dialog) {
+        android.widget.ListView list = dialog.getListView();
+        if (list == null || list.getAdapter() == null) {
+            return new String[0];
+        }
+
+        String[] labels = new String[list.getAdapter().getCount()];
+        for (int i = 0; i < labels.length; i++) {
+            labels[i] = String.valueOf(list.getAdapter().getItem(i)).toLowerCase();
+        }
+
+        return labels;
+    }
+
+    private static boolean contains(String[] labels, String needle) {
+        for (String label : labels) {
+            if (label.contains(needle)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private UniversalVirtualControllerElement holdTarget;

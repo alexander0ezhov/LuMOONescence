@@ -123,6 +123,11 @@ public class UniversalLayoutEditorActivity extends Activity
     private static final String KEY_PANEL_POSITION = "panelPosition";
 
     /**
+     * Where the floating settings button was left, so it comes back where the user put it.
+     */
+    private static final String KEY_SETTINGS_BUTTON_POSITION = "settingsButtonPosition";
+
+    /**
      * An element smaller than this would be unusable, and the editor never creates one
      * that small.
      */
@@ -210,13 +215,15 @@ public class UniversalLayoutEditorActivity extends Activity
 
         // The header carries the type of the control being edited and the way to stop
         // editing it. Everything that acts on the whole layout is asked for by holding a
-        // control, which is also where the control menu is.
+        // control, or from the settings button that floats over the arrangement.
         findViewById(R.id.layoutEditorPanelClose).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectElement(null);
             }
         });
+
+        setUpSettingsButton();
 
         createController();
 
@@ -347,6 +354,135 @@ public class UniversalLayoutEditorActivity extends Activity
 
         multiWindowState = isInMultiWindowMode;
         getWindow().getDecorView().setSystemUiVisibility(hideSystemUiFlags());
+    }
+
+    /**
+     * The general settings button: a tap opens the menu for the whole layout, a drag moves it
+     * out of the way of what is being arranged.
+     */
+    private void setUpSettingsButton() {
+        final View button = findViewById(R.id.layoutEditorSettingsButton);
+        if (button == null) {
+            return;
+        }
+
+        button.setOnTouchListener(new View.OnTouchListener() {
+            private float downRawX;
+            private float downRawY;
+            private float startX;
+            private float startY;
+            private boolean moved;
+
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        downRawX = event.getRawX();
+                        downRawY = event.getRawY();
+                        startX = view.getX();
+                        startY = view.getY();
+                        moved = false;
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float deltaX = event.getRawX() - downRawX;
+                        float deltaY = event.getRawY() - downRawY;
+
+                        // A few pixels of slop, so a tap is not read as a drag
+                        if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+                            moved = true;
+                        }
+
+                        if (moved) {
+                            moveWithinRoot(view, startX + deltaX, startY + deltaY);
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        if (moved) {
+                            saveSettingsButtonPosition();
+                        }
+                        else {
+                            showGeneralMenu();
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_CANCEL:
+                        if (moved) {
+                            saveSettingsButtonPosition();
+                        }
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        // The position is known only once the layout has been measured
+        button.post(new Runnable() {
+            @Override
+            public void run() {
+                restoreSettingsButtonPosition();
+            }
+        });
+    }
+
+    /**
+     * Keeps a floating view inside the editor, so it cannot be dragged off screen.
+     */
+    private void moveWithinRoot(View view, float x, float y) {
+        View root = findViewById(R.id.layoutEditorFrame);
+        if (root == null) {
+            return;
+        }
+
+        float maxX = Math.max(0, root.getWidth() - view.getWidth());
+        float maxY = Math.max(0, root.getHeight() - view.getHeight());
+
+        view.setX(Math.max(0, Math.min(x, maxX)));
+        view.setY(Math.max(0, Math.min(y, maxY)));
+    }
+
+    private void saveSettingsButtonPosition() {
+        View button = findViewById(R.id.layoutEditorSettingsButton);
+        if (button == null) {
+            return;
+        }
+
+        getEditorPreferences().edit()
+                .putString(KEY_SETTINGS_BUTTON_POSITION,
+                        button.getX() + ":" + button.getY())
+                .apply();
+    }
+
+    private void restoreSettingsButtonPosition() {
+        View button = findViewById(R.id.layoutEditorSettingsButton);
+        if (button == null) {
+            return;
+        }
+
+        View root = findViewById(R.id.layoutEditorFrame);
+
+        String saved = getEditorPreferences().getString(KEY_SETTINGS_BUTTON_POSITION, null);
+        if (saved == null) {
+            // Park it against the bottom left corner, where it is out of the way of a layout
+            // that is usually arranged from the left
+            moveWithinRoot(button, 0, root == null ? 0 : root.getHeight() - button.getHeight());
+            return;
+        }
+
+        int separator = saved.indexOf(':');
+        if (separator <= 0) {
+            return;
+        }
+
+        try {
+            moveWithinRoot(button, Float.parseFloat(saved.substring(0, separator)),
+                    Float.parseFloat(saved.substring(separator + 1)));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
     }
 
     private void createController() {
@@ -637,7 +773,7 @@ public class UniversalLayoutEditorActivity extends Activity
                 getString(R.string.menu_exit),
         };
 
-        new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(this)
                 .setTitle(R.string.title_layout_settings)
                 .setItems(entries, new DialogInterface.OnClickListener() {
                     @Override
@@ -665,7 +801,7 @@ public class UniversalLayoutEditorActivity extends Activity
                         }
                     }
                 })
-                .create();
+                .create());
     }
 
     /**
