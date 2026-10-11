@@ -3,6 +3,7 @@ package com.limelight.debug;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -428,12 +429,48 @@ public class LayoutSmokeActivity extends Activity {
                     check("the layout menu offers saving as", contains(labels, "save as"));
                     check("the layout menu offers leaving", contains(labels, "exit"));
 
-                    menu.dismiss();
+                    // "Save as" must actually put a dialog on screen, which it did not while
+                    // the dialog was built without being shown
+                    clickMenuItem("save as");
                 }
 
-                report();
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog saveAs = editor.getVisibleDialogForTesting();
+                        check("choosing save as opens a dialog", saveAs != null);
+
+                        if (saveAs != null) {
+                            check("the save as dialog asks for a name",
+                                    saveAs.getButton(DialogInterface.BUTTON_POSITIVE) != null);
+                            saveAs.dismiss();
+                        }
+
+                        checkBackHandling();
+                        report();
+                    }
+                }, DIALOG_SETTLE_MS);
             }
         }, DIALOG_SETTLE_MS);
+    }
+
+    /**
+     * Answers the dialog that is on screen by the label of one of its entries.
+     */
+    private void clickMenuItem(String label) {
+        AlertDialog menu = editor.getVisibleDialogForTesting();
+        if (menu == null || menu.getListView() == null || menu.getListView().getAdapter() == null) {
+            return;
+        }
+
+        android.widget.ListView list = menu.getListView();
+        for (int i = 0; i < list.getAdapter().getCount(); i++) {
+            if (String.valueOf(list.getAdapter().getItem(i)).toLowerCase().contains(label)) {
+                menu.getListView().performItemClick(list.getChildAt(i), i,
+                        list.getAdapter().getItemId(i));
+                return;
+            }
+        }
     }
 
     /**
@@ -456,6 +493,29 @@ public class LayoutSmokeActivity extends Activity {
 
     private int settingsButtonId() {
         return getResources().getIdentifier("layoutEditorSettingsButton", "id", getPackageName());
+    }
+
+    /**
+     * The back gesture must reach the same handling the "Exit" entry of the settings menu
+     * uses, which is what asks about unsaved changes.
+     */
+    private void checkBackHandling() {
+        // Unsaved work is what makes the question appear, so the check sets that state first
+        universalController.markConfigurationDirty();
+
+        boolean newerDispatch = editor.invokeBackForTesting();
+
+        AlertDialog question = editor.getVisibleDialogForTesting();
+        check("the back gesture is handled"
+                + (newerDispatch ? " through the registered callback" : " through onBackPressed"),
+                question != null);
+        check("the back gesture asks about unsaved changes like the Exit entry does",
+                question != null);
+
+        if (question != null) {
+            question.dismiss();
+            universalController.clearLayoutDirty();
+        }
     }
 
     private static String[] listItemLabels(AlertDialog dialog) {

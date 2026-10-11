@@ -23,6 +23,8 @@ import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
 import com.limelight.R;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
@@ -224,6 +226,8 @@ public class UniversalLayoutEditorActivity extends Activity
         });
 
         setUpSettingsButton();
+
+        registerBackCallback();
 
         createController();
 
@@ -727,7 +731,7 @@ public class UniversalLayoutEditorActivity extends Activity
             }
         });
 
-        new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(this)
                 .setTitle(element.getElementName())
                 .setItems(entries.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
                     @Override
@@ -735,11 +739,11 @@ public class UniversalLayoutEditorActivity extends Activity
                         actions.get(which).run();
                     }
                 })
-                .create();
+                .create());
     }
 
     private void showDeleteElementDialog(final UniversalVirtualControllerElement element) {
-        new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(this)
                 .setTitle(R.string.menu_delete)
                 .setMessage(getString(R.string.dialog_text_delete_layout, element.getElementName()))
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -755,7 +759,7 @@ public class UniversalLayoutEditorActivity extends Activity
                     }
                 })
                 .setNegativeButton(R.string.no, null)
-                .create();
+                .create());
     }
 
     // ---------------------------------------------------------------- general menu
@@ -768,6 +772,7 @@ public class UniversalLayoutEditorActivity extends Activity
         String[] entries = new String[]{
                 getString(R.string.menu_add_button),
                 getString(R.string.menu_add_stick),
+                getString(R.string.title_reset_controls),
                 getString(R.string.menu_save),
                 getString(R.string.menu_save_as),
                 getString(R.string.menu_exit),
@@ -788,10 +793,16 @@ public class UniversalLayoutEditorActivity extends Activity
                                 break;
 
                             case 2:
-                                saveLayout();
+                                // The reset used to be a button of its own; the menu is where
+                                // it lives now
+                                showResetDialog();
                                 break;
 
                             case 3:
+                                saveLayout();
+                                break;
+
+                            case 4:
                                 showSaveAsDialog();
                                 break;
 
@@ -850,7 +861,7 @@ public class UniversalLayoutEditorActivity extends Activity
         nameInput.setHint(R.string.hint_layout_name_new);
         nameInput.setText(getString(R.string.menu_save_as) + " " + layout.getName());
 
-        new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_save_layout_as)
                 .setView(nameInput)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -865,7 +876,7 @@ public class UniversalLayoutEditorActivity extends Activity
                     }
                 })
                 .setNegativeButton(R.string.no, null)
-                .create();
+                .create());
     }
 
     /**
@@ -895,7 +906,7 @@ public class UniversalLayoutEditorActivity extends Activity
     }
 
     private void showResetDialog() {
-        new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(this)
                 .setTitle(R.string.title_reset_controls)
                 .setMessage(R.string.dialog_text_reset_layout_controls)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -905,7 +916,7 @@ public class UniversalLayoutEditorActivity extends Activity
                     }
                 })
                 .setNegativeButton(R.string.no, null)
-                .create();
+                .create());
     }
 
     private void resetControls() {
@@ -924,9 +935,55 @@ public class UniversalLayoutEditorActivity extends Activity
 
     // ---------------------------------------------------------------- leaving
 
+    /**
+     * Leaves the editor when the system back gesture is used.
+     *
+     * This is what the "Exit" entry of the settings menu does as well, so both ways out ask
+     * about unsaved changes.
+     *
+     * NOTE: from Android 13 the back gesture is delivered through the registered callback
+     * below instead of here, because this activity asks for the newer dispatch by declaring
+     * enableOnBackInvokedCallback in the manifest.
+     */
     @Override
     public void onBackPressed() {
         requestExit();
+    }
+
+    /**
+     * Registers the back gesture handler for Android 13 and newer.
+     */
+    private void registerBackCallback() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+
+        backCallback = new OnBackInvokedCallback() {
+            @Override
+            public void onBackInvoked() {
+                requestExit();
+            }
+        };
+
+        getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT, backCallback);
+    }
+
+    private OnBackInvokedCallback backCallback;
+
+    /**
+     * Invokes the back handling that the system would invoke, so the debug smoke test can
+     * check it without injecting a key event.
+     *
+     * @return true when the newer back dispatch is in use, so the callback is what answers
+     */
+    public boolean invokeBackForTesting() {
+        if (backCallback == null) {
+            return false;
+        }
+
+        backCallback.onBackInvoked();
+        return true;
     }
 
     /**
