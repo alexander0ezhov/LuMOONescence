@@ -262,12 +262,11 @@ public class UniversalLayoutEditorActivity extends Activity
         overlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
-                android.util.Log.i("LayoutSmoke", "overlay touch action=" + event.getActionMasked()
-                        + " at " + event.getX() + "," + event.getY()
-                        + " selected=" + (selectedElement != null));
-
+                // The gesture must be claimed from the first event. A view that refuses the
+                // touch down is not sent the rest of the gesture, so the release would never
+                // arrive and the drawer would never close on a tap.
                 if (event.getActionMasked() != MotionEvent.ACTION_UP) {
-                    return false;
+                    return true;
                 }
 
                 // A hold opened the control menu, so it must not also close the drawer
