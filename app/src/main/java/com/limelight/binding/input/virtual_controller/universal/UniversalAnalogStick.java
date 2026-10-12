@@ -7,7 +7,9 @@ package com.limelight.binding.input.virtual_controller.universal;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.view.MotionEvent;
 
 import com.limelight.binding.input.virtual_controller.universal.action.ActionSequence;
@@ -470,35 +472,38 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
         // set transparent background
         canvas.drawColor(Color.TRANSPARENT);
 
+        // A stick is round, so its own shape decides the corner radius rather than the
+        // configured one
+        float radius = Math.min(getWidth(), getHeight()) / 2f - 2f;
+        boolean active = stick_state != STICK_STATE.NO_MOVEMENT || isPressed();
+
+        // A stick is a disc with the thumb on it, so a filled circle is what reads as one
+        drawButtonShape(canvas, getWidth() / 2f - radius, getHeight() / 2f - radius,
+                getWidth() / 2f + radius, getHeight() / 2f + radius, radius, active);
+
+        paint.setShader(null);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(getDefaultStrokeWidth());
+        paint.setStrokeWidth(Math.max(1f, getDefaultStrokeWidth() * 0.4f));
 
-        // draw outer circle
-        if (!isPressed() || click_state == CLICK_STATE.SINGLE) {
-            paint.setColor(getDefaultColor());
-        } else {
-            paint.setColor(pressedColor);
-        }
-        canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius_complete, paint);
-
-        paint.setColor(getDefaultColor());
-        // draw dead zone
+        // The dead zone is marked so the middle of the stick is visible, which is where its
+        // middle button is pressed
+        paint.setColor(0x5AC8CDD6);
         canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius_dead_zone, paint);
 
-        // draw stick depending on state
-        switch (stick_state) {
-            case NO_MOVEMENT: {
-                paint.setColor(getDefaultColor());
-                canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius_analog_stick, paint);
-                break;
-            }
-            case MOVED_IN_DEAD_ZONE:
-            case MOVED_ACTIVE: {
-                paint.setColor(pressedColor);
-                canvas.drawCircle(position_stick_x, position_stick_y, radius_analog_stick, paint);
-                break;
-            }
-        }
+        // The thumb rests in the middle and follows the touch while the stick is pushed
+        float thumbRadius = radius_analog_stick;
+        float thumbX = stick_state == STICK_STATE.NO_MOVEMENT ? getWidth() / 2f : position_stick_x;
+        float thumbY = stick_state == STICK_STATE.NO_MOVEMENT ? getHeight() / 2f : position_stick_y;
+
+        paint.setShader(active
+                ? new LinearGradient(0, thumbY - thumbRadius, 0, thumbY + thumbRadius,
+                        0xFF7FE6FF, 0xFF2E9FC4, Shader.TileMode.CLAMP)
+                : new LinearGradient(0, thumbY - thumbRadius, 0, thumbY + thumbRadius,
+                        0xFFC9CFD8, 0xFF8A9099, Shader.TileMode.CLAMP));
+        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeWidth(0);
+        canvas.drawCircle(thumbX, thumbY, thumbRadius, paint);
+        paint.setShader(null);
     }
 
     private void updatePosition(long eventTime) {

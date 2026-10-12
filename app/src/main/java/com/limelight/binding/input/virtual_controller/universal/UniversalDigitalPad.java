@@ -59,7 +59,6 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement
 
     List<DigitalPadListener> listeners = new ArrayList<>();
 
-    private static final int DPAD_MARGIN = 5;
 
     private final Paint paint = new Paint();
 
@@ -108,114 +107,58 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement
         // set transparent background
         canvas.drawColor(Color.TRANSPARENT);
 
-        paint.setTextSize(getPercent(getCorrectWidth(), 20));
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setStrokeWidth(getDefaultStrokeWidth());
+        // The pad is one cross made of four arms. The body is drawn whole first, so the arms
+        // join without seams, and the arm that is pushed is drawn over it lit up.
+        float unit = Math.min(getWidth(), getHeight());
+        float arm = unit * ARM_SHARE;
+        float half = unit * GAP_SHARE / 2f;
+        float radius = getCornerRadius();
 
-        if (direction == DIGITAL_PAD_DIRECTION_NO_DIRECTION) {
-            // draw no direction rect
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(getDefaultColor());
-            canvas.drawRect(
-                    getPercent(getWidth(), 36), getPercent(getHeight(), 36),
-                    getPercent(getWidth(), 63), getPercent(getHeight(), 63),
-                    paint
-            );
+        float centerX = getWidth() / 2f;
+        float centerY = getHeight() / 2f;
+
+        boolean up = (direction & DIGITAL_PAD_DIRECTION_UP) > 0;
+        boolean down = (direction & DIGITAL_PAD_DIRECTION_DOWN) > 0;
+        boolean left = (direction & DIGITAL_PAD_DIRECTION_LEFT) > 0;
+        boolean right = (direction & DIGITAL_PAD_DIRECTION_RIGHT) > 0;
+
+        // The whole cross, unlit
+        drawButtonShape(canvas, centerX - half, centerY - half - arm,
+                centerX + half, centerY + half + arm, radius, false);
+        drawButtonShape(canvas, centerX - half - arm, centerY - half,
+                centerX + half + arm, centerY + half, radius, false);
+
+        // Then the pushed arms, each drawn on its own so only it lights up
+        if (up) {
+            drawButtonShape(canvas, centerX - half, centerY - half - arm,
+                    centerX + half, centerY - half, radius, true);
         }
 
-        // draw left rect
-        paint.setColor(
-                (direction & DIGITAL_PAD_DIRECTION_LEFT) > 0 ? pressedColor : getDefaultColor());
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawRect(
-                paint.getStrokeWidth()+DPAD_MARGIN, getPercent(getHeight(), 33),
-                getPercent(getWidth(), 33), getPercent(getHeight(), 66),
-                paint
-        );
+        if (down) {
+            drawButtonShape(canvas, centerX - half, centerY + half,
+                    centerX + half, centerY + half + arm, radius, true);
+        }
 
+        if (left) {
+            drawButtonShape(canvas, centerX - half - arm, centerY - half,
+                    centerX - half, centerY + half, radius, true);
+        }
 
-        // draw up rect
-        paint.setColor(
-                (direction & DIGITAL_PAD_DIRECTION_UP) > 0 ? pressedColor : getDefaultColor());
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawRect(
-                getPercent(getWidth(), 33), paint.getStrokeWidth()+DPAD_MARGIN,
-                getPercent(getWidth(), 66), getPercent(getHeight(), 33),
-                paint
-        );
-
-        // draw right rect
-        paint.setColor(
-                (direction & DIGITAL_PAD_DIRECTION_RIGHT) > 0 ? pressedColor : getDefaultColor());
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawRect(
-                getPercent(getWidth(), 66), getPercent(getHeight(), 33),
-                getWidth() - (paint.getStrokeWidth()+DPAD_MARGIN), getPercent(getHeight(), 66),
-                paint
-        );
-
-        // draw down rect
-        paint.setColor(
-                (direction & DIGITAL_PAD_DIRECTION_DOWN) > 0 ? pressedColor : getDefaultColor());
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawRect(
-                getPercent(getWidth(), 33), getPercent(getHeight(), 66),
-                getPercent(getWidth(), 66), getHeight() - (paint.getStrokeWidth()+DPAD_MARGIN),
-                paint
-        );
-
-        // draw left up line
-        paint.setColor((
-                        (direction & DIGITAL_PAD_DIRECTION_LEFT) > 0 &&
-                                (direction & DIGITAL_PAD_DIRECTION_UP) > 0
-                ) ? pressedColor : getDefaultColor()
-        );
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawLine(
-                paint.getStrokeWidth()+DPAD_MARGIN, getPercent(getHeight(), 33),
-                getPercent(getWidth(), 33), paint.getStrokeWidth()+DPAD_MARGIN,
-                paint
-        );
-
-        // draw up right line
-        paint.setColor((
-                        (direction & DIGITAL_PAD_DIRECTION_UP) > 0 &&
-                                (direction & DIGITAL_PAD_DIRECTION_RIGHT) > 0
-                ) ? pressedColor : getDefaultColor()
-        );
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawLine(
-                getPercent(getWidth(), 66), paint.getStrokeWidth()+DPAD_MARGIN,
-                getWidth() - (paint.getStrokeWidth()+DPAD_MARGIN), getPercent(getHeight(), 33),
-                paint
-        );
-
-        // draw right down line
-        paint.setColor((
-                        (direction & DIGITAL_PAD_DIRECTION_RIGHT) > 0 &&
-                                (direction & DIGITAL_PAD_DIRECTION_DOWN) > 0
-                ) ? pressedColor : getDefaultColor()
-        );
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawLine(
-                getWidth()-paint.getStrokeWidth(), getPercent(getHeight(), 66),
-                getPercent(getWidth(), 66), getHeight()-(paint.getStrokeWidth()+DPAD_MARGIN),
-                paint
-        );
-
-        // draw down left line
-        paint.setColor((
-                        (direction & DIGITAL_PAD_DIRECTION_DOWN) > 0 &&
-                                (direction & DIGITAL_PAD_DIRECTION_LEFT) > 0
-                ) ? pressedColor : getDefaultColor()
-        );
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawLine(
-                getPercent(getWidth(), 33), getHeight()-(paint.getStrokeWidth()+DPAD_MARGIN),
-                paint.getStrokeWidth()+DPAD_MARGIN, getPercent(getHeight(), 66),
-                paint
-        );
+        if (right) {
+            drawButtonShape(canvas, centerX + half, centerY - half,
+                    centerX + half + arm, centerY + half, radius, true);
+        }
     }
+
+    /**
+     * Length of one arm of the cross, as a share of the shorter side of the pad.
+     */
+    private static final float ARM_SHARE = 0.30f;
+
+    /**
+     * Width of the middle the arms meet at, as a share of the shorter side of the pad.
+     */
+    private static final float GAP_SHARE = 0.20f;
 
     private void newDirectionCallback(int direction) {
         _DBG("direction: " + direction);

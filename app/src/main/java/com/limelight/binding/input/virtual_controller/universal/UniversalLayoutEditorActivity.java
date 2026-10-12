@@ -148,9 +148,70 @@ public class UniversalLayoutEditorActivity extends Activity
     private UniversalVirtualControllerElement selectedElement;
 
     /**
-     * Size copied from one control and waiting to be pasted onto another.
+     * Size copied from one control and waiting to be pasted onto another: the width, the
+     * height and the corner radius, never the position.
      */
-    private UniversalGeometry copiedSize;
+    private int copiedWidth;
+    private int copiedHeight;
+    private int copiedBorderRadius;
+    private boolean hasCopiedSize;
+
+    /**
+     * Remembers the shape of a control: its width, its height and its corner radius.
+     *
+     * The position is deliberately not remembered, because pasting a size onto another
+     * control must leave that control where the user put it.
+     */
+    public void copySizeOf(UniversalVirtualControllerElement element) {
+        UniversalGeometry geometry = UniversalGeometry.of(element);
+
+        copiedWidth = geometry.getWidth();
+        copiedHeight = geometry.getHeight();
+        copiedBorderRadius = element.getConfig().getBorderRadius();
+        hasCopiedSize = true;
+
+        Toast.makeText(this, R.string.menu_copy_size, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Puts the copied shape onto a control, leaving it where it is.
+     */
+    public void pasteSizeOnto(UniversalVirtualControllerElement element) {
+        if (!hasCopiedSize) {
+            return;
+        }
+
+        UniversalGeometry geometry = UniversalGeometry.of(element);
+        geometry.setWidth(copiedWidth);
+        geometry.setHeight(copiedHeight);
+        geometry.applyTo(element);
+
+        // The corner radius is part of the shape, so a pasted size brings it along as well
+        element.getConfig().setBorderRadius(copiedBorderRadius);
+
+        markDirty();
+
+        if (selectedElement == element) {
+            refreshPanel();
+        }
+        else {
+            element.invalidate();
+        }
+    }
+
+    /**
+     * The size the editor is holding for a paste, for the debug smoke test.
+     */
+    public void setCopiedSizeForTesting(int width, int height, int borderRadius) {
+        copiedWidth = width;
+        copiedHeight = height;
+        copiedBorderRadius = borderRadius;
+        hasCopiedSize = true;
+    }
+
+    public boolean hasCopiedSize() {
+        return hasCopiedSize;
+    }
 
     private boolean saveDialogShowing;
 
@@ -654,6 +715,13 @@ public class UniversalLayoutEditorActivity extends Activity
                 selectedElement.setElementName(name);
                 markDirty();
             }
+
+            @Override
+            public void onBorderRadiusChanged(int percent) {
+                selectedElement.getConfig().setBorderRadius(percent);
+                selectedElement.invalidate();
+                markDirty();
+            }
         });
     }
 
@@ -748,9 +816,7 @@ public class UniversalLayoutEditorActivity extends Activity
         actions.add(new Runnable() {
             @Override
             public void run() {
-                copiedSize = UniversalGeometry.of(element).copy();
-                Toast.makeText(UniversalLayoutEditorActivity.this,
-                        R.string.menu_copy_size, Toast.LENGTH_SHORT).show();
+                copySizeOf(element);
             }
         });
 
@@ -765,17 +831,12 @@ public class UniversalLayoutEditorActivity extends Activity
             }
         });
 
-        if (copiedSize != null) {
+        if (hasCopiedSize) {
             entries.add(getString(R.string.menu_paste_size));
             actions.add(new Runnable() {
                 @Override
                 public void run() {
-                    UniversalGeometry geometry = copiedSize.copy();
-                    element.getConfig().setGeometry(geometry);
-                    geometry.applyTo(element);
-
-                    markDirty();
-                    refreshPanel();
+                    pasteSizeOnto(element);
                 }
             });
         }

@@ -26,6 +26,8 @@ import com.limelight.binding.input.virtual_controller.universal.UniversalVirtual
 import com.limelight.binding.input.virtual_controller.universal.action.ActionSequence;
 import com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer;
 import com.limelight.binding.input.virtual_controller.universal.action.InputEvent;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalButtonConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickButtonConfig;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickConfig;
@@ -580,6 +582,7 @@ public class LayoutSmokeActivity extends Activity {
         checkStickCenterButton();
         checkTriggerEvents();
         checkDpadCanBeAdded();
+        checkBorderRadiusAndCopyPaste();
     }
 
     /**
@@ -750,6 +753,10 @@ public class LayoutSmokeActivity extends Activity {
             @Override
             public void onNameChanged(String name) {
             }
+
+            @Override
+            public void onBorderRadiusChanged(int percent) {
+            }
         });
 
         UniversalEditorPanel.SliderRow widthRow =
@@ -832,6 +839,77 @@ public class LayoutSmokeActivity extends Activity {
 
         // Put the layout back the way it was
         universalController.removeElement(dpad);
+    }
+
+    /**
+     * The corner radius is part of what a control looks like, so it must survive a save and
+     * load, and it must be the radius that a copied size carries.
+     */
+    private void checkBorderRadiusAndCopyPaste() {
+        final UniversalVirtualControllerElement element = editor.getSelectedElementForTesting();
+        if (element == null) {
+            check("a control is selected for the corner radius check", false);
+            return;
+        }
+
+        UniversalEditorPanel drawer = editor.getPanelForTesting();
+        int originalRadius = element.getConfig().getBorderRadius();
+
+        try {
+            // A save and load round trip
+            UniversalElementConfig config = element.getConfig().copy();
+            config.setBorderRadius(37);
+
+            UniversalElementConfig reloaded = new UniversalButtonConfig();
+            boolean reloadedOk = false;
+
+            try {
+                reloaded.loadFromJson(config.toJson());
+                reloadedOk = true;
+            } catch (org.json.JSONException e) {
+                reloadedOk = false;
+            }
+
+            check("a corner radius survives being saved and loaded",
+                    reloadedOk && reloaded.getBorderRadius() == 37);
+
+            // The panel must offer the radius and report a change of it
+            UniversalEditorPanel.SliderRow radiusRow = drawer.getSliderRow(
+                    getString(com.limelight.R.string.editor_label_corner_radius));
+
+            check("the panel offers a corner radius slider", radiusRow != null);
+
+            if (radiusRow != null) {
+                radiusRow.dragTo(42);
+                check("the corner radius reaches the control",
+                        element.getConfig().getBorderRadius() == 42);
+            }
+
+            // A copied size carries the width, the height and the radius, and never the
+            // position
+            int beforeLeft = UniversalGeometry.of(element).getLeft();
+            int beforeTop = UniversalGeometry.of(element).getTop();
+            int wantWidth = UniversalGeometry.of(element).getWidth() + 17;
+            int wantHeight = UniversalGeometry.of(element).getHeight() + 23;
+
+            editor.copySizeOf(element);
+            check("a size can be copied", editor.hasCopiedSize());
+
+            editor.setCopiedSizeForTesting(wantWidth, wantHeight, 33);
+            editor.pasteSizeOnto(element);
+
+            UniversalGeometry pasted = UniversalGeometry.of(element);
+            check("a pasted size brings the width", pasted.getWidth() == wantWidth);
+            check("a pasted size brings the height", pasted.getHeight() == wantHeight);
+            check("a pasted size brings the corner radius",
+                    element.getConfig().getBorderRadius() == 33);
+            check("a pasted size leaves the position alone",
+                    pasted.getLeft() == beforeLeft && pasted.getTop() == beforeTop);
+        } finally {
+            // Put the control back the way it was found
+            element.getConfig().setBorderRadius(originalRadius);
+            editor.onElementTapped(element);
+        }
     }
 
     private static boolean contains(String[] labels, String needle) {        for (String label : labels) {

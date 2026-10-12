@@ -8,7 +8,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 
@@ -70,7 +69,6 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
     };
 
     private final Paint paint = new Paint();
-    private final RectF rect = new RectF();
 
     private int layer;
     private UniversalDigitalButton movingButton = null;
@@ -155,28 +153,53 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
         // set transparent background
         canvas.drawColor(Color.TRANSPARENT);
 
+        // The body is inset so the glow of a pressed button still fits inside the element
+        float stroke = Math.max(2f, getDefaultStrokeWidth());
+        float radius = getCornerRadius();
+
+        drawButtonShape(canvas, stroke, stroke, getWidth() - stroke, getHeight() - stroke,
+                radius, isPressed());
+
         paint.setTextSize(getPercent(getWidth(), 25));
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setStrokeWidth(getDefaultStrokeWidth());
-
-        paint.setColor(isPressed() ? pressedColor : getDefaultColor());
-        paint.setStyle(Paint.Style.STROKE);
-
-        rect.left = rect.top = paint.getStrokeWidth();
-        rect.right = getWidth() - rect.left;
-        rect.bottom = getHeight() - rect.top;
-
-        canvas.drawOval(rect, paint);
 
         if (icon != -1) {
             Drawable d = getResources().getDrawable(icon);
             d.setBounds(5, 5, getWidth() - 5, getHeight() - 5);
             d.draw(canvas);
         } else {
-            paint.setStyle(Paint.Style.FILL_AND_STROKE);
-            paint.setStrokeWidth(getDefaultStrokeWidth()/2);
-            canvas.drawText(text, getPercent(getWidth(), 50), getPercent(getHeight(), 63), paint);
+            // The label of a control is its name, which the drawer edits, unless it was
+            // given a text of its own
+            String label = text != null && !text.isEmpty() ? text : getElementName();
+
+            if (label != null && !label.isEmpty()) {
+                drawFittedLabel(canvas, label, isPressed());
+            }
         }
+    }
+
+    /**
+     * Draws the label in the middle of the button, shrunk until it fits, so a long name stays
+     * readable instead of running past the edge.
+     */
+    private void drawFittedLabel(Canvas canvas, String label, boolean active) {
+        float size = getPercent(getWidth(), 25);
+        float available = getWidth() * 0.82f;
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeWidth(0);
+        paint.setTextAlign(Paint.Align.CENTER);
+
+        paint.setTextSize(size);
+
+        float measured = paint.measureText(label);
+        if (measured > available && measured > 0) {
+            size = size * available / measured;
+            paint.setTextSize(size);
+        }
+
+        paint.setColor(active ? 0xFFEAF9FF : 0xFFEDEFF3);
+        canvas.drawText(label, getPercent(getWidth(), 50), getPercent(getHeight(), 63), paint);
     }
 
     private void onClickCallback() {

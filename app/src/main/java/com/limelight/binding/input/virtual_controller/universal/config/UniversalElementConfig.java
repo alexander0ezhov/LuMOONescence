@@ -15,9 +15,22 @@ public class UniversalElementConfig {
     private static final String KEY_NAME = "name";
     private static final String KEY_GEOMETRY = "geometry";
     private static final String KEY_OPTIONS = "options";
+    private static final String KEY_BORDER_RADIUS = "borderRadius";
+
+    /**
+     * Corner radius of a control that has not been given one, as a share of its shorter
+     * side. A share rather than a number of pixels, so the shape survives every resize.
+     */
+    public static final int DEFAULT_BORDER_RADIUS_PERCENT = 18;
 
     private String name = "";
     private UniversalGeometry geometry = new UniversalGeometry();
+
+    /**
+     * How round the control is drawn, as a share of its shorter side: 0 is a rectangle and
+     * 50 is a circle or a pill.
+     */
+    private int borderRadius = DEFAULT_BORDER_RADIUS_PERCENT;
 
     public String getName() {
         return name;
@@ -26,6 +39,16 @@ public class UniversalElementConfig {
     public void setName(String name) {
         this.name = name == null ? "" : name;
     }
+
+    public int getBorderRadius() {
+        return borderRadius;
+    }
+
+    public void setBorderRadius(int borderRadius) {
+        this.borderRadius = Math.max(0, Math.min(MAX_BORDER_RADIUS_PERCENT, borderRadius));
+    }
+
+    public static final int MAX_BORDER_RADIUS_PERCENT = 50;
 
     public UniversalGeometry getGeometry() {
         return geometry;
@@ -52,12 +75,16 @@ public class UniversalElementConfig {
         JSONObject json = new JSONObject();
         json.put(KEY_NAME, name);
         json.put(KEY_GEOMETRY, geometry.toJson());
+        json.put(KEY_BORDER_RADIUS, borderRadius);
         json.put(KEY_OPTIONS, createOptionsJson());
         return json;
     }
 
     public final void loadFromJson(JSONObject json) throws JSONException {
         name = json.optString(KEY_NAME, "");
+
+        // A layout written before the corner radius existed keeps the default
+        borderRadius = json.optInt(KEY_BORDER_RADIUS, DEFAULT_BORDER_RADIUS_PERCENT);
 
         // Geometry can be missing in a config that was written before this model existed
         if (json.has(KEY_GEOMETRY) || json.has("LEFT")) {
@@ -86,6 +113,7 @@ public class UniversalElementConfig {
         UniversalElementConfig copy = createEmptyCopy();
         copy.name = name;
         copy.geometry = geometry.copy();
+        copy.borderRadius = borderRadius;
         copy.copyOptionsFrom(this);
         return copy;
     }

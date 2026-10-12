@@ -54,6 +54,11 @@ public class UniversalElementEditorBuilder {
         void onGeometryChanged(int left, int top, int width, int height);
 
         void onNameChanged(String name);
+
+        /**
+         * The corner radius changed, as a share of the shorter side.
+         */
+        void onBorderRadiusChanged(int percent);
     }
 
     private final Context context;
@@ -108,7 +113,23 @@ public class UniversalElementEditorBuilder {
                         callbacks.onNameChanged(text);
                     }
                 });
+
+        // How round the control is drawn. It is a share of the shorter side, so the shape
+        // stays the same whatever the control is resized to.
+        panel.addSliderRow(context.getString(R.string.editor_label_corner_radius),
+                element.getConfig().getBorderRadius(), MAX_BORDER_RADIUS,
+                new UniversalEditorPanel.OnValueChangedListener() {
+                    @Override
+                    public void onValueChanged(int value) {
+                        callbacks.onBorderRadiusChanged(value);
+                    }
+                });
     }
+
+    /**
+     * Half of the shorter side is a full circle, so that is the top of the range.
+     */
+    private static final int MAX_BORDER_RADIUS = 50;
 
     private void buildGeometrySection(UniversalVirtualControllerElement element,
                                       final Callbacks callbacks) {

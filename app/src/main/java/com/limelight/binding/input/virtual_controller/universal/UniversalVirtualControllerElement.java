@@ -13,7 +13,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.Shader;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
@@ -292,6 +295,80 @@ public abstract class UniversalVirtualControllerElement extends View {
             return configResizeColor;
         else
             return normalColor;
+    }
+
+    // ---------------------------------------------------------------- appearance
+
+    /**
+     * The look of a control: a dark body under a light edge, with a glow when it is active.
+     *
+     * The same colours are used by every kind of control, so a layout looks like one set
+     * rather than a collection of different widgets.
+     */
+    protected static final int BODY_TOP = 0xC0333840;
+    protected static final int BODY_BOTTOM = 0xD01A1D23;
+    protected static final int EDGE_NORMAL = 0x8AC8CDD6;
+
+    protected static final int GLOW_COLOR = 0x802FD4FF;
+    protected static final int BODY_TOP_ACTIVE = 0xE0254A5C;
+    protected static final int BODY_BOTTOM_ACTIVE = 0xE0142833;
+    protected static final int EDGE_ACTIVE = 0xF04FE0FF;
+
+    private final Paint shapePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF shapeRect = new RectF();
+
+    /**
+     * Draws one part of a control: a rounded body with a light edge, and a soft glow around
+     * it while it is active.
+     *
+     * @param active whether the part is pressed, toggled on or currently pushed
+     */
+    protected void drawButtonShape(Canvas canvas, float left, float top, float right,
+                                   float bottom, float radius, boolean active) {
+        if (right - left <= 0 || bottom - top <= 0) {
+            return;
+        }
+
+        shapeRect.set(left, top, right, bottom);
+
+        if (active) {
+            float spread = Math.max(2f, getDefaultStrokeWidth() * 1.6f);
+
+            shapePaint.setStyle(Paint.Style.STROKE);
+            shapePaint.setStrokeWidth(spread * 2f);
+            shapePaint.setShader(null);
+            shapePaint.setColor(GLOW_COLOR);
+
+            shapeRect.inset(-spread * 0.5f, -spread * 0.5f);
+            canvas.drawRoundRect(shapeRect, radius + spread, radius + spread, shapePaint);
+            shapeRect.set(left, top, right, bottom);
+        }
+
+        shapePaint.setStyle(Paint.Style.FILL);
+        shapePaint.setStrokeWidth(0);
+        shapePaint.setShader(new LinearGradient(0, top, 0, bottom,
+                active ? BODY_TOP_ACTIVE : BODY_TOP,
+                active ? BODY_BOTTOM_ACTIVE : BODY_BOTTOM,
+                Shader.TileMode.CLAMP));
+
+        canvas.drawRoundRect(shapeRect, radius, radius, shapePaint);
+
+        shapePaint.setShader(null);
+        shapePaint.setStyle(Paint.Style.STROKE);
+        shapePaint.setStrokeWidth(Math.max(1.5f, getDefaultStrokeWidth() * 0.5f));
+        shapePaint.setColor(active ? EDGE_ACTIVE : EDGE_NORMAL);
+
+        canvas.drawRoundRect(shapeRect, radius, radius, shapePaint);
+    }
+
+    /**
+     * The corner radius of a control, as a share of its shorter side. Half the shorter side
+     * is a full circle or a pill, which is what the control's own shape defaults to.
+     */
+    protected float getCornerRadius() {
+        float share = getConfig().getBorderRadius();
+        int shorter = Math.min(getWidth(), getHeight());
+        return shorter * share / 100f;
     }
 
     protected int getDefaultStrokeWidth() {
@@ -575,16 +652,6 @@ public abstract class UniversalVirtualControllerElement extends View {
 
     public void setElementName(String name) {
         getConfig().setName(name);
-    }
-
-    /**
-     * Copies the size and position from another element, which is what the editor's
-     * "paste size" action does.
-     */
-    public void pasteGeometryFrom(UniversalVirtualControllerElement source) {
-        UniversalGeometry geometry = UniversalGeometry.of(source).copy();
-        getConfig().setGeometry(geometry);
-        geometry.applyTo(this);
     }
 
     /**
