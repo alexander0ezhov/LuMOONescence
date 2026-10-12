@@ -538,26 +538,38 @@ public class LayoutSmokeActivity extends Activity {
         newWidth = Math.min(newWidth, 900);
         newHeight = Math.min(newHeight, 700);
 
-        // The size change the width slider makes, and nothing else at the same time
-        editor.applySizeChangeForTesting(newWidth, originalHeight);
+        int startHeight = heightRow.getValue();
+
+        // The width slider is dragged the way a finger drags it
+        widthRow.dragTo(newWidth);
 
         UniversalGeometry afterWidth = editor.getSelectedGeometryForTesting();
-        check("the width change takes effect", afterWidth != null && afterWidth.getWidth() == newWidth);
-        check("the width change leaves the height alone",
-                afterWidth != null && afterWidth.getHeight() == originalHeight);
+        check("dragging the width slider applies the width",
+                afterWidth != null && afterWidth.getWidth() == newWidth);
+        check("dragging the width slider leaves the height alone",
+                afterWidth != null && afterWidth.getHeight() == startHeight);
 
-        // The size change the height slider makes, reading the size the way the drawer does
-        editor.applySizeChangeForTesting(
-                afterWidth == null ? newWidth : afterWidth.getWidth(), newHeight);
+        // Then the height slider, whose rows were built before the width was dragged
+        heightRow.dragTo(newHeight);
 
         UniversalGeometry afterHeight = editor.getSelectedGeometryForTesting();
-        check("the height change takes effect",
+        check("dragging the height slider applies the height",
                 afterHeight != null && afterHeight.getHeight() == newHeight);
-        check("changing the height keeps the width that was set before",
+        check("dragging the height slider keeps the dragged width",
                 afterHeight != null && afterHeight.getWidth() == newWidth);
 
-        // Put the original size back
-        editor.applySizeChangeForTesting(originalWidth, originalHeight);
+        // Put the original size back, using the rows the drawer now has
+        UniversalEditorPanel.SliderRow widthNow =
+                drawer.getSliderRow(getString(com.limelight.R.string.editor_label_width));
+        UniversalEditorPanel.SliderRow heightNow =
+                drawer.getSliderRow(getString(com.limelight.R.string.editor_label_height));
+
+        if (widthNow != null) {
+            widthNow.dragTo(originalWidth);
+        }
+        if (heightNow != null) {
+            heightNow.dragTo(originalHeight);
+        }
 
         checkRebuiltRows();
         checkStickCenterButton();

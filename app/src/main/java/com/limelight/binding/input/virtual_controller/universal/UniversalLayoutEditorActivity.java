@@ -256,23 +256,29 @@ public class UniversalLayoutEditorActivity extends Activity
      * that should close the drawer.
      */
     private void setUpEmptySpaceHandling() {
+        // The arrangement itself is looked at: it only receives a touch when no control took
+        // it, which is exactly the "empty space" case that should close the drawer. The
+        // drawer is a sibling over it, so a touch on the drawer never reaches this.
         overlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_UP:
-                        // A hold opened the control menu, so it must not also close the drawer
-                        boolean wasHold = longPressHandled;
-                        longPressHandled = false;
+                android.util.Log.i("LayoutSmoke", "overlay touch action=" + event.getActionMasked()
+                        + " at " + event.getX() + "," + event.getY()
+                        + " selected=" + (selectedElement != null));
 
-                        if (!wasHold) {
-                            selectElement(null);
-                        }
-                        return true;
-
-                    default:
-                        return false;
+                if (event.getActionMasked() != MotionEvent.ACTION_UP) {
+                    return false;
                 }
+
+                // A hold opened the control menu, so it must not also close the drawer
+                boolean wasHold = longPressHandled;
+                longPressHandled = false;
+
+                if (!wasHold) {
+                    selectElement(null);
+                }
+
+                return true;
             }
         });
     }
@@ -653,16 +659,14 @@ public class UniversalLayoutEditorActivity extends Activity
     }
 
     /**
-     * Applies one size change the way the drawer does, for the debug smoke test. It calls the
-     * very handler the sliders call, so a check here covers the real path.
+     * Applies one change the way a slider reports it, for the debug smoke test.
      */
-    public void applySizeChangeForTesting(int width, int height) {
+    public void applyGeometryForTesting(int left, int top, int width, int height) {
         if (selectedElement == null) {
             return;
         }
 
-        UniversalGeometry current = UniversalGeometry.of(selectedElement);
-        applyGeometry(current.getLeft(), current.getTop(), width, height);
+        applyGeometry(left, top, width, height);
     }
 
     /**
@@ -684,20 +688,37 @@ public class UniversalLayoutEditorActivity extends Activity
         return editorBuilder;
     }
 
-    private void applyGeometry(int left, int top, int width, int height) {        UniversalGeometry geometry = selectedElement.getConfig().getGeometry();
-        geometry.setLeft(left);
-        geometry.setTop(top);
-        geometry.setWidth(width);
-        geometry.setHeight(height);
-        geometry.applyTo(selectedElement);
+    /**
+     * Applies a position or size change.
+     *
+     * All four values are read from the sliders that are on screen right now rather than
+     * taken from the caller's arguments. A slider reports its change together with the values
+     * its rows were built with, so applying those would put back the values of every other
+     * slider as they were when the drawer was built, undoing whatever the user changed
+     * before. Reading the live sliders means a change moves only what the user moved.
+     */
+    private void applyGeometry(int left, int top, int width, int height) {
+        UniversalGeometry geometry = selectedElement.getConfig().getGeometry();
+        UniversalGeometry onScreen = UniversalGeometry.of(selectedElement);
 
-        // The sliders are shown the result instead of the drawer being rebuilt. Rebuilding
-        // here would replace the slider the user is holding, and its replacement would report
-        // the size it was built with, which is what made a width change disappear as soon as
-        // the height was changed.
+        geometry.setLeft(readSlider(R.string.editor_label_x, onScreen.getLeft()));
+        geometry.setTop(readSlider(R.string.editor_label_y, onScreen.getTop()));
+        geometry.setWidth(readSlider(R.string.editor_label_width, onScreen.getWidth()));
+        geometry.setHeight(readSlider(R.string.editor_label_height, onScreen.getHeight()));
+
+        geometry.applyTo(selectedElement);
         panel.showGeometry(geometry);
 
         markDirty();
+    }
+
+    /**
+     * The value a slider currently shows, falling back to what is on screen while the slider
+     * is not part of the drawer.
+     */
+    private int readSlider(int labelId, int fallback) {
+        UniversalEditorPanel.SliderRow row = panel.getSliderRow(getString(labelId));
+        return row == null ? fallback : row.getValue();
     }
 
     private void markDirty() {

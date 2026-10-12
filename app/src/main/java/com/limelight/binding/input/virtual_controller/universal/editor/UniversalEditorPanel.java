@@ -209,6 +209,7 @@ public class UniversalEditorPanel {
      */
     public void clear() {
         content.removeAllViews();
+        sliderRows.clear();
     }
 
     public void addSection(String title) {
@@ -420,9 +421,20 @@ public class UniversalEditorPanel {
          */
         private final SeekBar.OnSeekBarChangeListener changeListener;
 
+        /**
+         * The value that was last applied.
+         *
+         * This is not always the position of the handle: a number typed into the field may be
+         * larger than the slider can show, and the number that was typed is the one that
+         * counts.
+         */
+        private int value;
+
         private boolean updating;
 
-        SliderRow(String label, int value, int max, final OnValueChangedListener listener) {
+        SliderRow(String label, int initialValue, int max, final OnValueChangedListener listener) {
+            this.value = initialValue;
+
             LinearLayout row = new LinearLayout(context);
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setGravity(Gravity.CENTER_VERTICAL);
@@ -437,13 +449,13 @@ public class UniversalEditorPanel {
 
             seekBar = new SeekBar(context);
             seekBar.setMax(Math.max(1, max));
-            seekBar.setProgress(clamp(value, max));
+            seekBar.setProgress(clamp(initialValue, max));
             row.addView(seekBar, new LinearLayout.LayoutParams(
                     0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
             input = new EditText(context);
             input.setSingleLine(true);
-            input.setText(String.valueOf(value));
+            input.setText(String.valueOf(initialValue));
             input.setTextColor(0xFFE0E0E6);
             input.setInputType(InputType.TYPE_CLASS_NUMBER);
             input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -463,6 +475,7 @@ public class UniversalEditorPanel {
                     input.setText(String.valueOf(progress));
                     updating = false;
 
+                    SliderRow.this.value = progress;
                     listener.onValueChanged(progress);
                 }
 
@@ -504,6 +517,9 @@ public class UniversalEditorPanel {
                     seekBar.setProgress(clamp(parsed, seekBar.getMax()));
                     updating = false;
 
+                    // The number that was typed is the value, even when the slider cannot
+                    // show it, so a large typed size is not quietly cut down
+                    value = parsed;
                     listener.onValueChanged(parsed);
                 }
             });
@@ -524,6 +540,8 @@ public class UniversalEditorPanel {
          * dragged on screen. Nothing is reported back to the caller, so this cannot loop.
          */
         public void setValue(int value) {
+            this.value = value;
+
             updating = true;
             seekBar.setProgress(clamp(value, seekBar.getMax()));
             input.setText(String.valueOf(value));
@@ -531,11 +549,11 @@ public class UniversalEditorPanel {
         }
 
         /**
-         * The value the row currently shows, which is what the editor would use as the
-         * starting point of the next change.
+         * The value the row currently stands for, which is what the editor applies. It is the
+         * typed number for a typed value and the handle position for a drag.
          */
         public int getValue() {
-            return seekBar.getProgress();
+            return value;
         }
 
         /**
@@ -546,8 +564,7 @@ public class UniversalEditorPanel {
             int clamped = clamp(value, seekBar.getMax());
             seekBar.setProgress(clamped);
             changeListener.onProgressChanged(seekBar, clamped, true);
-        }
-    }
+        }    }
 
     /**
      * The rows that were added, by their label. Used by the debug smoke test to check that a
