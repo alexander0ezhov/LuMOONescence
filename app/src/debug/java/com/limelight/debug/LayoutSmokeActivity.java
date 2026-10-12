@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 
 import com.limelight.binding.input.virtual_controller.universal.UniversalAnalogStick;
+import com.limelight.binding.input.virtual_controller.universal.UniversalElementTypes;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutConfigurationLoader;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutEditorActivity;
@@ -432,6 +433,7 @@ public class LayoutSmokeActivity extends Activity {
                     String[] labels = listItemLabels(menu);
                     check("the layout menu offers adding a button", contains(labels, "button"));
                     check("the layout menu offers adding a stick", contains(labels, "stick"));
+                    check("the layout menu offers adding a D-pad", contains(labels, "d-pad"));
                     check("the layout menu offers saving", contains(labels, "save"));
                     check("the layout menu offers saving as", contains(labels, "save as"));
                     check("the layout menu offers leaving", contains(labels, "exit"));
@@ -577,6 +579,7 @@ public class LayoutSmokeActivity extends Activity {
         checkRebuiltRows();
         checkStickCenterButton();
         checkTriggerEvents();
+        checkDpadCanBeAdded();
     }
 
     /**
@@ -802,8 +805,36 @@ public class LayoutSmokeActivity extends Activity {
         return labels;
     }
 
-    private static boolean contains(String[] labels, String needle) {
-        for (String label : labels) {
+    /**
+     * A D-pad offered by the layout menu must be a real D-pad: the type the menu adds is the
+     * one the layout builder knows, and it comes with the configuration its editor needs.
+     */
+    private void checkDpadCanBeAdded() {
+        int before = universalController.getElements().size();
+
+        UniversalVirtualControllerElement dpad =
+                universalController.addUserElement(UniversalElementTypes.ELEMENT_DPAD, 60, 60, 220, 220);
+
+        check("a D-pad can be added", dpad != null);
+        check("the added D-pad has a D-pad configuration",
+                dpad != null && dpad.getPadConfigIfAny() != null);
+        check("adding a D-pad adds one control",
+                universalController.getElements().size() == before + 1);
+
+        if (dpad == null) {
+            return;
+        }
+
+        editor.onElementTapped(dpad);
+        check("the D-pad becomes the selected one",
+                editor.getSelectedElementForTesting() == dpad);
+        check("the panel has rows for a D-pad", countPanelRows() > 3);
+
+        // Put the layout back the way it was
+        universalController.removeElement(dpad);
+    }
+
+    private static boolean contains(String[] labels, String needle) {        for (String label : labels) {
             if (label.contains(needle)) {
                 return true;
             }

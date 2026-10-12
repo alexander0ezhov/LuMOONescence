@@ -829,6 +829,7 @@ public class UniversalLayoutEditorActivity extends Activity
         String[] entries = new String[]{
                 getString(R.string.menu_add_button),
                 getString(R.string.menu_add_stick),
+                getString(R.string.menu_add_dpad),
                 getString(R.string.title_reset_controls),
                 getString(R.string.menu_save),
                 getString(R.string.menu_save_as),
@@ -850,16 +851,20 @@ public class UniversalLayoutEditorActivity extends Activity
                                 break;
 
                             case 2:
+                                addElement(UniversalElementTypes.ELEMENT_DPAD);
+                                break;
+
+                            case 3:
                                 // The reset used to be a button of its own; the menu is where
                                 // it lives now
                                 showResetDialog();
                                 break;
 
-                            case 3:
+                            case 4:
                                 saveLayout();
                                 break;
 
-                            case 4:
+                            case 5:
                                 showSaveAsDialog();
                                 break;
 

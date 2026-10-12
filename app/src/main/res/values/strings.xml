@@ -272,6 +272,7 @@
     <string name="editor_label_center_button_action">What the middle sends</string>
     <string name="menu_add_button">Add button</string>
     <string name="menu_add_stick">Add stick</string>
+    <string name="menu_add_dpad">Add D-pad</string>
     <string name="menu_save">Save</string>
     <string name="menu_save_as">Save as</string>
     <string name="menu_exit">Exit</string>
