@@ -80,8 +80,7 @@ public final class InputEventNames {
         return name != null ? name : ("Key 0x" + Integer.toHexString(gfeKeyCode).toUpperCase());
     }
 
-    public static String mouseButtonName(int button) {
-        switch (button) {
+    public static String mouseButtonName(int button) {        switch (button) {
             case MouseButtonPacket.BUTTON_LEFT:
                 return "Left button";
 
@@ -102,6 +101,13 @@ public final class InputEventNames {
         }
     }
 
+    /**
+     * The name of one of the analog triggers.
+     */
+    public static String triggerName(int trigger) {
+        return trigger == InputEvent.TRIGGER_RIGHT ? "Right trigger (RT)" : "Left trigger (LT)";
+    }
+
     public static String describe(InputEvent event) {
         if (event.isKeyboard()) {
             return keyboardKeyName(event.getCode());
@@ -111,7 +117,22 @@ public final class InputEventNames {
             return "Mouse: " + mouseButtonName(event.getCode());
         }
 
+        if (event.isTrigger()) {
+            return triggerName(event.getCode());
+        }
+
         return "Pad: " + GamepadButtons.nameForCode(event.getCode());
+    }
+
+    /**
+     * The analog triggers, which are offered alongside the gamepad buttons because they are
+     * part of the same controller.
+     */
+    public static List<InputEvent> triggerCatalog() {
+        List<InputEvent> events = new ArrayList<>();
+        events.add(new InputEvent(InputEvent.KIND_TRIGGER, InputEvent.TRIGGER_LEFT));
+        events.add(new InputEvent(InputEvent.KIND_TRIGGER, InputEvent.TRIGGER_RIGHT));
+        return events;
     }
 
     /**

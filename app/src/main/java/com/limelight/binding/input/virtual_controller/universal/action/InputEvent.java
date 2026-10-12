@@ -16,6 +16,21 @@ public class InputEvent {
     public static final int KIND_MOUSE = 1;
     public static final int KIND_GAMEPAD = 2;
 
+    /**
+     * An analog trigger.
+     *
+     * The host takes a trigger as a byte of the controller packet rather than as a button
+     * flag, so it is a kind of its own: nothing in the button flags could express half a
+     * trigger.
+     */
+    public static final int KIND_TRIGGER = 3;
+
+    /**
+     * Which trigger a trigger event drives, used as its code.
+     */
+    public static final int TRIGGER_LEFT = 0;
+    public static final int TRIGGER_RIGHT = 1;
+
     private static final String KEY_KIND = "kind";
     private static final String KEY_CODE = "code";
 
@@ -51,6 +66,15 @@ public class InputEvent {
     public boolean isGamepad() {
         return kind == KIND_GAMEPAD;
     }
+
+    public boolean isTrigger() {
+        return kind == KIND_TRIGGER;
+    }
+
+    /**
+     * The value a trigger reaches when it is fully pulled.
+     */
+    public static final int TRIGGER_FULLY_PULLED = 0xFF;
 
     /**
      * Returns the gamepad packet flag of this event, or 0 when it is not a gamepad event.

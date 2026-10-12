@@ -417,6 +417,11 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
     }
 
     @Override
+    public void setTrigger(int trigger, int value) {
+        controller.getHostInput().setTrigger(trigger, value);
+    }
+
+    @Override
     public void sendMouseButton(int button, boolean down) {
         controller.getHostInput().sendMouseButton(button, down);
     }

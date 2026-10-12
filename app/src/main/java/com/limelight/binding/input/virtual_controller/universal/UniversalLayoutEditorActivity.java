@@ -917,7 +917,11 @@ public class UniversalLayoutEditorActivity extends Activity
         final EditText nameInput = new EditText(this);
         nameInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         nameInput.setHint(R.string.hint_layout_name_new);
-        nameInput.setText(getString(R.string.menu_save_as) + " " + layout.getName());
+
+        // The field starts with the current name so it can be adjusted. Nothing else is put
+        // in front of it: whatever is in the field becomes the name of the new layout.
+        nameInput.setText(layout.getName());
+        nameInput.setSelection(nameInput.getText().length());
 
         showDialog(new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_save_layout_as)

@@ -640,6 +640,18 @@ public class UniversalVirtualController {
         }
 
         @Override
+        public void setTrigger(int trigger, int value) {
+            if (trigger == com.limelight.binding.input.virtual_controller.universal.action.InputEvent.TRIGGER_LEFT) {
+                inputContext.leftTrigger = (byte) value;
+            }
+            else {
+                inputContext.rightTrigger = (byte) value;
+            }
+
+            sendControllerInputContext();
+        }
+
+        @Override
         public void sendMouseButton(int button, boolean down) {
             if (controllerHandler != null) {
                 controllerHandler.reportOscMouseButton((byte) button, down);

@@ -33,4 +33,18 @@ public class UniversalRightTrigger extends UniversalDigitalButton {
 
         controller.sendControllerInputContext();
     }
+
+    /**
+     * A trigger driving its own axis directly, which is what a trigger event on the trigger
+     * control means.
+     */
+    @Override
+    public void setTrigger(int trigger, int value) {
+        if (trigger != com.limelight.binding.input.virtual_controller.universal.action.InputEvent.TRIGGER_RIGHT) {
+            return;
+        }
+
+        controller.getControllerInputContext().rightTrigger = (byte) value;
+        controller.sendControllerInputContext();
+    }
 }

@@ -22,6 +22,9 @@ import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutE
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutStore;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualController;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualControllerElement;
+import com.limelight.binding.input.virtual_controller.universal.action.ActionSequence;
+import com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer;
+import com.limelight.binding.input.virtual_controller.universal.action.InputEvent;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickButtonConfig;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickConfig;
@@ -573,6 +576,74 @@ public class LayoutSmokeActivity extends Activity {
 
         checkRebuiltRows();
         checkStickCenterButton();
+        checkTriggerEvents();
+    }
+
+    /**
+     * An analog trigger is a kind of its own, because the host takes it as a byte of the
+     * controller packet rather than as a button flag.
+     */
+    private void checkTriggerEvents() {
+        UniversalVirtualControllerElement element = editor.getSelectedElementForTesting();
+        UniversalVirtualController controller = universalController;
+
+        if (element == null) {
+            check("a control is selected for the trigger check", false);
+            return;
+        }
+
+        final int[] lastTrigger = new int[]{-1, -1};
+        final ActionSequencePlayer.HostInput real = controller.getHostInput();
+
+        // Guards the real host input and records what the sequence sends, so the value that
+        // would reach the host is what is looked at
+        ActionSequencePlayer.HostInput recorder = new ActionSequencePlayer.HostInput() {
+            @Override
+            public void setGamepadButtons(int flagsToAdd, int flagsToRemove) {
+                real.setGamepadButtons(flagsToAdd, flagsToRemove);
+            }
+
+            @Override
+            public void setTrigger(int trigger, int value) {
+                lastTrigger[trigger] = value;
+                real.setTrigger(trigger, value);
+            }
+
+            @Override
+            public void sendMouseButton(int button, boolean down) {
+                real.sendMouseButton(button, down);
+            }
+
+            @Override
+            public void sendKeyboardKey(short keyCode, boolean down) {
+                real.sendKeyboardKey(keyCode, down);
+            }
+        };
+
+        ActionSequencePlayer player = new ActionSequencePlayer(recorder);
+
+        ActionSequence sequence = ActionSequence.single(
+                new InputEvent(InputEvent.KIND_TRIGGER, InputEvent.TRIGGER_LEFT));
+        sequence.getSteps().get(0).addEvent(
+                new InputEvent(InputEvent.KIND_TRIGGER, InputEvent.TRIGGER_RIGHT));
+
+        player.press(sequence);
+
+        check("a trigger event pulls the left trigger",
+                lastTrigger[InputEvent.TRIGGER_LEFT] == InputEvent.TRIGGER_FULLY_PULLED);
+        check("a trigger event pulls the right trigger",
+                lastTrigger[InputEvent.TRIGGER_RIGHT] == InputEvent.TRIGGER_FULLY_PULLED);
+
+        player.release();
+
+        check("releasing a trigger event lets the left trigger out",
+                lastTrigger[InputEvent.TRIGGER_LEFT] == 0);
+        check("releasing a trigger event lets the right trigger out",
+                lastTrigger[InputEvent.TRIGGER_RIGHT] == 0);
+
+        // The triggers the check pulled are put back, so the layout is not left with them on
+        universalController.getControllerInputContext().leftTrigger = 0;
+        universalController.getControllerInputContext().rightTrigger = 0;
     }
 
     /**

@@ -28,6 +28,11 @@ public class ActionSequencePlayer {
          */
         void setGamepadButtons(int flagsToAdd, int flagsToRemove);
 
+        /**
+         * Sets one of the analog triggers, see InputEvent.TRIGGER_*.
+         */
+        void setTrigger(int trigger, int value);
+
         void sendMouseButton(int button, boolean down);
 
         void sendKeyboardKey(short keyCode, boolean down);
@@ -155,6 +160,13 @@ public class ActionSequencePlayer {
             }
 
             host.setGamepadButtons(down ? flag : 0, down ? 0 : flag);
+            return true;
+        }
+
+        if (event.isTrigger()) {
+            // A trigger is released by letting it back out, which is what a value of zero is
+            host.setTrigger(event.getCode(),
+                    down ? InputEvent.TRIGGER_FULLY_PULLED : 0);
             return true;
         }
 

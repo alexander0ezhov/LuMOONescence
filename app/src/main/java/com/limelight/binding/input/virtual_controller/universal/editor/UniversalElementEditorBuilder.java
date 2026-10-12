@@ -398,13 +398,32 @@ public class UniversalElementEditorBuilder {
                 }, callbacks);
     }
 
+    /**
+     * Everything a press can send: the gamepad buttons and the analog triggers.
+     */
     private static List<InputEvent> gamepadCatalog() {
+        List<InputEvent> events = new ArrayList<>(buttonCodeCatalog());
+
+        // The analog triggers are part of the same controller, so they are offered alongside
+        // its buttons. They cannot be a button flag, which is why they are their own event
+        // kind.
+        events.addAll(InputEventNames.triggerCatalog());
+
+        return events;
+    }
+
+    /**
+     * The gamepad buttons alone, for the places that store a button code rather than an
+     * event: a stick direction and the middle of a stick press a button, not a trigger.
+     */
+    private static List<InputEvent> buttonCodeCatalog() {
         List<InputEvent> events = new ArrayList<>();
         for (GamepadButtons.Button button : GamepadButtons.all()) {
             if (button.code != GamepadButtons.CODE_NONE) {
                 events.add(new InputEvent(InputEvent.KIND_GAMEPAD, button.code));
             }
         }
+
         return events;
     }
 
@@ -503,7 +522,7 @@ public class UniversalElementEditorBuilder {
             final UniversalStickButtonConfig button = config.getButton(direction);
             final int directionIndex = direction;
 
-            List<InputEvent> catalog = gamepadCatalog();
+            List<InputEvent> catalog = buttonCodeCatalog();
             List<String> names = describeAll(catalog);
 
             // The stored value is a button code, so the selected entry is looked up by code
@@ -519,7 +538,7 @@ public class UniversalElementEditorBuilder {
                     new UniversalEditorPanel.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(int position) {
-                            int newCode = gamepadCatalog().get(position).getCode();
+                            int newCode = buttonCodeCatalog().get(position).getCode();
 
                             // A spinner reports its initial selection as well
                             if (button.getButtonCode() == newCode) {
@@ -576,7 +595,8 @@ public class UniversalElementEditorBuilder {
 
         final UniversalStickButtonConfig binding = config.getCenterButton();
 
-        List<InputEvent> catalog = gamepadCatalog();
+        // A press of the middle sends a button, so only the buttons are offered here
+        List<InputEvent> catalog = buttonCodeCatalog();
         List<String> names = describeAll(catalog);
 
         int selected = 0;
@@ -591,7 +611,7 @@ public class UniversalElementEditorBuilder {
                 selected, new UniversalEditorPanel.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(int position) {
-                        int newCode = gamepadCatalog().get(position).getCode();
+                        int newCode = buttonCodeCatalog().get(position).getCode();
 
                         if (binding.getButtonCode() == newCode) {
                             return;
