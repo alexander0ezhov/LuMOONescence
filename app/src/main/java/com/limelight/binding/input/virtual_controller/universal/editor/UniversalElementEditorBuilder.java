@@ -487,6 +487,7 @@ public class UniversalElementEditorBuilder {
                         }
                     });
 
+            buildCenterButtonSection(config, callbacks);
             return;
         }
 
@@ -536,6 +537,74 @@ public class UniversalElementEditorBuilder {
             if (button.isAssigned()) {
                 buildSequenceEditor(button.getActionSequence(), callbacks);
             }
+        }
+
+        buildCenterButtonSection(config, callbacks);
+    }
+
+    /**
+     * The middle of the stick, which is the stick click on a real controller.
+     *
+     * The switch turns the button on or off, and once it is on the binding is chosen and
+     * edited exactly like a direction binding, so what a press of the middle sends is set up
+     * the same way as everything else on the stick.
+     */
+    private void buildCenterButtonSection(final UniversalStickConfig config,
+                                         final Callbacks callbacks) {
+        panel.addSection(context.getString(R.string.editor_section_center_button));
+
+        panel.addCheckBox(context.getString(R.string.editor_label_center_button_enabled),
+                config.isCenterButtonEnabled(), new UniversalEditorPanel.OnCheckedListener() {
+                    @Override
+                    public void onCheckedChanged(boolean checked) {
+                        // A checkbox reports its initial state as well
+                        if (config.isCenterButtonEnabled() == checked) {
+                            return;
+                        }
+
+                        config.setCenterButtonEnabled(checked);
+                        callbacks.onElementChanged();
+
+                        // Turning it on or off adds or removes the binding rows
+                        onRebuildRequested.run();
+                    }
+                });
+
+        if (!config.isCenterButtonEnabled()) {
+            return;
+        }
+
+        final UniversalStickButtonConfig binding = config.getCenterButton();
+
+        List<InputEvent> catalog = gamepadCatalog();
+        List<String> names = describeAll(catalog);
+
+        int selected = 0;
+        for (int i = 0; i < catalog.size(); i++) {
+            if (catalog.get(i).getCode() == binding.getButtonCode()) {
+                selected = i;
+                break;
+            }
+        }
+
+        panel.addSpinner(context.getString(R.string.editor_label_center_button_action), names,
+                selected, new UniversalEditorPanel.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(int position) {
+                        int newCode = gamepadCatalog().get(position).getCode();
+
+                        if (binding.getButtonCode() == newCode) {
+                            return;
+                        }
+
+                        binding.setButtonCode(newCode);
+                        callbacks.onElementChanged();
+                        onRebuildRequested.run();
+                    }
+                });
+
+        if (binding.isAssigned()) {
+            buildSequenceEditor(binding.getActionSequence(), callbacks);
         }
     }
 

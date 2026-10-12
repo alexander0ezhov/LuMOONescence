@@ -266,6 +266,10 @@
     <string name="control_type_trigger">Trigger</string>
     <string name="control_type_element">Control</string>
     <string name="action_stop_editing">Stop editing</string>
+    <string name="editor_label_center_button">Middle button</string>
+    <string name="editor_section_center_button">Middle of the stick</string>
+    <string name="editor_label_center_button_enabled">Tap the middle acts as a button</string>
+    <string name="editor_label_center_button_action">What the middle sends</string>
     <string name="menu_add_button">Add button</string>
     <string name="menu_add_stick">Add stick</string>
     <string name="menu_save">Save</string>

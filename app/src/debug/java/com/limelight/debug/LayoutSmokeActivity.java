@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 
+import com.limelight.binding.input.virtual_controller.universal.UniversalAnalogStick;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutConfigurationLoader;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutEditorActivity;
@@ -22,7 +23,10 @@ import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutS
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualController;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualControllerElement;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickButtonConfig;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalStickConfig;
 import com.limelight.binding.input.virtual_controller.universal.editor.UniversalEditorPanel;
+import com.limelight.binding.input.virtual_controller.universal.editor.UniversalElementEditorBuilder;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -496,6 +500,187 @@ public class LayoutSmokeActivity extends Activity {
     }
 
     /**
+     * Checks that changing one of the size sliders does not disturb the other.
+     *
+     * The editor applies a change by writing all four values at once, so a stale value for
+     * any of them would silently undo the change that was just made.
+     */
+    private void checkSliderIndependence() {
+        Object panelField = getField(editor, "panel");
+        if (!(panelField instanceof UniversalEditorPanel)) {
+            check("the drawer panel was found", false);
+            return;
+        }
+
+        UniversalEditorPanel drawer = (UniversalEditorPanel) panelField;
+
+        String widthLabel = getString(com.limelight.R.string.editor_label_width);
+        String heightLabel = getString(com.limelight.R.string.editor_label_height);
+
+        UniversalEditorPanel.SliderRow widthRow = drawer.getSliderRow(widthLabel);
+        UniversalEditorPanel.SliderRow heightRow = drawer.getSliderRow(heightLabel);
+
+        check("the width slider is on screen", widthRow != null);
+        check("the height slider is on screen", heightRow != null);
+
+        if (widthRow == null || heightRow == null) {
+            return;
+        }
+
+        int originalWidth = widthRow.getValue();
+        int originalHeight = heightRow.getValue();
+
+        int newWidth = Math.max(24, originalWidth - 40);
+        int newHeight = Math.max(24, originalHeight - 30);
+
+        // Both changes stay inside the slider range, so the check cannot be confused by a
+        // value the slider refuses to show.
+        newWidth = Math.min(newWidth, 900);
+        newHeight = Math.min(newHeight, 700);
+
+        // The size change the width slider makes, and nothing else at the same time
+        editor.applySizeChangeForTesting(newWidth, originalHeight);
+
+        UniversalGeometry afterWidth = editor.getSelectedGeometryForTesting();
+        check("the width change takes effect", afterWidth != null && afterWidth.getWidth() == newWidth);
+        check("the width change leaves the height alone",
+                afterWidth != null && afterWidth.getHeight() == originalHeight);
+
+        // The size change the height slider makes, reading the size the way the drawer does
+        editor.applySizeChangeForTesting(
+                afterWidth == null ? newWidth : afterWidth.getWidth(), newHeight);
+
+        UniversalGeometry afterHeight = editor.getSelectedGeometryForTesting();
+        check("the height change takes effect",
+                afterHeight != null && afterHeight.getHeight() == newHeight);
+        check("changing the height keeps the width that was set before",
+                afterHeight != null && afterHeight.getWidth() == newWidth);
+
+        // Put the original size back
+        editor.applySizeChangeForTesting(originalWidth, originalHeight);
+
+        checkRebuiltRows();
+        checkStickCenterButton();
+    }
+
+    /**
+     * The middle of a stick acts as a button when it is switched on and bound, and a touch
+     * that stays in the middle is what presses it.
+     */
+    private void checkStickCenterButton() {
+        UniversalAnalogStick stick = null;
+        for (UniversalVirtualControllerElement element : universalController.getElements()) {
+            if (element instanceof UniversalAnalogStick) {
+                stick = (UniversalAnalogStick) element;
+                break;
+            }
+        }
+
+        check("the layout has a stick", stick != null);
+        if (stick == null) {
+            return;
+        }
+
+        UniversalStickConfig config = stick.getStickConfig();
+        boolean originalEnabled = config.isCenterButtonEnabled();
+        UniversalStickButtonConfig originalBinding = config.getCenterButton().copy();
+
+        // A touch in the middle while the switch is off must not press anything
+        config.setCenterButtonEnabled(false);
+        stick.forgetCenterPressForTesting();
+        tapStickCenter(stick);
+        check("the middle of the stick does nothing while it is switched off",
+                !stick.wasCenterPressedForTesting());
+
+        // Switched on and bound to the stick click, a touch in the middle presses it
+        config.setCenterButtonEnabled(true);
+        config.getCenterButton().setButtonCode(11);
+        stick.forgetCenterPressForTesting();
+        tapStickCenter(stick);
+        check("the middle of the stick presses its binding once switched on",
+                stick.wasCenterPressedForTesting());
+
+        // A touch that moves out of the middle is a movement, not a button press
+        stick.forgetCenterPressForTesting();
+        dragStickOutOfCenter(stick);
+        check("moving the stick does not also press its middle button",
+                !stick.wasCenterPressedForTesting());
+
+        // Put the original binding back
+        config.setCenterButtonEnabled(originalEnabled);
+        config.getCenterButton().setButtonCode(originalBinding.getButtonCode());
+    }
+
+    /**
+     * Sends one touch to a control, at a point given as a fraction of its size.
+     */
+    private void tapStickCenter(UniversalAnalogStick stick) {
+        stick.onElementTouchEvent(motionEventFor(stick, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+        stick.onElementTouchEvent(motionEventFor(stick, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+    }
+
+    private void dragStickOutOfCenter(UniversalAnalogStick stick) {
+        stick.onElementTouchEvent(motionEventFor(stick, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+        stick.onElementTouchEvent(motionEventFor(stick, MotionEvent.ACTION_MOVE, 0.95f, 0.5f));
+        stick.onElementTouchEvent(motionEventFor(stick, MotionEvent.ACTION_UP, 0.95f, 0.5f));
+    }
+
+    private MotionEvent motionEventFor(View view, int action, float fractionX, float fractionY) {
+        long now = SystemClock.uptimeMillis();
+        return MotionEvent.obtain(now, now, action,
+                view.getWidth() * fractionX, view.getHeight() * fractionY, 0);
+    }
+
+    /**
+     * Rebuilds the rows from the control's saved state, which is what the drawer does when it
+     * is opened again, and checks that the values a fresh set of rows reports match what was
+     * set. This is what catches a row that reports a size it was built with rather than the
+     * size the control now has.
+     */
+    private void checkRebuiltRows() {
+        final UniversalVirtualControllerElement element = editor.getSelectedElementForTesting();
+        UniversalEditorPanel drawer = editor.getPanelForTesting();
+        UniversalElementEditorBuilder builder = editor.getEditorBuilderForTesting();
+
+        if (element == null || drawer == null || builder == null) {
+            check("the drawer can be rebuilt", false);
+            return;
+        }
+
+        int width = editor.getSelectedGeometryForTesting().getWidth();
+        int height = editor.getSelectedGeometryForTesting().getHeight();
+
+        // A fresh build of the rows, exactly as opening the drawer on this control does
+        drawer.clear();
+        builder.build(element, new UniversalElementEditorBuilder.Callbacks() {
+            @Override
+            public void onElementChanged() {
+            }
+
+            @Override
+            public void onGeometryChanged(int left, int top, int newWidth, int newHeight) {
+            }
+
+            @Override
+            public void onNameChanged(String name) {
+            }
+        });
+
+        UniversalEditorPanel.SliderRow widthRow =
+                drawer.getSliderRow(getString(com.limelight.R.string.editor_label_width));
+        UniversalEditorPanel.SliderRow heightRow =
+                drawer.getSliderRow(getString(com.limelight.R.string.editor_label_height));
+
+        check("a rebuilt width row shows the size the control has",
+                widthRow != null && widthRow.getValue() == width);
+        check("a rebuilt height row shows the size the control has",
+                heightRow != null && heightRow.getValue() == height);
+
+        // Leave the drawer showing the selection again
+        editor.onElementTapped(element);
+    }
+
+    /**
      * The back gesture must reach the same handling the "Exit" entry of the settings menu
      * uses, which is what asks about unsaved changes.
      */
@@ -516,6 +701,8 @@ public class LayoutSmokeActivity extends Activity {
             question.dismiss();
             universalController.clearLayoutDirty();
         }
+
+        checkSliderIndependence();
     }
 
     private static String[] listItemLabels(AlertDialog dialog) {

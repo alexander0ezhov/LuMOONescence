@@ -27,6 +27,7 @@ public class UniversalStickConfig extends UniversalElementConfig {
     private static final String KEY_AXIS_X = "axisX";
     private static final String KEY_AXIS_Y = "axisY";
     private static final String KEY_BUTTONS = "buttons";
+    private static final String KEY_CENTER_BUTTON = "centerButton";
 
     private static final String[] DIRECTION_NAMES = new String[]{"Up", "Down", "Left", "Right"};
 
@@ -39,6 +40,17 @@ public class UniversalStickConfig extends UniversalElementConfig {
     private int axisY = UniversalHostAxis.codeOf(UniversalHostAxis.KIND_GAMEPAD, UniversalHostAxis.TARGET_LEFT_Y);
 
     private final UniversalStickButtonConfig[] buttons = new UniversalStickButtonConfig[DIRECTION_COUNT];
+
+    /**
+     * Whether a tap in the middle of the stick acts as a button, which is what the stick
+     * click (L3/R3) is on a real controller.
+     */
+    private boolean centerButtonEnabled;
+
+    /**
+     * What the middle of the stick sends. It is bound like any other button of the stick.
+     */
+    private UniversalStickButtonConfig centerButton = new UniversalStickButtonConfig();
 
     public UniversalStickConfig() {
         for (int i = 0; i < DIRECTION_COUNT; i++) {
@@ -89,6 +101,33 @@ public class UniversalStickConfig extends UniversalElementConfig {
         return mode == MODE_AXES;
     }
 
+    /**
+     * Whether a tap in the middle of the stick acts as a button at all.
+     */
+    public boolean isCenterButtonEnabled() {
+        return centerButtonEnabled;
+    }
+
+    public void setCenterButtonEnabled(boolean centerButtonEnabled) {
+        this.centerButtonEnabled = centerButtonEnabled;
+    }
+
+    /**
+     * The binding of the middle of the stick. It carries both the gamepad button and what
+     * sending it involves, exactly like a direction binding does.
+     */
+    public UniversalStickButtonConfig getCenterButton() {
+        return centerButton;
+    }
+
+    /**
+     * True when the middle of the stick should act as a button, which needs both the switch
+     * and a binding.
+     */
+    public boolean isCenterButtonActive() {
+        return centerButtonEnabled && centerButton.isAssigned();
+    }
+
     @Override
     protected JSONObject createOptionsJson() throws JSONException {
         JSONObject options = new JSONObject();
@@ -101,6 +140,11 @@ public class UniversalStickConfig extends UniversalElementConfig {
             buttonArray.put(button.toJson());
         }
         options.put(KEY_BUTTONS, buttonArray);
+
+        JSONObject center = new JSONObject();
+        center.put("enabled", centerButtonEnabled);
+        center.put("binding", centerButton.toJson());
+        options.put(KEY_CENTER_BUTTON, center);
 
         return options;
     }
@@ -115,6 +159,16 @@ public class UniversalStickConfig extends UniversalElementConfig {
         if (buttonArray != null) {
             for (int i = 0; i < DIRECTION_COUNT && i < buttonArray.length(); i++) {
                 buttons[i] = UniversalStickButtonConfig.fromJson(buttonArray.getJSONObject(i));
+            }
+        }
+
+        JSONObject center = options.optJSONObject(KEY_CENTER_BUTTON);
+        if (center != null) {
+            centerButtonEnabled = center.optBoolean("enabled", false);
+
+            JSONObject binding = center.optJSONObject("binding");
+            if (binding != null) {
+                centerButton = UniversalStickButtonConfig.fromJson(binding);
             }
         }
     }
@@ -138,5 +192,8 @@ public class UniversalStickConfig extends UniversalElementConfig {
         for (int i = 0; i < DIRECTION_COUNT; i++) {
             buttons[i] = other.buttons[i].copy();
         }
+
+        centerButtonEnabled = other.centerButtonEnabled;
+        centerButton = other.centerButton.copy();
     }
 }

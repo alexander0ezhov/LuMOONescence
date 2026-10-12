@@ -47,10 +47,29 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
     private final ActionSequencePlayer[] directionPlayers = new ActionSequencePlayer[UniversalStickConfig.DIRECTION_COUNT];
 
     /**
+     * Plays whatever the middle of the stick is bound to, which is the stick click on a real
+     * controller.
+     */
+    private ActionSequencePlayer centerPlayer;
+
+    /**
      * The directions that are currently pushed, used to avoid resending the same
      * transition on every movement event.
      */
     private final boolean[] directionPressed = new boolean[UniversalStickConfig.DIRECTION_COUNT];
+
+    /**
+     * True from the moment a touch lands in the middle of the stick until it is lifted. A
+     * touch that only ever stays in the middle is a press of the middle button rather than
+     * a movement.
+     */
+    private boolean centerTouchActive;
+
+    /**
+     * Set once the touch has moved out of the middle, which turns the touch into a movement
+     * and stops it from also acting as a button press.
+     */
+    private boolean centerTouchMoved;
 
     /**
      * outer radius size in percent of the ui element
@@ -202,6 +221,8 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
         for (int i = 0; i < directionPlayers.length; i++) {
             directionPlayers[i] = new ActionSequencePlayer(this);
         }
+
+        centerPlayer = new ActionSequencePlayer(this);
     }
 
     @Override
@@ -336,10 +357,50 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
             directionPressed[i] = false;
         }
 
+        centerPlayer.release();
+        centerTouchActive = false;
+        centerTouchMoved = false;
+
         gamepadButtonsDown = 0;
 
         // Stop the pointer as well, otherwise a stick that drives the mouse keeps moving
         controller.stopStickMouseMovement();
+    }
+
+    /**
+     * True while the touch is inside the dead zone, which is the middle of the stick.
+     */
+    private boolean isInCenter() {
+        return movement_radius <= radius_dead_zone;
+    }
+
+    /**
+     * Sends the binding of the middle of the stick, when one is enabled and assigned.
+     */
+    private void pressCenterButton() {
+        UniversalStickButtonConfig binding = getStickConfig().getCenterButton();
+
+        centerPressedForTesting = true;
+
+        centerPlayer.press(ActionSequence.single(
+                new com.limelight.binding.input.virtual_controller.universal.action.InputEvent(
+                        com.limelight.binding.input.virtual_controller.universal.action.InputEvent.KIND_GAMEPAD,
+                        binding.getButtonCode())));
+    }
+
+    /**
+     * How many times the middle of the stick has sent its binding. Used by the debug smoke
+     * test, because the press and its release are a single burst that leaves no trace on the
+     * host state to look at afterwards.
+     */
+    private boolean centerPressedForTesting;
+
+    public boolean wasCenterPressedForTesting() {
+        return centerPressedForTesting;
+    }
+
+    public void forgetCenterPressForTesting() {
+        centerPressedForTesting = false;
     }
 
     @Override
@@ -490,6 +551,13 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
             case MotionEvent.ACTION_DOWN: {
                 // set to dead zoned, will be corrected in update position if necessary
                 stick_state = STICK_STATE.MOVED_IN_DEAD_ZONE;
+
+                // A touch that starts in the middle may be a press of the middle button.
+                // Whether it is one is decided when the finger is lifted, because a touch
+                // that moves out of the middle is a movement instead.
+                centerTouchActive = getStickConfig().isCenterButtonActive() && isInCenter();
+                centerTouchMoved = false;
+
                 // check for double click
                 if (lastClickState == CLICK_STATE.SINGLE &&
                         event.getEventTime() - timeLastClick <= timeoutDoubleClick) {
@@ -513,12 +581,24 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
             }
         }
 
+        // A finger that leaves the middle is moving the stick, not pressing its button
+        if (centerTouchActive && !isInCenter()) {
+            centerTouchMoved = true;
+        }
+
         if (isPressed()) {
             // when is pressed calculate new positions (will trigger movement if necessary)
             updatePosition(event.getEventTime());
         } else {
             stick_state = STICK_STATE.NO_MOVEMENT;
             notifyOnRevoke();
+
+            // A touch that stayed in the middle throughout is a press of the middle button
+            if (centerTouchActive && !centerTouchMoved) {
+                pressCenterButton();
+                centerPlayer.release();
+            }
+            centerTouchActive = false;
 
             // not longer pressed reset analog stick
             notifyOnMovement(0, 0);

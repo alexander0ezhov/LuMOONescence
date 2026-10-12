@@ -652,13 +652,50 @@ public class UniversalLayoutEditorActivity extends Activity
         });
     }
 
-    private void applyGeometry(int left, int top, int width, int height) {
-        UniversalGeometry geometry = selectedElement.getConfig().getGeometry();
+    /**
+     * Applies one size change the way the drawer does, for the debug smoke test. It calls the
+     * very handler the sliders call, so a check here covers the real path.
+     */
+    public void applySizeChangeForTesting(int width, int height) {
+        if (selectedElement == null) {
+            return;
+        }
+
+        UniversalGeometry current = UniversalGeometry.of(selectedElement);
+        applyGeometry(current.getLeft(), current.getTop(), width, height);
+    }
+
+    /**
+     * The size the selected control currently has on screen.
+     */
+    public UniversalGeometry getSelectedGeometryForTesting() {
+        return selectedElement == null ? null : UniversalGeometry.of(selectedElement);
+    }
+
+    /**
+     * The drawer and its builder, so the debug smoke test can rebuild the rows the way the
+     * editor does and check what a fresh set of rows reports.
+     */
+    public UniversalEditorPanel getPanelForTesting() {
+        return panel;
+    }
+
+    public UniversalElementEditorBuilder getEditorBuilderForTesting() {
+        return editorBuilder;
+    }
+
+    private void applyGeometry(int left, int top, int width, int height) {        UniversalGeometry geometry = selectedElement.getConfig().getGeometry();
         geometry.setLeft(left);
         geometry.setTop(top);
         geometry.setWidth(width);
         geometry.setHeight(height);
         geometry.applyTo(selectedElement);
+
+        // The sliders are shown the result instead of the drawer being rebuilt. Rebuilding
+        // here would replace the slider the user is holding, and its replacement would report
+        // the size it was built with, which is what made a width change disappear as soon as
+        // the height was changed.
+        panel.showGeometry(geometry);
 
         markDirty();
     }

@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.limelight.R;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
 
 import java.util.List;
 
@@ -332,7 +333,9 @@ public class UniversalEditorPanel {
      */
     public SliderRow addSliderRow(String label, int value, int max,
                                  final OnValueChangedListener listener) {
-        return new SliderRow(label, value, max, listener);
+        SliderRow row = new SliderRow(label, value, max, listener);
+        sliderRows.put(label, row);
+        return row;
     }
 
     public void addButton(String text, View.OnClickListener listener) {
@@ -410,6 +413,13 @@ public class UniversalEditorPanel {
     public class SliderRow {
         private final SeekBar seekBar;
         private final EditText input;
+
+        /**
+         * Kept so a test can run the slider exactly as a drag does; the platform does not
+         * hand the listener back.
+         */
+        private final SeekBar.OnSeekBarChangeListener changeListener;
+
         private boolean updating;
 
         SliderRow(String label, int value, int max, final OnValueChangedListener listener) {
@@ -442,7 +452,7 @@ public class UniversalEditorPanel {
                     context.getResources().getDimensionPixelSize(R.dimen.layout_editor_slider_input_width),
                     ViewGroup.LayoutParams.WRAP_CONTENT));
 
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            changeListener = new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {
                     if (!fromUser || updating) {
@@ -463,7 +473,9 @@ public class UniversalEditorPanel {
                 @Override
                 public void onStopTrackingTouch(SeekBar bar) {
                 }
-            });
+            };
+
+            seekBar.setOnSeekBarChangeListener(changeListener);
 
             input.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -516,6 +528,56 @@ public class UniversalEditorPanel {
             seekBar.setProgress(clamp(value, seekBar.getMax()));
             input.setText(String.valueOf(value));
             updating = false;
+        }
+
+        /**
+         * The value the row currently shows, which is what the editor would use as the
+         * starting point of the next change.
+         */
+        public int getValue() {
+            return seekBar.getProgress();
+        }
+
+        /**
+         * Moves the slider the way a finger does, so the listener runs exactly as it does
+         * during a drag. Used by the debug smoke test.
+         */
+        public void dragTo(int value) {
+            int clamped = clamp(value, seekBar.getMax());
+            seekBar.setProgress(clamped);
+            changeListener.onProgressChanged(seekBar, clamped, true);
+        }
+    }
+
+    /**
+     * The rows that were added, by their label. Used by the debug smoke test to check that a
+     * change to one row does not disturb another.
+     */
+    private final java.util.Map<String, SliderRow> sliderRows = new java.util.HashMap<>();
+
+    public SliderRow getSliderRow(String label) {
+        return sliderRows.get(label);
+    }
+
+    /**
+     * Shows the current geometry on the position and size sliders.
+     *
+     * A change made on one slider must not rebuild the drawer: rebuilding it would replace
+     * the control the user is holding, and the rows of the new drawer would report the size
+     * they were built with, silently undoing the change just made. Updating the values in
+     * place is what keeps a width and a height change from overwriting each other.
+     */
+    public void showGeometry(UniversalGeometry geometry) {
+        setSliderValue(R.string.editor_label_x, geometry.getLeft());
+        setSliderValue(R.string.editor_label_y, geometry.getTop());
+        setSliderValue(R.string.editor_label_width, geometry.getWidth());
+        setSliderValue(R.string.editor_label_height, geometry.getHeight());
+    }
+
+    private void setSliderValue(int labelId, int value) {
+        SliderRow row = sliderRows.get(context.getString(labelId));
+        if (row != null) {
+            row.setValue(value);
         }
     }
 }
