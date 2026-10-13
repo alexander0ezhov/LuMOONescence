@@ -8,8 +8,10 @@
 package com.limelight.binding.input.virtual_controller.universal;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +26,7 @@ import com.limelight.binding.input.virtual_controller.universal.action.ActionSeq
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
 import com.limelight.nvstream.input.KeyboardPacket;
+import com.limelight.preferences.PreferenceConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -588,6 +591,34 @@ public class UniversalVirtualController {
 
         UniversalLayoutConfigurationLoader.createDefaultLayout(this, context);
         UniversalLayoutConfigurationLoader.loadFromPreferences(this, context, layoutId);
+
+        applyElementOpacity();
+    }
+
+    /**
+     * Applies the transparency the user chose for the layout.
+     *
+     * It is one setting for the whole layout rather than a per-control value, because it is
+     * about how much of the game shows through, and it covers the body, the edges and the
+     * labels together.
+     */
+    public void applyElementOpacity() {
+        float opacity = getElementOpacity();
+
+        for (UniversalVirtualControllerElement element : elements) {
+            element.setElementOpacity(opacity);
+        }
+    }
+
+    /**
+     * The transparency of the layout, 0..1. One means fully opaque.
+     */
+    public float getElementOpacity() {
+        int percent = PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING,
+                        PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_DEFAULT);
+
+        return Math.max(0.05f, Math.min(1f, percent / 100f));
     }
 
     /**

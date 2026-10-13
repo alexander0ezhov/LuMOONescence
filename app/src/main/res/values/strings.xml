@@ -260,6 +260,7 @@
     <string name="msg_editor_hint_editing">Drag a control to move it, or drag its edge to resize it. Tap &quot;Done&quot; when finished.</string>
 
     <string name="title_layout_settings">Layout settings</string>
+    <string name="title_layout_opacity">Layout opacity: %1$d%%</string>
     <string name="control_type_button">Button</string>
     <string name="control_type_stick">Stick</string>
     <string name="control_type_dpad">D-pad</string>

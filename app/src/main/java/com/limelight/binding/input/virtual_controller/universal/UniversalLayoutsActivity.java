@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -39,6 +40,10 @@ public class UniversalLayoutsActivity extends Activity {
 
     private boolean updatingSwitch;
 
+    private SeekBar opacitySlider;
+    private TextView opacityLabel;
+    private boolean updatingOpacity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +59,8 @@ public class UniversalLayoutsActivity extends Activity {
         layoutsGrid = findViewById(R.id.layoutsGrid);
         enabledSwitch = findViewById(R.id.layoutsEnabledSwitch);
         emptyText = findViewById(R.id.layoutsEmptyText);
+        opacitySlider = findViewById(R.id.layoutsOpacitySlider);
+        opacityLabel = findViewById(R.id.layoutsOpacityLabel);
 
         adapter = new LayoutGridAdapter();
         layoutsGrid.setAdapter(adapter);
@@ -91,6 +98,51 @@ public class UniversalLayoutsActivity extends Activity {
                 setUniversalLayoutEnabled(isChecked);
             }
         });
+
+        setUpOpacitySlider();
+    }
+
+    /**
+     * The transparency of the layout, as one slider for all of it.
+     */
+    private void setUpOpacitySlider() {
+        opacitySlider.setMax(100 - PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_MIN);
+
+        opacitySlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int percent = PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_MIN + progress;
+                showOpacity(percent);
+
+                if (fromUser && !updatingOpacity) {
+                    setLayoutOpacity(percent);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    private void showOpacity(int percent) {
+        opacityLabel.setText(getString(R.string.title_layout_opacity, percent));
+    }
+
+    private int getLayoutOpacity() {
+        return getPreferences().getInt(
+                PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING,
+                PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_DEFAULT);
+    }
+
+    private void setLayoutOpacity(int percent) {
+        getPreferences().edit()
+                .putInt(PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING, percent)
+                .apply();
     }
 
     @Override
@@ -119,6 +171,13 @@ public class UniversalLayoutsActivity extends Activity {
         updatingSwitch = true;
         enabledSwitch.setChecked(isUniversalLayoutEnabled());
         updatingSwitch = false;
+
+        int percent = getLayoutOpacity();
+
+        updatingOpacity = true;
+        opacitySlider.setProgress(percent - PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_MIN);
+        updatingOpacity = false;
+        showOpacity(percent);
 
         List<UniversalLayoutDefinition> layouts = layoutStore.getLayouts();
         adapter.setLayouts(layouts);

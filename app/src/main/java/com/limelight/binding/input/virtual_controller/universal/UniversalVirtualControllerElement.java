@@ -15,6 +15,7 @@ import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.DisplayMetrics;
@@ -138,6 +139,12 @@ public abstract class UniversalVirtualControllerElement extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        // The transparency of the layout applies to everything a control draws: its body, its
+        // edges, its glow and its label. The layer is skipped when the layout is opaque, which
+        // is what avoids paying for it in the common case.
+        int alpha = Math.round(elementOpacity * 255f);
+        int checkpoint = alpha >= 255 ? -1 : canvas.saveLayerAlpha(0, 0, getWidth(), getHeight(), alpha);
+
         onElementDraw(canvas);
 
         if (selected) {
@@ -162,8 +169,32 @@ public abstract class UniversalVirtualControllerElement extends View {
                     paint);
         }
 
+        if (checkpoint >= 0) {
+            canvas.restoreToCount(checkpoint);
+        }
+
         super.onDraw(canvas);
     }
+
+    /**
+     * The transparency of this control, 0..1. It comes from one setting for the whole layout.
+     */
+    public void setElementOpacity(float opacity) {
+        float clamped = Math.max(0.05f, Math.min(1f, opacity));
+
+        if (Math.abs(clamped - elementOpacity) < 0.001f) {
+            return;
+        }
+
+        elementOpacity = clamped;
+        invalidate();
+    }
+
+    public float getElementOpacity() {
+        return elementOpacity;
+    }
+
+    private float elementOpacity = 1f;
 
     /**
      * Marks this element as the one the editor is editing.
@@ -300,8 +331,8 @@ public abstract class UniversalVirtualControllerElement extends View {
     // ---------------------------------------------------------------- appearance
 
     /**
-     * The look of a control: a dark body under a light edge, with a white glow when it is
-     * active.
+     * The look of a control: a dark body under a light edge, with a soft white glow inside
+     * when it is active.
      *
      * The same colours are used by every kind of control, so a layout looks like one set
      * rather than a collection of different widgets.
@@ -310,17 +341,27 @@ public abstract class UniversalVirtualControllerElement extends View {
     protected static final int BODY_BOTTOM = 0xD01A1D23;
     protected static final int EDGE_NORMAL = 0x8AC8CDD6;
 
-    protected static final int GLOW_COLOR = 0x8AFFFFFF;
-    protected static final int BODY_TOP_ACTIVE = 0xE0484E58;
-    protected static final int BODY_BOTTOM_ACTIVE = 0xE0262A31;
-    protected static final int EDGE_ACTIVE = 0xFFFFFFFF;
+    protected static final int BODY_TOP_ACTIVE = 0xD63A4049;
+    protected static final int BODY_BOTTOM_ACTIVE = 0xD61E2228;
+    protected static final int EDGE_ACTIVE = 0xC4FFFFFF;
+
+    /**
+     * The glow is a soft halo that fades inwards rather than a bright ring, so an active
+     * control reads as lit without shouting.
+     *
+     * The middle of the gradient is faint and the outer stop is clear, which is what turns
+     * the edge into a gradual pool of light instead of a line.
+     */
+    private static final int GLOW_INNER = 0x38FFFFFF;
+    private static final int GLOW_OUTER = 0x00FFFFFF;
 
     private final Paint shapePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint glowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF shapeRect = new RectF();
 
     /**
-     * Draws one part of a control: a rounded body with a light edge, and a soft glow around
-     * it while it is active.
+     * Draws one part of a control: a rounded body with a light edge, and a soft glow inside
+     * while it is active.
      *
      * @param active whether the part is pressed, toggled on or currently pushed
      */
@@ -333,16 +374,7 @@ public abstract class UniversalVirtualControllerElement extends View {
         shapeRect.set(left, top, right, bottom);
 
         if (active) {
-            float spread = Math.max(2f, getDefaultStrokeWidth() * 1.6f);
-
-            shapePaint.setStyle(Paint.Style.STROKE);
-            shapePaint.setStrokeWidth(spread * 2f);
-            shapePaint.setShader(null);
-            shapePaint.setColor(GLOW_COLOR);
-
-            shapeRect.inset(-spread * 0.5f, -spread * 0.5f);
-            canvas.drawRoundRect(shapeRect, radius + spread, radius + spread, shapePaint);
-            shapeRect.set(left, top, right, bottom);
+            drawInnerGlow(canvas, radius);
         }
 
         shapePaint.setStyle(Paint.Style.FILL);
@@ -356,10 +388,31 @@ public abstract class UniversalVirtualControllerElement extends View {
 
         shapePaint.setShader(null);
         shapePaint.setStyle(Paint.Style.STROKE);
-        shapePaint.setStrokeWidth(Math.max(1.5f, getDefaultStrokeWidth() * 0.5f));
+        shapePaint.setStrokeWidth(Math.max(1.5f, getDefaultStrokeWidth() * 0.45f));
         shapePaint.setColor(active ? EDGE_ACTIVE : EDGE_NORMAL);
 
         canvas.drawRoundRect(shapeRect, radius, radius, shapePaint);
+    }
+
+    /**
+     * Draws the lit halo of an active control.
+     *
+     * It is a thick stroke along the edge whose gradient runs from the middle of the shape
+     * outwards, so the light is strongest just inside the border and fades into the body. The
+     * body is painted over it afterwards, which leaves only the inner part visible.
+     */
+    private void drawInnerGlow(Canvas canvas, float radius) {
+        float depth = Math.max(3f, getDefaultStrokeWidth() * 1.1f);
+
+        glowPaint.setStyle(Paint.Style.STROKE);
+        glowPaint.setStrokeWidth(depth * 2f);
+        glowPaint.setShader(new RadialGradient(
+                shapeRect.centerX(), shapeRect.centerY(),
+                Math.max(shapeRect.width(), shapeRect.height()) / 2f,
+                GLOW_INNER, GLOW_OUTER, Shader.TileMode.CLAMP));
+
+        canvas.drawRoundRect(shapeRect, radius, radius, glowPaint);
+        glowPaint.setShader(null);
     }
 
     /**

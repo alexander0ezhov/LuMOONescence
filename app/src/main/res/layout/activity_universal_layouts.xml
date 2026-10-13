@@ -59,11 +59,41 @@
         android:textColor="#FFFFFF"
         android:textSize="16sp"/>
 
+    <!--
+        How much of the game shows through the layout. One setting for the whole layout,
+        because it is about how visible the game is rather than about one control.
+    -->
+    <LinearLayout
+        android:id="@+id/layoutsOpacityBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layoutsEnabledSwitch"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:id="@+id/layoutsOpacityLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_layout_opacity"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"/>
+
+        <SeekBar
+            android:id="@+id/layoutsOpacitySlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/layoutsInfoText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/layoutsEnabledSwitch"
+        android:layout_below="@id/layoutsOpacityBox"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingLeft="16dp"

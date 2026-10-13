@@ -44,6 +44,13 @@ public class PreferenceConfiguration {
     private static final String VIDEO_FORMAT_PREF_STRING = "video_format";
     private static final String ONSCREEN_CONTROLLER_PREF_STRING = "checkbox_show_onscreen_controls";
     public static final String UNIVERSAL_LAYOUT_PREF_STRING = "checkbox_show_universal_layout";
+
+    /**
+     * How opaque the universal layout is drawn, in percent. One setting for the whole layout.
+     */
+    public static final String UNIVERSAL_LAYOUT_OPACITY_PREF_STRING = "universal_layout_opacity";
+    public static final int UNIVERSAL_LAYOUT_OPACITY_DEFAULT = 100;
+    public static final int UNIVERSAL_LAYOUT_OPACITY_MIN = 20;
     private static final String ONLY_L3_R3_PREF_STRING = "checkbox_only_show_L3R3";
     private static final String SHOW_GUIDE_BUTTON_PREF_STRING = "checkbox_show_guide_button";
     private static final String LEGACY_DISABLE_FRAME_DROP_PREF_STRING = "checkbox_disable_frame_drop";

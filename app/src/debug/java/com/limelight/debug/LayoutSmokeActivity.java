@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 
+import android.graphics.Canvas;
+import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.binding.input.virtual_controller.universal.UniversalAnalogStick;
 import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalButton;
 import com.limelight.binding.input.virtual_controller.universal.UniversalElementTypes;
@@ -585,6 +587,7 @@ public class LayoutSmokeActivity extends Activity {
         checkDpadCanBeAdded();
         checkBorderRadiusAndCopyPaste();
         checkButtonHighlightReturns();
+        checkLayoutOpacity();
     }
 
     /**
@@ -1001,6 +1004,97 @@ public class LayoutSmokeActivity extends Activity {
     private static final long LATCHED_VISIBLE_MS = 4000;
 
     private boolean keepButtonOnScreen;
+
+    /**
+     * The transparency of the layout comes from one setting, is applied to every control, and
+     * really reaches the pixels.
+     */
+    private void checkLayoutOpacity() {
+        UniversalVirtualController controller = universalController;
+
+        int originalPercent = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(this)
+                .getInt(PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING,
+                        PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_DEFAULT);
+
+        try {
+            setOpacityPercent(45);
+            check("the layout opacity is read from the settings",
+                    Math.abs(controller.getElementOpacity() - 0.45f) < 0.01f);
+
+            controller.applyElementOpacity();
+
+            boolean allApplied = !controller.getElements().isEmpty();
+            for (UniversalVirtualControllerElement element : controller.getElements()) {
+                if (Math.abs(element.getElementOpacity() - 0.45f) > 0.01f) {
+                    allApplied = false;
+                    break;
+                }
+            }
+            check("the layout opacity reaches every control", allApplied);
+
+            // And it reaches the picture: a faded control is drawn lighter than an opaque one
+            UniversalDigitalButton button = new UniversalDigitalButton(controller, 4242, 0, this);
+            button.getConfig().setName("Opacity");
+            button.getConfig().setBorderRadius(18);
+            button.setElementOpacity(1f);
+            button.measure(View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY));
+            button.layout(0, 0, 120, 120);
+
+            int opaque = averageBodyPixel(button);
+            button.setElementOpacity(0.45f);
+            int faded = averageBodyPixel(button);
+
+            check("drawing honours the layout opacity", opaque != faded);
+        } finally {
+            setOpacityPercent(originalPercent);
+            controller.applyElementOpacity();
+        }
+    }
+
+    /**
+     * Draws a control into a bitmap and returns how bright its body is, which is enough to
+     * tell an opaque control from a faded one.
+     */
+    private int averageBodyPixel(View control) {
+        int size = Math.max(1, Math.min(control.getWidth(), control.getHeight()));
+        android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(
+                size, size, android.graphics.Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(bitmap);
+        control.draw(canvas);
+
+        long total = 0;
+        long count = 0;
+
+        // The middle of the control is its body, away from the edge and the label
+        int from = size / 3;
+        int to = size * 2 / 3;
+
+        for (int x = from; x < to; x++) {
+            for (int y = from; y < to; y++) {
+                int pixel = bitmap.getPixel(x, y);
+
+                // Weighted by its own transparency, so a faded body counts as lighter
+                total += (android.graphics.Color.red(pixel)
+                        + android.graphics.Color.green(pixel)
+                        + android.graphics.Color.blue(pixel)) / 3
+                        * android.graphics.Color.alpha(pixel) / 255;
+                count++;
+            }
+        }
+
+        bitmap.recycle();
+        return count == 0 ? 0 : (int) (total / count);
+    }
+
+    private void setOpacityPercent(int percent) {
+        android.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                .edit()
+                .putInt(PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING, percent)
+                .apply();
+    }
 
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
