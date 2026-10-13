@@ -18,24 +18,21 @@ public class UniversalLeftTrigger extends UniversalDigitalButton {
     }
 
     /**
-     * A trigger is an analog axis on the host rather than a button, so its press is
-     * reported through the trigger byte of the controller packet instead of a button
-     * flag. What triggers it is described by its configuration like any other button.
+     * A trigger is an analog axis on the host rather than a button, so its press is reported
+     * through the trigger byte of the controller packet instead of a button flag.
+     *
+     * The byte follows the control's own press and release, exactly as the built-in on-screen
+     * trigger does, so a trigger works the moment it is on screen and does not need anything
+     * configured for it. Its configuration is still free to send other inputs as well.
      */
     @Override
-    public void setGamepadButtons(int flagsToAdd, int flagsToRemove) {
-        if (flagsToAdd != 0) {
-            controller.getControllerInputContext().leftTrigger = (byte) 0xFF;
-        }
-        else if (flagsToRemove != 0) {
-            controller.getControllerInputContext().leftTrigger = 0;
-        }
-
+    protected void onPressedStateChanged(boolean pressed) {
+        controller.getControllerInputContext().leftTrigger = (byte) (pressed ? 0xFF : 0);
         controller.sendControllerInputContext();
     }
 
     /**
-     * A trigger driving its own axis directly, which is what a trigger event on the trigger
+     * A trigger driving its own axis directly, which is what a trigger event bound to any
      * control means.
      */
     @Override

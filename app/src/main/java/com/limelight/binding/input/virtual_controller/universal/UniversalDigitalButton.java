@@ -92,13 +92,13 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
                 && this.inRange(x, y)) {
             // set button pressed state depending on moving button pressed state
             if (this.isPressed() != movingButton.isPressed()) {
-                this.setPressed(movingButton.isPressed());
+                applyPressedState(movingButton.isPressed());
             }
         }
         // check if the movement is outside of the range and the movement button
         // is the saved moving button
         else if (movingButton == this.movingButton) {
-            this.setPressed(false);
+            applyPressedState(false);
         }
 
         // check if a change occurred
@@ -242,7 +242,7 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
                 movingButton = null;
-                setPressed(true);
+                applyPressedState(true);
 
                 // The editor uses a hold to open the context menu; during a stream nothing
                 // listens, so the action is sent as usual.
@@ -267,7 +267,7 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
             }
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
-                setPressed(false);
+                applyPressedState(false);
 
                 boolean wasHold = endPressWatch(action == MotionEvent.ACTION_UP);
 
@@ -327,6 +327,25 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
     }
 
     /**
+     * Sets the control's own pressed state and tells the subclass about it.
+     *
+     * A control whose host state is not a button flag needs to know when it goes down and up,
+     * because the configured sequence is not what drives it: a trigger writes an analog value
+     * instead of a flag, and it must do so even when nothing is configured for it.
+     */
+    private void applyPressedState(boolean pressed) {
+        setPressed(pressed);
+        onPressedStateChanged(pressed);
+    }
+
+    /**
+     * Called whenever this control's own pressed state changes, whatever its configured
+     * action does. A latched button reports the latched state as well.
+     */
+    protected void onPressedStateChanged(boolean pressed) {
+    }
+
+    /**
      * One tap of a toggle button presses, the next one releases. A plain button is held
      * for as long as the finger is on it.
      */
@@ -372,7 +391,7 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
 
         // A latched button stays visibly pressed, otherwise the user cannot tell that it is
         // still sending input.
-        setPressed(isToggledOn());
+        applyPressedState(isToggledOn());
         invalidate();
     }
 
@@ -387,7 +406,7 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
 
         // Nothing is being sent any more, so the latch is off as well
         toggledOn = false;
-        setPressed(false);
+        applyPressedState(false);
     }
 
     @Override

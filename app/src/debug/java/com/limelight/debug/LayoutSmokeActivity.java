@@ -23,6 +23,7 @@ import com.limelight.binding.input.virtual_controller.universal.UniversalDigital
 import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalPad;
 import com.limelight.binding.input.virtual_controller.universal.UniversalElementTypes;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutConfigurationLoader;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLeftTrigger;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutEditorActivity;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutStore;
@@ -594,6 +595,7 @@ public class LayoutSmokeActivity extends Activity {
         checkDraggingMarksLayoutDirty();
         checkDraggedGeometryIsSaved();
         checkOnScreenLayoutRegistersGamepad();
+        checkTriggersWorkOnTheirOwn();
     }
 
     /**
@@ -1314,6 +1316,52 @@ public class LayoutSmokeActivity extends Activity {
                 ControllerHandler.onScreenPlayerMask(true, true) == 1);
         check("no on-screen layout leaves player one out",
                 ControllerHandler.onScreenPlayerMask(false, false) == 0);
+    }
+
+    /**
+     * A trigger drives an analog byte, not a button flag, and it must do so with nothing
+     * configured for it, exactly as the built-in on-screen trigger does.
+     */
+    private void checkTriggersWorkOnTheirOwn() {
+        UniversalVirtualController controller = universalController;
+
+        // The left trigger of the layout that is on screen, which is how the built-in one is
+        // made: it carries the left trigger's own element id
+        UniversalVirtualControllerElement lt = null;
+        for (UniversalVirtualControllerElement element : controller.getElements()) {
+            if (element instanceof UniversalLeftTrigger) {
+                lt = element;
+                break;
+            }
+        }
+
+        check("the layout has a left trigger", lt != null);
+
+        if (lt == null) {
+            return;
+        }
+
+        UniversalVirtualController.ControllerMode originalMode = controller.getControllerMode();
+        controller.setControllerMode(UniversalVirtualController.ControllerMode.Active);
+
+        try {
+            // Nothing is configured for it, which is how the built-in layout makes one
+            ((UniversalLeftTrigger) lt).getButtonConfig().setActionSequence(ActionSequence.empty());
+
+            controller.getControllerInputContext().leftTrigger = 0;
+
+            lt.onElementTouchEvent(motionEventFor(lt, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+            check("a trigger pulls its axis without anything configured for it",
+                    controller.getControllerInputContext().leftTrigger == (byte) 0xFF);
+
+            lt.onElementTouchEvent(motionEventFor(lt, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+            check("a trigger lets its axis out again",
+                    controller.getControllerInputContext().leftTrigger == 0);
+        } finally {
+            lt.releaseConfiguredActions();
+            controller.getControllerInputContext().leftTrigger = 0;
+            controller.setControllerMode(originalMode);
+        }
     }
 
     private static boolean contains(String[] labels, String needle) {
