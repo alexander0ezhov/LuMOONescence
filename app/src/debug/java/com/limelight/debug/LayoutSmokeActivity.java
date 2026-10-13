@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 
 import com.limelight.binding.input.virtual_controller.universal.UniversalAnalogStick;
+import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalButton;
 import com.limelight.binding.input.virtual_controller.universal.UniversalElementTypes;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutConfigurationLoader;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
@@ -583,6 +584,7 @@ public class LayoutSmokeActivity extends Activity {
         checkTriggerEvents();
         checkDpadCanBeAdded();
         checkBorderRadiusAndCopyPaste();
+        checkButtonHighlightReturns();
     }
 
     /**
@@ -912,7 +914,96 @@ public class LayoutSmokeActivity extends Activity {
         }
     }
 
-    private static boolean contains(String[] labels, String needle) {        for (String label : labels) {
+    /**
+     * A plain button lights up while it is held and goes back to normal when the finger
+     * comes off. Only a latched button stays lit, which is what tells the user it is still
+     * sending.
+     */
+    private void checkButtonHighlightReturns() {
+        // A button of its own, so the check does not depend on what happens to be selected
+        UniversalVirtualControllerElement created = universalController.addUserElement(
+                UniversalElementTypes.ELEMENT_BUTTON, 30, 30, 160, 160);
+
+        if (!(created instanceof UniversalDigitalButton)) {
+            check("a button is available for the highlight check", false);
+            return;
+        }
+
+        UniversalDigitalButton button = (UniversalDigitalButton) created;
+        UniversalButtonConfig config = button.getButtonConfig();
+
+        boolean originalToggle = config.isToggle();
+        UniversalVirtualController.ControllerMode originalMode =
+                universalController.getControllerMode();
+
+        try {
+            // In a stream a press of a button sends its action, which is the case this looks at
+            universalController.setControllerMode(UniversalVirtualController.ControllerMode.Active);
+
+            config.setToggle(false);
+            button.releaseConfiguredActions();
+
+            button.onElementTouchEvent(motionEventFor(button, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+            check("a held button looks pressed", button.isPressed());
+
+            button.onElementTouchEvent(motionEventFor(button, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+            check("a released button stops looking pressed", !button.isPressed());
+            check("a released button is not left holding its action", !button.isToggledOn());
+
+            // A latching button is the one case that stays lit
+            config.setToggle(true);
+            button.releaseConfiguredActions();
+
+            button.onElementTouchEvent(motionEventFor(button, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+            button.onElementTouchEvent(motionEventFor(button, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+            check("a latched button stays lit after the finger is lifted", button.isPressed());
+
+            // The next tap lets it go
+            button.onElementTouchEvent(motionEventFor(button, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+            button.onElementTouchEvent(motionEventFor(button, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+            check("a latched button goes out on the next tap", !button.isPressed());
+
+            // The button is left latched for a moment, so the glow of a pressed control can
+            // be looked at on screen. It is let go and taken away afterwards.
+            config.setToggle(true);
+            button.releaseConfiguredActions();
+            button.onElementTouchEvent(motionEventFor(button, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+            button.onElementTouchEvent(motionEventFor(button, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+
+            final UniversalDigitalButton latched = button;
+
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    latched.releaseConfiguredActions();
+                    universalController.removeElement(latched);
+                }
+            }, LATCHED_VISIBLE_MS);
+
+            // The button stays on screen until the delayed run takes it away
+            keepButtonOnScreen = true;
+        } finally {
+            config.setToggle(originalToggle);
+            universalController.setControllerMode(originalMode);
+
+            // The button is left on screen when it is showing a latched state, so the glow
+            // can be seen; the delayed run above takes it away
+            if (!keepButtonOnScreen) {
+                button.releaseConfiguredActions();
+                universalController.removeElement(button);
+            }
+        }
+    }
+
+    /**
+     * How long a latched button is left on screen, so its glow can be looked at.
+     */
+    private static final long LATCHED_VISIBLE_MS = 4000;
+
+    private boolean keepButtonOnScreen;
+
+    private static boolean contains(String[] labels, String needle) {
+        for (String label : labels) {
             if (label.contains(needle)) {
                 return true;
             }

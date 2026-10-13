@@ -279,7 +279,13 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
 
                 checkMovementForAllButtons(x, y);
 
-                invalidate();
+                // A latched button is on again straight away, because it is still sending
+                if (getButtonConfig().isToggle()) {
+                    updateToggledAppearance();
+                }
+                else {
+                    invalidate();
+                }
 
                 return true;
             }
@@ -304,11 +310,20 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
     }
 
     /**
+     * True while a latching button is on.
+     *
+     * This is the button's own memory rather than the player's: a button with nothing
+     * assigned yet holds no input, and it still has to show that it is latched, otherwise
+     * the switch looks broken while it is being set up.
+     */
+    private boolean toggledOn;
+
+    /**
      * True while this button is toggled on, which is only possible when it is configured
      * as a toggle.
      */
     public boolean isToggledOn() {
-        return sequencePlayer.isHolding();
+        return toggledOn;
     }
 
     /**
@@ -320,9 +335,11 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
 
         if (config.isToggle()) {
             if (isToggledOn()) {
+                toggledOn = false;
                 sequencePlayer.release();
             }
             else {
+                toggledOn = true;
                 sequencePlayer.press(config.getActionSequence());
             }
         }
@@ -343,9 +360,19 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
     }
 
     private void updateToggledAppearance() {
-        // A latched button must stay visibly pressed, otherwise the user cannot tell that
-        // it is still sending input.
-        setPressed(getButtonConfig().isToggle() && isToggledOn());
+        UniversalButtonConfig config = getButtonConfig();
+
+        // Only a latching button shows a state of its own. A plain button must not be touched
+        // here: it looks pressed exactly while the finger is on it, which is what the press
+        // and release handlers already set, and clearing that here would make its highlight
+        // flash for a moment and disappear.
+        if (!config.isToggle()) {
+            return;
+        }
+
+        // A latched button stays visibly pressed, otherwise the user cannot tell that it is
+        // still sending input.
+        setPressed(isToggledOn());
         invalidate();
     }
 
@@ -357,6 +384,9 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
     public void releaseConfiguredActions() {
         sequencePlayer.cancel();
         gamepadButtonsDown = 0;
+
+        // Nothing is being sent any more, so the latch is off as well
+        toggledOn = false;
         setPressed(false);
     }
 

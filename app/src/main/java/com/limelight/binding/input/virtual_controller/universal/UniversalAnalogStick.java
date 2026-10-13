@@ -497,7 +497,7 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
 
         paint.setShader(active
                 ? new LinearGradient(0, thumbY - thumbRadius, 0, thumbY + thumbRadius,
-                        0xFF7FE6FF, 0xFF2E9FC4, Shader.TileMode.CLAMP)
+                        0xFFFFFFFF, 0xFFA8B0BA, Shader.TileMode.CLAMP)
                 : new LinearGradient(0, thumbY - thumbRadius, 0, thumbY + thumbRadius,
                         0xFFC9CFD8, 0xFF8A9099, Shader.TileMode.CLAMP));
         paint.setStyle(Paint.Style.FILL);

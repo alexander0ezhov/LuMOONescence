@@ -300,7 +300,8 @@ public abstract class UniversalVirtualControllerElement extends View {
     // ---------------------------------------------------------------- appearance
 
     /**
-     * The look of a control: a dark body under a light edge, with a glow when it is active.
+     * The look of a control: a dark body under a light edge, with a white glow when it is
+     * active.
      *
      * The same colours are used by every kind of control, so a layout looks like one set
      * rather than a collection of different widgets.
@@ -309,10 +310,10 @@ public abstract class UniversalVirtualControllerElement extends View {
     protected static final int BODY_BOTTOM = 0xD01A1D23;
     protected static final int EDGE_NORMAL = 0x8AC8CDD6;
 
-    protected static final int GLOW_COLOR = 0x802FD4FF;
-    protected static final int BODY_TOP_ACTIVE = 0xE0254A5C;
-    protected static final int BODY_BOTTOM_ACTIVE = 0xE0142833;
-    protected static final int EDGE_ACTIVE = 0xF04FE0FF;
+    protected static final int GLOW_COLOR = 0x8AFFFFFF;
+    protected static final int BODY_TOP_ACTIVE = 0xE0484E58;
+    protected static final int BODY_BOTTOM_ACTIVE = 0xE0262A31;
+    protected static final int EDGE_ACTIVE = 0xFFFFFFFF;
 
     private final Paint shapePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF shapeRect = new RectF();

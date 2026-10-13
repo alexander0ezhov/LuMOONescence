@@ -28,6 +28,10 @@
             android:name=".debug.DialogCheckActivity"
             android:exported="true"
             android:label="Layout dialog check" />
+        <activity
+            android:name=".debug.StylePreviewActivity"
+            android:exported="true"
+            android:label="Control style preview" />
     </application>
 
 </manifest>
