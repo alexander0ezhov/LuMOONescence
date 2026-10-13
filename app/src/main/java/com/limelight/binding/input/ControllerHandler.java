@@ -1077,12 +1077,26 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
 
     private short getActiveControllerMask() {
         if (prefConfig.multiController) {
-            return (short)(currentControllers | initialControllers | (prefConfig.onscreenController ? 1 : 0));
+            return (short)(currentControllers | initialControllers
+                    | onScreenPlayerMask(prefConfig.onscreenController, prefConfig.universalLayout));
         }
         else {
             // Only Player 1 is active with multi-controller disabled
             return 1;
         }
+    }
+
+    /**
+     * The player-one bit when an on-screen layout is in use.
+     *
+     * The host learns which players have a gamepad from the mask carried by every input
+     * packet, so a layout that is not in this mask is ignored no matter how much input it
+     * sends. Both on-screen layouts count: the built-in one and the universal one, which is
+     * a separate setting and used to be left out, leaving the universal layout unable to
+     * register its gamepad until the built-in one was enabled as well.
+     */
+    public static int onScreenPlayerMask(boolean onscreenController, boolean universalLayout) {
+        return (onscreenController || universalLayout) ? 1 : 0;
     }
 
     private static boolean areBatteryCapacitiesEqual(float first, float second) {

@@ -593,6 +593,23 @@ public class UniversalVirtualController {
         UniversalLayoutConfigurationLoader.loadFromPreferences(this, context, layoutId);
 
         applyElementOpacity();
+        announceToHost();
+    }
+
+    /**
+     * Tells the host that this layout is a gamepad, without waiting for the user to press
+     * something.
+     *
+     * The host decides which players have a gamepad from the mask carried by every input
+     * packet, so one empty packet is what registers the gamepad as soon as the layout is on
+     * screen. Nothing is sent from the layout editor, where there is no host to talk to.
+     */
+    public void announceToHost() {
+        if (controllerHandler == null) {
+            return;
+        }
+
+        sendControllerInputContextInternal();
     }
 
     /**

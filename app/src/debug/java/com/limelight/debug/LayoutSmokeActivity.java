@@ -17,6 +17,7 @@ import android.widget.ScrollView;
 
 import android.graphics.Canvas;
 import com.limelight.preferences.PreferenceConfiguration;
+import com.limelight.binding.input.ControllerHandler;
 import com.limelight.binding.input.virtual_controller.universal.UniversalAnalogStick;
 import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalButton;
 import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalPad;
@@ -592,6 +593,7 @@ public class LayoutSmokeActivity extends Activity {
         checkDpadTouchZones();
         checkDraggingMarksLayoutDirty();
         checkDraggedGeometryIsSaved();
+        checkOnScreenLayoutRegistersGamepad();
     }
 
     /**
@@ -1298,6 +1300,21 @@ public class LayoutSmokeActivity extends Activity {
      * the user made.
      */
     private static final String SCRATCH_LAYOUT_ID = "smoke-test-scratch";
+
+    /**
+     * The host only registers a gamepad for the players named in the mask of an input packet,
+     * so a layout that is not in the mask has all of its input ignored.
+     */
+    private void checkOnScreenLayoutRegistersGamepad() {
+        check("the built-in on-screen layout names player one",
+                ControllerHandler.onScreenPlayerMask(true, false) == 1);
+        check("the universal layout names player one on its own",
+                ControllerHandler.onScreenPlayerMask(false, true) == 1);
+        check("both on-screen layouts together still name player one",
+                ControllerHandler.onScreenPlayerMask(true, true) == 1);
+        check("no on-screen layout leaves player one out",
+                ControllerHandler.onScreenPlayerMask(false, false) == 0);
+    }
 
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
