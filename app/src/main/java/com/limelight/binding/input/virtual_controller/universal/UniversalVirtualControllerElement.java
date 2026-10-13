@@ -125,6 +125,10 @@ public abstract class UniversalVirtualControllerElement extends View {
         layoutParams.bottomMargin = 0;
 
         requestLayout();
+
+        // The configuration follows every step of the drag, so anything that reads it while
+        // the control is being moved sees where it is
+        syncConfigGeometry();
     }
 
     protected void resizeElement(int pressed_x, int pressed_y, int width, int height) {
@@ -137,6 +141,8 @@ public abstract class UniversalVirtualControllerElement extends View {
         layoutParams.width = newWidth > 20 ? newWidth : 20;
 
         requestLayout();
+
+        syncConfigGeometry();
     }
 
     @Override
@@ -776,9 +782,37 @@ public abstract class UniversalVirtualControllerElement extends View {
     }
 
     public JSONObject getConfiguration() throws JSONException {
+        // A save writes what the layout looks like, so the configuration is brought in step
+        // with the screen first. Moving or resizing a control changes the view, and the
+        // configuration is what gets written, so without this a moved control would be saved
+        // back at the place it was dragged away from.
+        syncConfigGeometry();
+
         JSONObject configuration = getConfig().toJson();
         configuration.put(UniversalElementTypes.KEY_TYPE, getElementTypeName());
         return configuration;
+    }
+
+    /**
+     * Makes the configuration agree with where the control actually is on screen.
+     */
+    public void syncConfigGeometry() {
+        if (!(getLayoutParams() instanceof FrameLayout.LayoutParams)) {
+            return;
+        }
+
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
+        if (params.width <= 0 || params.height <= 0) {
+            return;
+        }
+
+        // The geometry object is changed rather than replaced, because the editor keeps a
+        // reference to it while a control is being edited
+        UniversalGeometry geometry = getConfig().getGeometry();
+        geometry.setLeft(params.leftMargin);
+        geometry.setTop(params.topMargin);
+        geometry.setWidth(params.width);
+        geometry.setHeight(params.height);
     }
 
     /**

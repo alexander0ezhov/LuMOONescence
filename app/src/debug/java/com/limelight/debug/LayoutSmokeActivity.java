@@ -591,6 +591,7 @@ public class LayoutSmokeActivity extends Activity {
         checkLayoutOpacity();
         checkDpadTouchZones();
         checkDraggingMarksLayoutDirty();
+        checkDraggedGeometryIsSaved();
     }
 
     /**
@@ -1202,6 +1203,101 @@ public class LayoutSmokeActivity extends Activity {
         check("the middle of the D-pad presses nothing",
                 pad.getDirectionAtForTesting(150, 150) == 0);
     }
+
+    /**
+     * What a save writes must be where the controls are, not where they were before they were
+     * dragged: the configuration only follows the screen when something asks it to.
+     */
+    private void checkDraggedGeometryIsSaved() {
+        UniversalVirtualControllerElement element = editor.getSelectedElementForTesting();
+        if (element == null) {
+            check("a control is selected for the save check", false);
+            return;
+        }
+
+        UniversalGeometry before = UniversalGeometry.of(element).copy();
+
+        // A drag, and nothing else
+        dispatchTouch(element, MotionEvent.ACTION_DOWN, 0.5f, 0.5f);
+        dispatchTouch(element, MotionEvent.ACTION_MOVE, 0.8f, 0.8f);
+        dispatchTouch(element, MotionEvent.ACTION_UP, 0.8f, 0.8f);
+
+        UniversalGeometry onScreen = UniversalGeometry.of(element).copy();
+        check("the drag moved the control on screen",
+                onScreen.getLeft() != before.getLeft() || onScreen.getTop() != before.getTop());
+
+        try {
+            // Exactly what a save writes, and what reading it back produces
+            org.json.JSONObject written = element.getConfiguration();
+            UniversalGeometry saved = UniversalGeometry.fromJson(written);
+
+            check("a dragged control is written where it is on screen",
+                    saved.getLeft() == onScreen.getLeft() && saved.getTop() == onScreen.getTop());
+            check("a dragged control keeps its size when it is written",
+                    saved.getWidth() == onScreen.getWidth()
+                            && saved.getHeight() == onScreen.getHeight());
+
+            // And a control read back from that lives where it was saved
+            UniversalDigitalButton reloaded =
+                    new UniversalDigitalButton(universalController, 5454, 0, this);
+            reloaded.loadConfiguration(written);
+
+            UniversalGeometry restored = reloaded.getConfig().getGeometry();
+            check("a control read back from a save is where it was saved",
+                    restored.getLeft() == onScreen.getLeft()
+                            && restored.getTop() == onScreen.getTop());
+
+            checkSavedProfileHoldsTheDrag(element, onScreen);
+        } catch (org.json.JSONException e) {
+            check("a dragged control is written where it is on screen", false);
+        }
+    }
+
+    /**
+     * The whole way a save goes: written into the layout's own store, read back from there.
+     *
+     * A profile of its own is used, so the check never disturbs a layout the user made.
+     */
+    private void checkSavedProfileHoldsTheDrag(UniversalVirtualControllerElement element,
+                                               UniversalGeometry onScreen) {
+        UniversalLayoutConfigurationLoader.saveProfile(universalController, this,
+                SCRATCH_LAYOUT_ID, 1000, 1000);
+
+        int savedLeft = -1;
+        int savedTop = -1;
+
+        try {
+            String stored = getSharedPreferences("OSC_UNIVERSAL_" + SCRATCH_LAYOUT_ID, MODE_PRIVATE)
+                    .getString("elements", null);
+
+            org.json.JSONArray elements = new org.json.JSONArray(stored == null ? "[]" : stored);
+
+            for (int i = 0; i < elements.length(); i++) {
+                org.json.JSONObject entry = elements.getJSONObject(i);
+
+                if (entry.optInt("elementId", -1) == element.getElementId()) {
+                    UniversalGeometry storedGeometry = UniversalGeometry.fromJson(entry);
+                    savedLeft = storedGeometry.getLeft();
+                    savedTop = storedGeometry.getTop();
+                    break;
+                }
+            }
+        } catch (org.json.JSONException e) {
+            savedLeft = -1;
+        }
+
+        check("the saved profile holds the position the control was dragged to",
+                savedLeft == onScreen.getLeft() && savedTop == onScreen.getTop());
+
+        // The scratch profile is not left behind
+        UniversalLayoutConfigurationLoader.resetLayout(this, SCRATCH_LAYOUT_ID);
+    }
+
+    /**
+     * A layout id used only by the smoke test, so a check that saves never overwrites a layout
+     * the user made.
+     */
+    private static final String SCRATCH_LAYOUT_ID = "smoke-test-scratch";
 
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
