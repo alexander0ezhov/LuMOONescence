@@ -13,8 +13,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
+import android.graphics.CornerPathEffect;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
@@ -393,6 +395,62 @@ public abstract class UniversalVirtualControllerElement extends View {
 
         canvas.drawRoundRect(shapeRect, radius, radius, shapePaint);
     }
+
+    /**
+     * Draws one part of a control that is not a rectangle, for example one arm of a D-pad.
+     *
+     * The colours, the glow and the rounding are the same as for a rectangular part, so a
+     * control made of several shapes still looks like one thing.
+     */
+    protected void drawButtonPath(Canvas canvas, Path path, boolean active, float cornerRadius) {
+        pathBounds.setEmpty();
+        path.computeBounds(pathBounds, true);
+
+        if (pathBounds.width() <= 0 || pathBounds.height() <= 0) {
+            return;
+        }
+
+        // The corners of a path are sharp, so they are rounded by a path effect for the
+        // duration of this shape
+        CornerPathEffect corners = cornerRadius > 0
+                ? new CornerPathEffect(cornerRadius) : null;
+
+        if (active) {
+            float depth = Math.max(3f, getDefaultStrokeWidth() * 1.1f);
+
+            glowPaint.setStyle(Paint.Style.STROKE);
+            glowPaint.setStrokeWidth(depth * 2f);
+            glowPaint.setPathEffect(corners);
+            glowPaint.setShader(new RadialGradient(
+                    pathBounds.centerX(), pathBounds.centerY(),
+                    Math.max(pathBounds.width(), pathBounds.height()) / 2f,
+                    GLOW_INNER, GLOW_OUTER, Shader.TileMode.CLAMP));
+
+            canvas.drawPath(path, glowPaint);
+            glowPaint.setShader(null);
+            glowPaint.setPathEffect(null);
+        }
+
+        shapePaint.setPathEffect(corners);
+        shapePaint.setStyle(Paint.Style.FILL);
+        shapePaint.setStrokeWidth(0);
+        shapePaint.setShader(new LinearGradient(0, pathBounds.top, 0, pathBounds.bottom,
+                active ? BODY_TOP_ACTIVE : BODY_TOP,
+                active ? BODY_BOTTOM_ACTIVE : BODY_BOTTOM,
+                Shader.TileMode.CLAMP));
+
+        canvas.drawPath(path, shapePaint);
+
+        shapePaint.setShader(null);
+        shapePaint.setStyle(Paint.Style.STROKE);
+        shapePaint.setStrokeWidth(Math.max(1.5f, getDefaultStrokeWidth() * 0.45f));
+        shapePaint.setColor(active ? EDGE_ACTIVE : EDGE_NORMAL);
+
+        canvas.drawPath(path, shapePaint);
+        shapePaint.setPathEffect(null);
+    }
+
+    private final RectF pathBounds = new RectF();
 
     /**
      * Draws the lit halo of an active control.

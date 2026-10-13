@@ -21,7 +21,7 @@ public class UniversalElementConfig {
      * Corner radius of a control that has not been given one, as a share of its shorter
      * side. A share rather than a number of pixels, so the shape survives every resize.
      */
-    public static final int DEFAULT_BORDER_RADIUS_PERCENT = 18;
+    public static final int DEFAULT_BORDER_RADIUS_PERCENT = 22;
 
     private String name = "";
     private UniversalGeometry geometry = new UniversalGeometry();

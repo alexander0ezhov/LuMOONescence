@@ -756,6 +756,13 @@ public class UniversalLayoutEditorActivity extends Activity
     }
 
     /**
+     * Switches the editor between arranging and sending, for the debug smoke test.
+     */
+    public void setControllerModeForTesting(UniversalVirtualController.ControllerMode mode) {
+        controller.setControllerMode(mode);
+    }
+
+    /**
      * Applies a position or size change.
      *
      * All four values are read from the sliders that are on screen right now rather than
@@ -1189,9 +1196,13 @@ public class UniversalLayoutEditorActivity extends Activity
 
     @Override
     public void onElementGeometrySettled(UniversalVirtualControllerElement element) {
-        // A drag changed the position or the size, so the sliders are brought back in step
+        // Moving or resizing any control is an unsaved change, including a control that is
+        // not the one being edited: a drag does not select what it moved, so requiring a
+        // selection here is what used to lose a plain drag on the way out.
+        markDirty();
+
+        // Only the control that is being edited has sliders to bring back in step
         if (element == selectedElement) {
-            markDirty();
             refreshPanel();
         }
     }

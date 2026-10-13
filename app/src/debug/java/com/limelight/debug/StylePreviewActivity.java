@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 
 import com.limelight.binding.input.virtual_controller.universal.UniversalAnalogStick;
 import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalButton;
+import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalPad;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLeftAnalogStick;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualController;
 
@@ -46,9 +47,9 @@ public class StylePreviewActivity extends Activity {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
 
-        UniversalDigitalButton normal = addButton(controller, row, "Normal", cell, margin, 18);
-        final UniversalDigitalButton pressed = addButton(controller, row, "Pressed", cell, margin, 18);
-        final UniversalDigitalButton latched = addButton(controller, row, "Toggled", cell, margin, 18);
+        UniversalDigitalButton normal = addButton(controller, row, "Normal", cell, margin, 22);
+        final UniversalDigitalButton pressed = addButton(controller, row, "Pressed", cell, margin, 22);
+        final UniversalDigitalButton latched = addButton(controller, row, "Toggled", cell, margin, 22);
         final UniversalDigitalButton round = addButton(controller, row, "Round", cell, margin, 50);
 
         root.addView(row, new FrameLayout.LayoutParams(
@@ -59,6 +60,7 @@ public class StylePreviewActivity extends Activity {
         second.setGravity(Gravity.CENTER_VERTICAL);
 
         final UniversalAnalogStick stick = addStick(controller, second, cell, margin);
+        final UniversalDigitalPad pad = addPad(controller, second, cell, margin);
 
         FrameLayout.LayoutParams secondParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -85,6 +87,12 @@ public class StylePreviewActivity extends Activity {
 
                 stick.setPressed(true);
                 stick.invalidate();
+
+                // The pad is shown with two directions lit, which is what a diagonal press
+                // looks like
+                pad.setDirectionForTesting(UniversalDigitalPad.DIGITAL_PAD_DIRECTION_UP
+                        | UniversalDigitalPad.DIGITAL_PAD_DIRECTION_RIGHT);
+                pad.invalidate();
             }
         }, 300);
     }
@@ -107,6 +115,14 @@ public class StylePreviewActivity extends Activity {
 
         addToRow(row, stick, size, margin);
         return stick;
+    }
+
+    private UniversalDigitalPad addPad(UniversalVirtualController controller, LinearLayout row,
+                                       int size, int margin) {
+        UniversalDigitalPad pad = new UniversalDigitalPad(controller, this, nextElementId++);
+
+        addToRow(row, pad, size, margin);
+        return pad;
     }
 
     /**

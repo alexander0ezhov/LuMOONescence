@@ -19,6 +19,7 @@ import android.graphics.Canvas;
 import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.binding.input.virtual_controller.universal.UniversalAnalogStick;
 import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalButton;
+import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalPad;
 import com.limelight.binding.input.virtual_controller.universal.UniversalElementTypes;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutConfigurationLoader;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
@@ -588,6 +589,39 @@ public class LayoutSmokeActivity extends Activity {
         checkBorderRadiusAndCopyPaste();
         checkButtonHighlightReturns();
         checkLayoutOpacity();
+        checkDpadTouchZones();
+        checkDraggingMarksLayoutDirty();
+    }
+
+    /**
+     * Moving a control counts as an unsaved change even when it is not the one being edited,
+     * which is the case a plain drag makes.
+     */
+    private void checkDraggingMarksLayoutDirty() {
+        // A control that is not the selected one, because a drag does not select
+        UniversalVirtualControllerElement other = null;
+        for (UniversalVirtualControllerElement element : universalController.getElements()) {
+            if (element != editor.getSelectedElementForTesting()) {
+                other = element;
+                break;
+            }
+        }
+
+        check("there is a control that is not being edited", other != null);
+        if (other == null) {
+            return;
+        }
+
+        editor.setControllerModeForTesting(UniversalVirtualController.ControllerMode.MoveButtons);
+
+        // A drag of its own, which is what the user does before leaving the editor
+        dispatchTouch(other, MotionEvent.ACTION_DOWN, 0.5f, 0.5f);
+        dispatchTouch(other, MotionEvent.ACTION_MOVE, 0.75f, 0.75f);
+        dispatchTouch(other, MotionEvent.ACTION_MOVE, 0.85f, 0.85f);
+        dispatchTouch(other, MotionEvent.ACTION_UP, 0.85f, 0.85f);
+
+        check("moving a control that is not being edited is an unsaved change",
+                universalController.isLayoutDirty());
     }
 
     /**
@@ -1094,6 +1128,79 @@ public class LayoutSmokeActivity extends Activity {
                 .edit()
                 .putInt(PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING, percent)
                 .apply();
+    }
+
+    /**
+     * The D-pad is drawn as four buttons around an empty middle, and each of them answers to
+     * a touch that reaches a little past what is drawn, so the pad is comfortable to use.
+     */
+    private void checkDpadTouchZones() {
+        UniversalDigitalPad pad = null;
+        for (UniversalVirtualControllerElement element : universalController.getElements()) {
+            if (element instanceof UniversalDigitalPad) {
+                pad = (UniversalDigitalPad) element;
+                break;
+            }
+        }
+
+        if (pad == null) {
+            pad = new UniversalDigitalPad(universalController, this, 4343);
+        }
+
+        pad.measure(View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY));
+        pad.layout(0, 0, 300, 300);
+
+        int up = pad.getDirectionAtForTesting(150, 50);
+        check("the D-pad answers to the up button", up == UniversalDigitalPad.DIGITAL_PAD_DIRECTION_UP);
+        check("the D-pad answers to the down button",
+                pad.getDirectionAtForTesting(150, 250) == UniversalDigitalPad.DIGITAL_PAD_DIRECTION_DOWN);
+        check("the D-pad answers to the left button",
+                pad.getDirectionAtForTesting(50, 150) == UniversalDigitalPad.DIGITAL_PAD_DIRECTION_LEFT);
+        check("the D-pad answers to the right button",
+                pad.getDirectionAtForTesting(250, 150) == UniversalDigitalPad.DIGITAL_PAD_DIRECTION_RIGHT);
+
+        // A diagonal needs both directions, and the place for it is the shared corner next to
+        // the middle. It is deliberately not available out at the corner of the pad, where a
+        // press is meant to be one direction only.
+        check("a diagonal near the middle presses two directions",
+                pad.getDirectionAtForTesting(100, 100)
+                        == (UniversalDigitalPad.DIGITAL_PAD_DIRECTION_UP
+                        | UniversalDigitalPad.DIGITAL_PAD_DIRECTION_LEFT));
+        check("the far corner of the D-pad presses nothing",
+                pad.getDirectionAtForTesting(45, 45) == 0);
+
+        // The zone is wider than the drawn button, which is the part that makes the pad
+        // comfortable: the drawn button is only about a third of the pad across
+        check("the up zone reaches wider than the drawn button",
+                (pad.getDirectionAtForTesting(90, 60) & UniversalDigitalPad.DIGITAL_PAD_DIRECTION_UP) != 0);
+        check("the left zone reaches taller than the drawn button",
+                (pad.getDirectionAtForTesting(60, 90) & UniversalDigitalPad.DIGITAL_PAD_DIRECTION_LEFT) != 0);
+
+        // Each button must be drawn on the side it belongs to, which is a turn of the same
+        // shape: the left button lit the right one while the turns were the wrong way round
+        float centerX = 150;
+        float centerY = 150;
+
+        check("the up button is drawn above the middle",
+                pad.getShapeCenterYForTesting(UniversalDigitalPad.SHAPE_UP) < centerY);
+        check("the down button is drawn below the middle",
+                pad.getShapeCenterYForTesting(UniversalDigitalPad.SHAPE_DOWN) > centerY);
+        check("the left button is drawn left of the middle",
+                pad.getShapeCenterXForTesting(UniversalDigitalPad.SHAPE_LEFT) < centerX);
+        check("the right button is drawn right of the middle",
+                pad.getShapeCenterXForTesting(UniversalDigitalPad.SHAPE_RIGHT) > centerX);
+
+        // A press in the middle of an edge belongs to one direction only, so the neighbouring
+        // directions are not caught by a press near the edge
+        check("pressing near the top edge does not also press left or right",
+                pad.getDirectionAtForTesting(150, 40) == UniversalDigitalPad.DIGITAL_PAD_DIRECTION_UP);
+        check("pressing near the left edge does not also press up or down",
+                pad.getDirectionAtForTesting(40, 150) == UniversalDigitalPad.DIGITAL_PAD_DIRECTION_LEFT);
+
+        // The middle is where the shape is empty, so it maps to no direction
+        check("the middle of the D-pad presses nothing",
+                pad.getDirectionAtForTesting(150, 150) == 0);
     }
 
     private static boolean contains(String[] labels, String needle) {

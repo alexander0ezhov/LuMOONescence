@@ -9,6 +9,9 @@ package com.limelight.binding.input.virtual_controller.universal;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
@@ -102,63 +105,209 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement
         listeners.add(listener);
     }
 
+    /**
+     * Which directions a point activates.
+     *
+     * A zone reaches past the button it belongs to, which is what makes the pad comfortable,
+     * but it does not sweep the whole cross: it is only as wide as the middle band, so a
+     * press in the middle of an edge presses the one direction it belongs to. Only the corners
+     * are shared, which is where a diagonal belongs.
+     */
+    private int directionAt(float x, float y) {
+        float unit = Math.min(getWidth(), getHeight());
+
+        float inner = unit * TIP_GAP_SHARE;
+        float length = unit * (TIP_GAP_SHARE + TAPER_SHARE + ARM_SHARE + TOUCH_REACH_SHARE);
+
+        // The band an arm spans across itself. It is wider than the arm so the pad is easy to
+        // hit, and narrower than the pad so the neighbouring arms stay out of it.
+        float across = unit * (ARM_HALF_WIDTH_SHARE + TOUCH_ACROSS_SHARE);
+
+        float centerX = getWidth() / 2f;
+        float centerY = getHeight() / 2f;
+
+        int direction = 0;
+
+        if (between(y, centerY - across, centerY + across)) {
+            if (x <= centerX - inner && x >= centerX - length) {
+                direction |= DIGITAL_PAD_DIRECTION_LEFT;
+            }
+            else if (x >= centerX + inner && x <= centerX + length) {
+                direction |= DIGITAL_PAD_DIRECTION_RIGHT;
+            }
+        }
+
+        if (between(x, centerX - across, centerX + across)) {
+            if (y <= centerY - inner && y >= centerY - length) {
+                direction |= DIGITAL_PAD_DIRECTION_UP;
+            }
+            else if (y >= centerY + inner && y <= centerY + length) {
+                direction |= DIGITAL_PAD_DIRECTION_DOWN;
+            }
+        }
+
+        return direction;
+    }
+
+    private static boolean between(float value, float from, float to) {
+        return value >= from && value <= to;
+    }
+
+    /**
+     * Which directions a point on the pad activates. Used by the debug smoke test, because
+     * the zones cannot be reached by injecting a touch on every device.
+     */
+    public int getDirectionAtForTesting(float x, float y) {
+        return directionAt(x, y);
+    }
+
+    /**
+     * Lights up the given directions without a touch, so a preview can show the look of a
+     * pressed pad.
+     */
+    public void setDirectionForTesting(int direction) {
+        this.direction = direction;
+        invalidate();
+    }
+
+    /**
+     * The middle of the drawn shape of one direction, in the order of DIRECTION_FLAGS. Used by
+     * the debug smoke test to check that each button is drawn on the side it belongs to.
+     */
+    public float getShapeCenterXForTesting(int directionIndex) {
+        ensureDirectionPaths();
+
+        RectF bounds = new RectF();
+        directionPaths[directionIndex].computeBounds(bounds, true);
+        return bounds.centerX();
+    }
+
+    public float getShapeCenterYForTesting(int directionIndex) {
+        ensureDirectionPaths();
+
+        RectF bounds = new RectF();
+        directionPaths[directionIndex].computeBounds(bounds, true);
+        return bounds.centerY();
+    }
+
+    /**
+     * The order the shapes are built in, which is the order of DIRECTION_FLAGS: up, down,
+     * left, right.
+     */
+    public static final int SHAPE_UP = 0;
+    public static final int SHAPE_DOWN = 1;
+    public static final int SHAPE_LEFT = 2;
+    public static final int SHAPE_RIGHT = 3;
+
     @Override
     protected void onElementDraw(Canvas canvas) {
         // set transparent background
         canvas.drawColor(Color.TRANSPARENT);
 
-        // The pad is one cross made of four arms. The body is drawn whole first, so the arms
-        // join without seams, and the arm that is pushed is drawn over it lit up.
-        float unit = Math.min(getWidth(), getHeight());
-        float arm = unit * ARM_SHARE;
-        float half = unit * GAP_SHARE / 2f;
-        float radius = getCornerRadius();
+        ensureDirectionPaths();
 
-        float centerX = getWidth() / 2f;
-        float centerY = getHeight() / 2f;
-
-        boolean up = (direction & DIGITAL_PAD_DIRECTION_UP) > 0;
-        boolean down = (direction & DIGITAL_PAD_DIRECTION_DOWN) > 0;
-        boolean left = (direction & DIGITAL_PAD_DIRECTION_LEFT) > 0;
-        boolean right = (direction & DIGITAL_PAD_DIRECTION_RIGHT) > 0;
-
-        // The whole cross, unlit
-        drawButtonShape(canvas, centerX - half, centerY - half - arm,
-                centerX + half, centerY + half + arm, radius, false);
-        drawButtonShape(canvas, centerX - half - arm, centerY - half,
-                centerX + half + arm, centerY + half, radius, false);
-
-        // Then the pushed arms, each drawn on its own so only it lights up
-        if (up) {
-            drawButtonShape(canvas, centerX - half, centerY - half - arm,
-                    centerX + half, centerY - half, radius, true);
+        // Every button is drawn with its own state: a plain one unlit, a pushed one lit. The
+        // shapes do not touch, so the light of one cannot spill onto its neighbour.
+        for (int i = 0; i < directionPaths.length; i++) {
+            if ((direction & DIRECTION_FLAGS[i]) == 0) {
+                drawButtonPath(canvas, directionPaths[i], false, getCornerRadius() * 0.5f);
+            }
         }
 
-        if (down) {
-            drawButtonShape(canvas, centerX - half, centerY + half,
-                    centerX + half, centerY + half + arm, radius, true);
-        }
-
-        if (left) {
-            drawButtonShape(canvas, centerX - half - arm, centerY - half,
-                    centerX - half, centerY + half, radius, true);
-        }
-
-        if (right) {
-            drawButtonShape(canvas, centerX + half, centerY - half,
-                    centerX + half + arm, centerY + half, radius, true);
+        for (int i = 0; i < directionPaths.length; i++) {
+            if ((direction & DIRECTION_FLAGS[i]) != 0) {
+                drawButtonPath(canvas, directionPaths[i], true, getCornerRadius() * 0.5f);
+            }
         }
     }
 
     /**
-     * Length of one arm of the cross, as a share of the shorter side of the pad.
+     * Length of the rectangular part of one button, as a share of the shorter side of the pad.
      */
-    private static final float ARM_SHARE = 0.30f;
+    private static final float ARM_SHARE = 0.36f;
 
     /**
-     * Width of the middle the arms meet at, as a share of the shorter side of the pad.
+     * Half the width of one button, as a share of the shorter side of the pad.
      */
-    private static final float GAP_SHARE = 0.20f;
+    private static final float ARM_HALF_WIDTH_SHARE = 0.13f;
+
+    /**
+     * How far the tip of a button stays away from the middle, as a share of the shorter side.
+     * The four tips do not meet, which leaves the middle of the pad empty.
+     */
+    private static final float TIP_GAP_SHARE = 0.04f;
+
+    /**
+     * Length of the tapering part of one button, as a share of the shorter side. This is what
+     * turns the inner end of a button into a cone pointing at the middle.
+     */
+    private static final float TAPER_SHARE = 0.10f;
+
+    /**
+     * How far past a drawn button its touch zone reaches along its own direction, as a share
+     * of the shorter side.
+     */
+    private static final float TOUCH_REACH_SHARE = 0.10f;
+
+    /**
+     * How far a touch zone reaches across its own direction, past the drawn width of a button.
+     * This is what makes the pad easy to hit without letting a press land on the neighbouring
+     * directions.
+     */
+    private static final float TOUCH_ACROSS_SHARE = 0.10f;
+
+    private final Path[] directionPaths = new Path[DIRECTION_COUNT];
+    private int pathsBuiltForWidth = -1;
+    private int pathsBuiltForHeight = -1;
+
+    /**
+     * Builds the shape of every button: a rectangle whose inner end narrows to a point at the
+     * middle of the pad, which is what a D-pad looks like.
+     */
+    private void ensureDirectionPaths() {
+        if (pathsBuiltForWidth == getWidth() && pathsBuiltForHeight == getHeight()) {
+            return;
+        }
+
+        pathsBuiltForWidth = getWidth();
+        pathsBuiltForHeight = getHeight();
+
+        float unit = Math.min(getWidth(), getHeight());
+        float arm = unit * ARM_SHARE;
+        float halfWidth = unit * ARM_HALF_WIDTH_SHARE;
+        float tip = unit * TIP_GAP_SHARE;
+        float taper = unit * TAPER_SHARE;
+
+        float centerX = getWidth() / 2f;
+        float centerY = getHeight() / 2f;
+
+        // The shape of the up button, which the other three are rotations of
+        Path up = new Path();
+        up.moveTo(centerX - halfWidth, centerY - tip - taper - arm);
+        up.lineTo(centerX + halfWidth, centerY - tip - taper - arm);
+        up.lineTo(centerX + halfWidth, centerY - tip - taper);
+        up.lineTo(centerX, centerY - tip);
+        up.lineTo(centerX - halfWidth, centerY - tip - taper);
+        up.close();
+
+        directionPaths[0] = up;
+        directionPaths[1] = rotate(up, centerX, centerY, 180f);
+
+        // A quarter turn clockwise points right, so the left button is the turn the other
+        // way. The order here follows DIRECTION_FLAGS.
+        directionPaths[2] = rotate(up, centerX, centerY, 270f);
+        directionPaths[3] = rotate(up, centerX, centerY, 90f);
+    }
+
+    private static Path rotate(Path source, float pivotX, float pivotY, float degrees) {
+        Matrix matrix = new Matrix();
+        matrix.setRotate(degrees, pivotX, pivotY);
+
+        Path rotated = new Path(source);
+        rotated.transform(matrix);
+
+        return rotated;
+    }
 
     private void newDirectionCallback(int direction) {
         _DBG("direction: " + direction);
@@ -208,20 +357,7 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE: {
-                direction = 0;
-
-                if (event.getX() < getPercent(getWidth(), 33)) {
-                    direction |= DIGITAL_PAD_DIRECTION_LEFT;
-                }
-                if (event.getX() > getPercent(getWidth(), 66)) {
-                    direction |= DIGITAL_PAD_DIRECTION_RIGHT;
-                }
-                if (event.getY() > getPercent(getHeight(), 66)) {
-                    direction |= DIGITAL_PAD_DIRECTION_DOWN;
-                }
-                if (event.getY() < getPercent(getHeight(), 33)) {
-                    direction |= DIGITAL_PAD_DIRECTION_UP;
-                }
+                direction = directionAt(event.getX(), event.getY());
 
                 if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                     beginPressWatch();
