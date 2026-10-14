@@ -596,6 +596,7 @@ public class LayoutSmokeActivity extends Activity {
         checkDraggedGeometryIsSaved();
         checkOnScreenLayoutRegistersGamepad();
         checkTriggersWorkOnTheirOwn();
+        checkAxisCombiningKeepsTheStrongerValue();
     }
 
     /**
@@ -1362,6 +1363,29 @@ public class LayoutSmokeActivity extends Activity {
             controller.getControllerInputContext().leftTrigger = 0;
             controller.setControllerMode(originalMode);
         }
+    }
+
+    /**
+     * Two controllers' readings of one axis are combined by keeping the stronger one.
+     *
+     * Combining them with a bitwise OR mixes the signs and turns a pushed stick into a large
+     * value of the opposite sign as soon as anything else reports even a tiny drift, which is
+     * what made a character briefly run the other way.
+     */
+    private void checkAxisCombiningKeepsTheStrongerValue() {
+        short pushedForward = 20000;
+        short drifting = -5000;
+
+        check("a weak reading on its own is kept",
+                ControllerHandler.combineAxisValue((short) 0, drifting) == drifting);
+        check("a pushed axis is not flipped by another controller's drift",
+                ControllerHandler.combineAxisValue(pushedForward, drifting) == pushedForward);
+        check("the stronger reading wins whichever way it points",
+                ControllerHandler.combineAxisValue((short) -20000, (short) 3000) == (short) -20000);
+
+        // What combining by bits did, so the check above cannot pass by accident
+        check("combining by bits would have flipped the sign",
+                (short) (pushedForward | drifting) < 0);
     }
 
     private static boolean contains(String[] labels, String needle) {

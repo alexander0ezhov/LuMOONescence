@@ -1075,6 +1075,30 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         }
     }
 
+    /**
+     * Combines two controllers' readings of one axis or trigger into the one the host is told
+     * about, which is the stronger of the two.
+     *
+     * This must not be done with a bitwise OR: the values are signed, so OR-ing a strong
+     * positive value with even a tiny negative one sets the sign bit and turns the result into
+     * a large negative value. A drifting second device would then flip a pushed stick around
+     * for a moment, which is what made a character briefly run the other way.
+     */
+    public static short combineAxisValue(short current, short other) {
+        return Math.abs(other) > Math.abs(current) ? other : current;
+    }
+
+    /**
+     * The same for a trigger, which the host takes as a byte.
+     *
+     * A trigger is unsigned here, so the stronger pull is the larger value and not the one
+     * with the larger signed magnitude: a fully pulled trigger is 0xFF, which as a signed byte
+     * is minus one.
+     */
+    public static byte combineAxisValue(byte current, byte other) {
+        return (current & 0xFF) >= (other & 0xFF) ? current : other;
+    }
+
     private short getActiveControllerMask() {
         if (prefConfig.multiController) {
             return (short)(currentControllers | initialControllers
@@ -1242,12 +1266,12 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
                     context.controllerNumber == controllerNumber &&
                     context.mouseEmulationActive == originalContext.mouseEmulationActive) {
                 inputMap |= context.inputMap;
-                leftTrigger |= maxByMagnitude(leftTrigger, context.leftTrigger);
-                rightTrigger |= maxByMagnitude(rightTrigger, context.rightTrigger);
-                leftStickX |= maxByMagnitude(leftStickX, context.leftStickX);
-                leftStickY |= maxByMagnitude(leftStickY, context.leftStickY);
-                rightStickX |= maxByMagnitude(rightStickX, context.rightStickX);
-                rightStickY |= maxByMagnitude(rightStickY, context.rightStickY);
+                leftTrigger = combineAxisValue(leftTrigger, context.leftTrigger);
+                rightTrigger = combineAxisValue(rightTrigger, context.rightTrigger);
+                leftStickX = combineAxisValue(leftStickX, context.leftStickX);
+                leftStickY = combineAxisValue(leftStickY, context.leftStickY);
+                rightStickX = combineAxisValue(rightStickX, context.rightStickX);
+                rightStickY = combineAxisValue(rightStickY, context.rightStickY);
             }
         }
         for (int i = 0; i < usbDeviceContexts.size(); i++) {
@@ -1256,22 +1280,22 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
                     context.controllerNumber == controllerNumber &&
                     context.mouseEmulationActive == originalContext.mouseEmulationActive) {
                 inputMap |= context.inputMap;
-                leftTrigger |= maxByMagnitude(leftTrigger, context.leftTrigger);
-                rightTrigger |= maxByMagnitude(rightTrigger, context.rightTrigger);
-                leftStickX |= maxByMagnitude(leftStickX, context.leftStickX);
-                leftStickY |= maxByMagnitude(leftStickY, context.leftStickY);
-                rightStickX |= maxByMagnitude(rightStickX, context.rightStickX);
-                rightStickY |= maxByMagnitude(rightStickY, context.rightStickY);
+                leftTrigger = combineAxisValue(leftTrigger, context.leftTrigger);
+                rightTrigger = combineAxisValue(rightTrigger, context.rightTrigger);
+                leftStickX = combineAxisValue(leftStickX, context.leftStickX);
+                leftStickY = combineAxisValue(leftStickY, context.leftStickY);
+                rightStickX = combineAxisValue(rightStickX, context.rightStickX);
+                rightStickY = combineAxisValue(rightStickY, context.rightStickY);
             }
         }
         if (defaultContext.controllerNumber == controllerNumber) {
             inputMap |= defaultContext.inputMap;
-            leftTrigger |= maxByMagnitude(leftTrigger, defaultContext.leftTrigger);
-            rightTrigger |= maxByMagnitude(rightTrigger, defaultContext.rightTrigger);
-            leftStickX |= maxByMagnitude(leftStickX, defaultContext.leftStickX);
-            leftStickY |= maxByMagnitude(leftStickY, defaultContext.leftStickY);
-            rightStickX |= maxByMagnitude(rightStickX, defaultContext.rightStickX);
-            rightStickY |= maxByMagnitude(rightStickY, defaultContext.rightStickY);
+            leftTrigger = combineAxisValue(leftTrigger, defaultContext.leftTrigger);
+            rightTrigger = combineAxisValue(rightTrigger, defaultContext.rightTrigger);
+            leftStickX = combineAxisValue(leftStickX, defaultContext.leftStickX);
+            leftStickY = combineAxisValue(leftStickY, defaultContext.leftStickY);
+            rightStickX = combineAxisValue(rightStickX, defaultContext.rightStickX);
+            rightStickY = combineAxisValue(rightStickY, defaultContext.rightStickY);
         }
 
         if (originalContext.mouseEmulationActive) {
