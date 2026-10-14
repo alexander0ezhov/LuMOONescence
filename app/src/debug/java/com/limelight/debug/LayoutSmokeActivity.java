@@ -32,6 +32,7 @@ import com.limelight.binding.input.virtual_controller.universal.UniversalVirtual
 import com.limelight.binding.input.virtual_controller.universal.action.ActionSequence;
 import com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer;
 import com.limelight.binding.input.virtual_controller.universal.action.InputEvent;
+import com.limelight.binding.input.virtual_controller.universal.action.InputEventNames;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalButtonConfig;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalElementConfig;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
@@ -597,6 +598,8 @@ public class LayoutSmokeActivity extends Activity {
         checkOnScreenLayoutRegistersGamepad();
         checkTriggersWorkOnTheirOwn();
         checkAxisCombiningKeepsTheStrongerValue();
+        checkStickDirectionCanSendAKey();
+        checkNewControlAdoptsTheOpacity();
     }
 
     /**
@@ -1386,6 +1389,75 @@ public class LayoutSmokeActivity extends Activity {
         // What combining by bits did, so the check above cannot pass by accident
         check("combining by bits would have flipped the sign",
                 (short) (pushedForward | drifting) < 0);
+    }
+
+    /**
+     * A stick direction can be bound to a key of a keyboard, not only to a gamepad button.
+     */
+    private void checkStickDirectionCanSendAKey() {
+        UniversalStickButtonConfig binding = new UniversalStickButtonConfig();
+
+        // A gamepad button is kept as a code
+        binding.setBinding(new InputEvent(InputEvent.KIND_GAMEPAD, 1));
+        check("a direction bound to a pad button says so", binding.isAssigned());
+        check("a pad binding is recognised again", binding.isBoundTo(new InputEvent(InputEvent.KIND_GAMEPAD, 1)));
+        check("a pad binding sends one gamepad event",
+                binding.getEffectiveSequence().getSteps().get(0).getEvents().get(0).isGamepad());
+
+        // A key is kept as a sequence instead, because it is not a button code
+        InputEvent key = InputEventNames.keyboardCatalog().get(0);
+        binding.setBinding(key);
+
+        check("a direction bound to a key counts as assigned", binding.isAssigned());
+        check("a key binding is recognised again", binding.isBoundTo(key));
+        check("a key binding does not leave a pad button behind", binding.getButtonCode() == 0);
+        check("a key binding sends one keyboard event",
+                binding.getEffectiveSequence().getSteps().get(0).getEvents().get(0).isKeyboard());
+
+        // And it survives being saved and loaded, which is what a layout file does
+        boolean roundTripped = false;
+        try {
+            UniversalStickButtonConfig reloaded =
+                    UniversalStickButtonConfig.fromJson(binding.toJson());
+            roundTripped = reloaded.isBoundTo(key) && reloaded.isAssigned();
+        } catch (org.json.JSONException e) {
+            roundTripped = false;
+        }
+
+        check("a key binding can be read back after being written", roundTripped);
+
+        // Binding a pad button again must clear the key, not leave both
+        binding.setBinding(new InputEvent(InputEvent.KIND_GAMEPAD, 2));
+        check("binding a pad button again clears the key",
+                binding.getButtonCode() == 2 && binding.getActionSequence().isEmpty());
+    }
+
+    /**
+     * The transparency of a layout is applied to a control the moment it is added, so a new
+     * control does not stand out as the only opaque one until the layout is reloaded.
+     */
+    private void checkNewControlAdoptsTheOpacity() {
+        int originalPercent = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(this)
+                .getInt(PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING,
+                        PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_DEFAULT);
+
+        try {
+            setOpacityPercent(40);
+
+            UniversalVirtualControllerElement added = universalController.addUserElement(
+                    UniversalElementTypes.ELEMENT_BUTTON, 20, 20, 120, 120);
+
+            check("a control added to a faded layout is faded as well",
+                    added != null && Math.abs(added.getElementOpacity() - 0.40f) < 0.01f);
+
+            if (added != null) {
+                universalController.removeElement(added);
+            }
+        } finally {
+            setOpacityPercent(originalPercent);
+            universalController.applyElementOpacity();
+        }
     }
 
     private static boolean contains(String[] labels, String needle) {

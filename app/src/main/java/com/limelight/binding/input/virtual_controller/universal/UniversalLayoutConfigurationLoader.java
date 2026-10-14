@@ -340,7 +340,8 @@ public class UniversalLayoutConfigurationLoader {
                     screenScale(definition.gridHeight, height));
         }
 
-        controller.setOpacity(config.oscOpacity);
+        // The transparency of the layout is applied by the controller once the whole layout
+        // is in place, which is also what a control added later adopts.
     }
 
     /**

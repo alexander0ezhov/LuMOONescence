@@ -338,10 +338,9 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
         directionPressed[direction] = pressed;
 
         if (pressed) {
-            directionPlayers[direction].press(ActionSequence.single(
-                    new com.limelight.binding.input.virtual_controller.universal.action.InputEvent(
-                            com.limelight.binding.input.virtual_controller.universal.action.InputEvent.KIND_GAMEPAD,
-                            button.getButtonCode())));
+            // A direction sends whatever it is bound to, which is a gamepad button or any
+            // other input such as a key of a keyboard
+            directionPlayers[direction].press(button.getEffectiveSequence());
         }
         else {
             directionPlayers[direction].release();
@@ -384,10 +383,8 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
 
         centerPressedForTesting = true;
 
-        centerPlayer.press(ActionSequence.single(
-                new com.limelight.binding.input.virtual_controller.universal.action.InputEvent(
-                        com.limelight.binding.input.virtual_controller.universal.action.InputEvent.KIND_GAMEPAD,
-                        binding.getButtonCode())));
+        // The middle of the stick is bound the same way a direction is
+        centerPlayer.press(binding.getEffectiveSequence());
     }
 
     /**

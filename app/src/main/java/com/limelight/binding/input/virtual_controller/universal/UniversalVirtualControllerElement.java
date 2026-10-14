@@ -351,16 +351,17 @@ public abstract class UniversalVirtualControllerElement extends View {
 
     protected static final int BODY_TOP_ACTIVE = 0xD63A4049;
     protected static final int BODY_BOTTOM_ACTIVE = 0xD61E2228;
-    protected static final int EDGE_ACTIVE = 0xC4FFFFFF;
+    protected static final int EDGE_ACTIVE = 0xE0FFFFFF;
 
     /**
-     * The glow is a soft halo that fades inwards rather than a bright ring, so an active
-     * control reads as lit without shouting.
+     * The glow is a soft halo that fades inwards rather than a bright ring.
      *
      * The middle of the gradient is faint and the outer stop is clear, which is what turns
-     * the edge into a gradual pool of light instead of a line.
+     * the edge into a gradual pool of light instead of a line. It is kept strong enough to be
+     * obvious while playing, where a control is under a thumb and is seen out of the corner of
+     * an eye.
      */
-    private static final int GLOW_INNER = 0x38FFFFFF;
+    private static final int GLOW_INNER = 0x6AFFFFFF;
     private static final int GLOW_OUTER = 0x00FFFFFF;
 
     private final Paint shapePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -422,7 +423,7 @@ public abstract class UniversalVirtualControllerElement extends View {
                 ? new CornerPathEffect(cornerRadius) : null;
 
         if (active) {
-            float depth = Math.max(3f, getDefaultStrokeWidth() * 1.1f);
+            float depth = Math.max(4f, getDefaultStrokeWidth() * 1.5f);
 
             glowPaint.setStyle(Paint.Style.STROKE);
             glowPaint.setStrokeWidth(depth * 2f);
@@ -466,7 +467,9 @@ public abstract class UniversalVirtualControllerElement extends View {
      * body is painted over it afterwards, which leaves only the inner part visible.
      */
     private void drawInnerGlow(Canvas canvas, float radius) {
-        float depth = Math.max(3f, getDefaultStrokeWidth() * 1.1f);
+        // The halo reaches further into the body than a hairline, otherwise it reads as a
+        // thicker border rather than as light
+        float depth = Math.max(4f, getDefaultStrokeWidth() * 1.5f);
 
         glowPaint.setStyle(Paint.Style.STROKE);
         glowPaint.setStrokeWidth(depth * 2f);
@@ -659,14 +662,6 @@ public abstract class UniversalVirtualControllerElement extends View {
         invalidate();
     }
 
-
-    public void setOpacity(int opacity) {
-        int hexOpacity = opacity * 255 / 100;
-        this.normalColor = (hexOpacity << 24) | (normalColor & 0x00FFFFFF);
-        this.pressedColor = (hexOpacity << 24) | (pressedColor & 0x00FFFFFF);
-
-        invalidate();
-    }
 
     protected final float getPercent(float value, float percent) {
         return value / 100 * percent;

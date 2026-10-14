@@ -450,13 +450,6 @@ public class UniversalVirtualController {
         frame_layout.removeView(buttonConfigure);
     }
 
-    public void setOpacity(int opacity) {
-        for (UniversalVirtualControllerElement element : elements) {
-            element.setOpacity(opacity);
-        }
-    }
-
-
     public void addElement(UniversalVirtualControllerElement element, int x, int y, int width, int height) {
         elements.add(element);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width, height);
@@ -467,6 +460,11 @@ public class UniversalVirtualController {
         // A layout is rebuilt while it is on screen (for example after a rotation), so
         // new elements must adopt the current visibility instead of defaulting to it.
         element.setVisibility(getViewVisibility());
+
+        // A control added while the layout is on screen must adopt the transparency that is
+        // in force as well, otherwise a new one stands out as the only fully opaque control
+        // until the layout is reloaded.
+        element.setElementOpacity(getElementOpacity());
     }
 
     public List<UniversalVirtualControllerElement> getElements() {
@@ -617,7 +615,8 @@ public class UniversalVirtualController {
      *
      * It is one setting for the whole layout rather than a per-control value, because it is
      * about how much of the game shows through, and it covers the body, the edges and the
-     * labels together.
+     * labels together. This is the only place the transparency of a layout is decided: the
+     * built-in on-screen controls have a separate setting of their own.
      */
     public void applyElementOpacity() {
         float opacity = getElementOpacity();

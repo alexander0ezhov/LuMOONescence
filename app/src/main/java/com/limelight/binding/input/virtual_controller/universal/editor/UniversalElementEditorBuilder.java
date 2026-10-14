@@ -435,7 +435,7 @@ public class UniversalElementEditorBuilder {
 
     /**
      * The gamepad buttons alone, for the places that store a button code rather than an
-     * event: a stick direction and the middle of a stick press a button, not a trigger.
+     * event.
      */
     private static List<InputEvent> buttonCodeCatalog() {
         List<InputEvent> events = new ArrayList<>();
@@ -444,6 +444,20 @@ public class UniversalElementEditorBuilder {
                 events.add(new InputEvent(InputEvent.KIND_GAMEPAD, button.code));
             }
         }
+
+        return events;
+    }
+
+    /**
+     * What one direction of a stick, or its middle, can send: the gamepad buttons and the keys
+     * of a keyboard.
+     *
+     * A stick in buttons mode is often used for a game that reads a key rather than a pad
+     * button, so the keys are offered alongside the buttons.
+     */
+    private static List<InputEvent> stickBindingCatalog() {
+        List<InputEvent> events = new ArrayList<>(buttonCodeCatalog());
+        events.addAll(InputEventNames.keyboardCatalog());
 
         return events;
     }
@@ -543,13 +557,14 @@ public class UniversalElementEditorBuilder {
             final UniversalStickButtonConfig button = config.getButton(direction);
             final int directionIndex = direction;
 
-            List<InputEvent> catalog = buttonCodeCatalog();
+            List<InputEvent> catalog = stickBindingCatalog();
             List<String> names = describeAll(catalog);
 
-            // The stored value is a button code, so the selected entry is looked up by code
+            // The stored binding is either a gamepad button or an event, so the selected entry
+            // is the one the binding is bound to
             int selected = 0;
             for (int i = 0; i < catalog.size(); i++) {
-                if (catalog.get(i).getCode() == button.getButtonCode()) {
+                if (button.isBoundTo(catalog.get(i))) {
                     selected = i;
                     break;
                 }
@@ -559,17 +574,16 @@ public class UniversalElementEditorBuilder {
                     new UniversalEditorPanel.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(int position) {
-                            int newCode = buttonCodeCatalog().get(position).getCode();
+                            InputEvent newBinding = stickBindingCatalog().get(position);
 
                             // A spinner reports its initial selection as well
-                            if (button.getButtonCode() == newCode) {
+                            if (button.isBoundTo(newBinding)) {
                                 return;
                             }
 
-                            button.setButtonCode(newCode);
+                            button.setBinding(newBinding);
                             callbacks.onElementChanged();
 
-                            // Assigning a button adds its action editor to the panel
                             onRebuildRequested.run();
                         }
                     });
@@ -616,13 +630,13 @@ public class UniversalElementEditorBuilder {
 
         final UniversalStickButtonConfig binding = config.getCenterButton();
 
-        // A press of the middle sends a button, so only the buttons are offered here
-        List<InputEvent> catalog = buttonCodeCatalog();
+        // The middle is bound the same way a direction is, so the keys are offered here too
+        List<InputEvent> catalog = stickBindingCatalog();
         List<String> names = describeAll(catalog);
 
         int selected = 0;
         for (int i = 0; i < catalog.size(); i++) {
-            if (catalog.get(i).getCode() == binding.getButtonCode()) {
+            if (binding.isBoundTo(catalog.get(i))) {
                 selected = i;
                 break;
             }
@@ -632,13 +646,13 @@ public class UniversalElementEditorBuilder {
                 selected, new UniversalEditorPanel.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(int position) {
-                        int newCode = buttonCodeCatalog().get(position).getCode();
+                        InputEvent newBinding = stickBindingCatalog().get(position);
 
-                        if (binding.getButtonCode() == newCode) {
+                        if (binding.isBoundTo(newBinding)) {
                             return;
                         }
 
-                        binding.setButtonCode(newCode);
+                        binding.setBinding(newBinding);
                         callbacks.onElementChanged();
                         onRebuildRequested.run();
                     }
