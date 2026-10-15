@@ -573,6 +573,16 @@ public class UniversalLayoutConfigurationLoader {
      * size was recorded is judged by whether it actually fits, which is what catches the
      * layouts that are already broken.
      */
+    /**
+     * Fits the loaded layout to an area of the given size, for the debug smoke test. The real
+     * call happens on the first layout pass that reports a size, which a test cannot wait for
+     * reliably.
+     */
+    public static void fitToAreaForTesting(UniversalVirtualController controller, Context context,
+                                           String layoutId, int width, int height) {
+        bringIntoView(getLayoutPreferences(context, layoutId), controller, width, height);
+    }
+
     private static void bringIntoView(SharedPreferences preferences,
                                       UniversalVirtualController controller,
                                       int currentWidth,
@@ -608,25 +618,18 @@ public class UniversalLayoutConfigurationLoader {
             savedHeight = measureReachY(controller, currentHeight);
         }
 
-        float scale = Math.min((float) currentWidth / savedWidth,
-                (float) currentHeight / savedHeight);
-
-        // Centre what is left over, so the layout keeps its shape
-        int offsetX = (int) ((currentWidth - savedWidth * scale) / 2);
-        int offsetY = (int) ((currentHeight - savedHeight * scale) / 2);
-
         for (UniversalVirtualControllerElement element : controller.getElements()) {
             UniversalGeometry geometry = element.getConfig().getGeometry();
 
-            int left = offsetX + Math.round(geometry.getLeft() * scale);
-            int top = offsetY + Math.round(geometry.getTop() * scale);
-            int width = Math.max(UniversalGeometry.MIN_SIZE, Math.round(geometry.getWidth() * scale));
-            int height = Math.max(UniversalGeometry.MIN_SIZE, Math.round(geometry.getHeight() * scale));
+            // The same rule an imported layout is moved by, so a layout ends up in the same
+            // place whether it was opened from here or arrived as a file
+            UniversalGeometry moved = UniversalLayoutExchange.rescale(geometry,
+                    savedWidth, savedHeight, currentWidth, currentHeight);
 
-            geometry.setLeft(Math.max(0, left));
-            geometry.setTop(Math.max(0, top));
-            geometry.setWidth(width);
-            geometry.setHeight(height);
+            geometry.setLeft(moved.getLeft());
+            geometry.setTop(moved.getTop());
+            geometry.setWidth(moved.getWidth());
+            geometry.setHeight(moved.getHeight());
             geometry.applyTo(element);
         }
 
@@ -737,6 +740,47 @@ public class UniversalLayoutConfigurationLoader {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * Writes a whole set of controls for a layout, and the screen it was arranged on.
+     *
+     * This is how an imported layout is stored. The screen is the one the file was written on
+     * rather than the one it is being read on, so the layout is fitted when it is opened, where
+     * the size of the area the controls live in is known.
+     */
+    public static void writeStoredElements(Context context, String layoutId, String elementsJson,
+                                           int arrangedWidth, int arrangedHeight) {
+        context.getSharedPreferences(getLayoutPreferenceFileName(layoutId), Context.MODE_PRIVATE)
+                .edit()
+                .putString(KEY_ELEMENTS, elementsJson)
+                .putInt(KEY_NEXT_ELEMENT_ID, nextElementIdIn(elementsJson))
+                .putInt(KEY_SAVED_WIDTH, arrangedWidth)
+                .putInt(KEY_SAVED_HEIGHT, arrangedHeight)
+                .apply();
+    }
+
+    /**
+     * The id a set of stored controls needs next, which is one past the highest it holds.
+     */
+    public static int nextElementIdIn(String elementsJson) {
+        int highest = 0;
+
+        try {
+            JSONArray elements = new JSONArray(elementsJson);
+
+            for (int i = 0; i < elements.length(); i++) {
+                JSONObject element = elements.optJSONObject(i);
+
+                if (element != null) {
+                    highest = Math.max(highest, element.optInt(KEY_ELEMENT_ID, 0));
+                }
+            }
+        } catch (JSONException e) {
+            return 1;
+        }
+
+        return highest + 1;
     }
 
     /**

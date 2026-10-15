@@ -341,20 +341,34 @@ public class UniversalEditorPanel {
     }
 
     public void addButton(String text, View.OnClickListener listener) {
-        content.addView(makeButton(text, listener, BUTTON_TEXT, BUTTON_FILL, BUTTON_EDGE),
-                matchWidth());
+        content.addView(makeButton(text, listener, NORMAL_STYLE, true), rowParams());
     }
 
     /**
      * Adds a row of buttons that share the available width.
      */
     public void addButtonRow(String[] texts, View.OnClickListener[] listeners) {
+        boolean[] enabled = new boolean[texts.length];
+
+        for (int i = 0; i < enabled.length; i++) {
+            enabled[i] = true;
+        }
+
+        addButtonRow(texts, listeners, enabled);
+    }
+
+    /**
+     * Adds a row of buttons, some of which may be unavailable.
+     *
+     * An unavailable button is still shown, greyed out, rather than removed: a row that comes
+     * and goes as things are copied makes the drawer jump about under the finger.
+     */
+    public void addButtonRow(String[] texts, View.OnClickListener[] listeners, boolean[] enabled) {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
 
         for (int i = 0; i < texts.length; i++) {
-            Button button = makeButton(texts[i], listeners[i], BUTTON_TEXT, BUTTON_FILL,
-                    BUTTON_EDGE);
+            Button button = makeButton(texts[i], listeners[i], NORMAL_STYLE, enabled[i]);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
@@ -367,38 +381,61 @@ public class UniversalEditorPanel {
             row.addView(button, params);
         }
 
-        content.addView(row, matchWidth());
+        content.addView(row, rowParams());
     }
 
     /**
      * Adds a button for something that cannot be undone.
      *
-     * It is drawn in red, on a red wash, so the one entry of the drawer that destroys work
-     * never looks like the others and is never pressed by accident.
+     * It is drawn in red, on a red wash, so the one entry of the drawer that destroys work never
+     * looks like the others and is never pressed by accident.
      */
     public void addDangerButton(String text, View.OnClickListener listener) {
-        content.addView(makeButton(text, listener, DANGER_TEXT, DANGER_FILL, DANGER_EDGE),
-                matchWidth());
+        content.addView(makeButton(text, listener, DANGER_STYLE, true), rowParams());
     }
 
-    private Button makeButton(String text, View.OnClickListener listener, int textColor,
-                              int fillColor, int edgeColor) {
+    private Button makeButton(String text, View.OnClickListener listener, ButtonStyle style,
+                              boolean enabled) {
         Button button = new Button(context);
 
         button.setText(text);
-        button.setTextColor(textColor);
+        button.setTextColor(style.text);
         button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
         button.setMinWidth(0);
         button.setMinimumWidth(0);
         button.setAllCaps(false);
-        button.setPadding(dp(8), dp(8), dp(8), dp(8));
-        button.setBackground(makeButtonBackground(fillColor, edgeColor));
+        button.setPadding(dp(8), dp(9), dp(8), dp(9));
+        button.setBackground(makeButtonBackground(style));
         button.setOnClickListener(listener);
+        button.setEnabled(enabled);
 
         return button;
     }
 
-    private GradientDrawable makeButtonBackground(int fillColor, int edgeColor) {
+    /**
+     * The background of a button, which lightens while the button is held.
+     *
+     * A tap has to be felt as well as seen, and on a dark panel over a dark game the moment of
+     * contact is the only confirmation there is.
+     */
+    private android.graphics.drawable.Drawable makeButtonBackground(ButtonStyle style) {
+        android.graphics.drawable.StateListDrawable states =
+                new android.graphics.drawable.StateListDrawable();
+
+        states.addState(new int[]{-android.R.attr.state_enabled},
+                makeButtonShape(DISABLED_STYLE));
+        states.addState(new int[]{android.R.attr.state_pressed},
+                makeButtonShape(style, style.fillPressed, style.edgePressed));
+        states.addState(new int[]{}, makeButtonShape(style));
+
+        return states;
+    }
+
+    private GradientDrawable makeButtonShape(ButtonStyle style) {
+        return makeButtonShape(style, style.fill, style.edge);
+    }
+
+    private GradientDrawable makeButtonShape(ButtonStyle style, int fillColor, int edgeColor) {
         GradientDrawable background = new GradientDrawable();
 
         background.setColor(fillColor);
@@ -411,18 +448,57 @@ public class UniversalEditorPanel {
         return background;
     }
 
-    private int dp(float value) {
-        return Math.round(value * context.getResources().getDisplayMetrics().density);
+    /**
+     * The look of one kind of button: its text, its fill, and the lighter fill it takes while
+     * it is held.
+     */
+    private static final class ButtonStyle {
+        final int text;
+        final int fill;
+        final int fillPressed;
+        final int edge;
+        final int edgePressed;
+
+        ButtonStyle(int text, int fill, int fillPressed, int edge, int edgePressed) {
+            this.text = text;
+            this.fill = fill;
+            this.fillPressed = fillPressed;
+            this.edge = edge;
+            this.edgePressed = edgePressed;
+        }
     }
 
     /**
-     * The text of every button in the panel, in the order they appear. Used by the debug smoke
-     * test to check that the drawer offers what it should.
+     * An ordinary button of the drawer: a faint light fill with a soft edge, which is quiet
+     * enough not to compete with the values it sits under.
+     */
+    private static final ButtonStyle NORMAL_STYLE = new ButtonStyle(
+            0xFFE8EAF0, 0x1FFFFFFF, 0x3DFFFFFF, 0x33FFFFFF, 0x66FFFFFF);
+
+    private static final ButtonStyle DANGER_STYLE = new ButtonStyle(
+            0xFFFF7B72, 0x2EFF5A50, 0x4DFF6B60, 0x66FF6B60, 0x99FF6B60);
+
+    private static final ButtonStyle DISABLED_STYLE = new ButtonStyle(
+            0x59E8EAF0, 0x0FFFFFFF, 0x0FFFFFFF, 0x1FFFFFFF, 0x1FFFFFFF);
+
+    /**
+     * The text of every button in the panel, in the order they appear, and whether it can be
+     * pressed. Used by the debug smoke test to check what the drawer offers.
      */
     public java.util.List<String> getButtonLabelsForTesting() {
         java.util.List<String> labels = new java.util.ArrayList<>();
 
         collectButtonLabels(content, labels);
+        return labels;
+    }
+
+    /**
+     * The buttons of the panel that cannot be pressed.
+     */
+    public java.util.List<String> getDisabledButtonLabelsForTesting() {
+        java.util.List<String> labels = new java.util.ArrayList<>();
+
+        collectDisabledButtonLabels(content, labels);
         return labels;
     }
 
@@ -439,17 +515,29 @@ public class UniversalEditorPanel {
         }
     }
 
-    /**
-     * The look of an ordinary button of the drawer: a faint light fill with a soft edge, which
-     * is quiet enough not to compete with the values it sits under.
-     */
-    private static final int BUTTON_TEXT = 0xFFE8EAF0;
-    private static final int BUTTON_FILL = 0x1FFFFFFF;
-    private static final int BUTTON_EDGE = 0x33FFFFFF;
+    private static void collectDisabledButtonLabels(ViewGroup group, java.util.List<String> labels) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
 
-    private static final int DANGER_TEXT = 0xFFFF7B72;
-    private static final int DANGER_FILL = 0x2EFF5A50;
-    private static final int DANGER_EDGE = 0x66FF6B60;
+            if (child instanceof Button) {
+                if (!child.isEnabled()) {
+                    labels.add(((Button) child).getText().toString());
+                }
+            }
+            else if (child instanceof ViewGroup) {
+                collectDisabledButtonLabels((ViewGroup) child, labels);
+            }
+        }
+    }
+
+    /**
+     * A row of the drawer keeps a little space under itself, so rows never look stuck together.
+     */
+    private LinearLayout.LayoutParams rowParams() {
+        LinearLayout.LayoutParams params = matchWidth();
+        params.bottomMargin = dp(6);
+        return params;
+    }
 
     private void addFieldLabel(String label) {
         TextView view = new TextView(context);

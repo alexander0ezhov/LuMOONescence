@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.InputType;
@@ -55,6 +56,13 @@ public class UniversalLayoutsActivity extends Activity {
         UiHelper.notifyNewRootView(this);
 
         layoutStore = UniversalLayoutStore.getInstance(this);
+
+        findViewById(R.id.layoutsImportButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                importLayout();
+            }
+        });
 
         layoutsGrid = findViewById(R.id.layoutsGrid);
         enabledSwitch = findViewById(R.id.layoutsEnabledSwitch);
@@ -298,6 +306,14 @@ public class UniversalLayoutsActivity extends Activity {
             });
         }
 
+        entries.add(getString(R.string.menu_share_layout));
+        actions.add(new Runnable() {
+            @Override
+            public void run() {
+                shareLayout(layout);
+            }
+        });
+
         entries.add(getString(R.string.menu_delete_layout));
         actions.add(new Runnable() {
             @Override
@@ -315,6 +331,225 @@ public class UniversalLayoutsActivity extends Activity {
                     }
                 })
                 .show();
+    }
+
+    /**
+     * Hands a layout to another app as a file, which is how a layout moves to another device.
+     *
+     * The file is written into the app's own cache and offered through a provider, so no
+     * storage permission is asked for and nothing is left lying about in shared storage.
+     */
+    private void shareLayout(final UniversalLayoutDefinition layout) {
+        String json;
+
+        try {
+            json = layoutAsExchangeJson(layout);
+        } catch (org.json.JSONException e) {
+            showMessage(getString(R.string.import_failed));
+            return;
+        }
+
+        try {
+            java.io.File file = UniversalLayoutExchange.writeShareFile(this, layout.getName(), json);
+            Uri address = Uri.parse("content://" + UniversalLayoutShareProvider.authority(this)
+                    + "/" + file.getName());
+
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("application/json");
+            share.putExtra(Intent.EXTRA_STREAM, address);
+            share.putExtra(Intent.EXTRA_SUBJECT, layout.getName());
+            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            startActivity(Intent.createChooser(share, getString(R.string.menu_share_layout)));
+        } catch (java.io.IOException e) {
+            showMessage(getString(R.string.import_failed));
+        }
+    }
+
+    /**
+     * A stored layout written as a file, with the screen it was arranged on.
+     */
+    private String layoutAsExchangeJson(UniversalLayoutDefinition layout) throws org.json.JSONException {
+        SharedPreferences preferences = getSharedPreferences(
+                UniversalLayoutConfigurationLoader.getLayoutPreferenceFileName(layout.getId()),
+                MODE_PRIVATE);
+
+        String elements = preferences.getString("elements", "[]");
+        int width = preferences.getInt("savedWidth", 0);
+        int height = preferences.getInt("savedHeight", 0);
+
+        if (width <= 0 || height <= 0) {
+            // A layout from before the size was recorded is sent as the screen it is on now,
+            // which is the best answer available and keeps it usable on the other device
+            width = getLayoutAreaWidth();
+            height = getLayoutAreaHeight();
+        }
+
+        return UniversalLayoutExchange.toJson(layout.getName(), width, height, elements);
+    }
+
+    /**
+     * Asks the user for a layout file. Reading one needs no permission, because the user picks
+     * the file themselves and the picker hands back a readable address.
+     */
+    private void importLayout() {
+        Intent pick = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+        pick.addCategory(Intent.CATEGORY_OPENABLE);
+        pick.setType("*/*");
+        pick.putExtra(Intent.EXTRA_MIME_TYPES,
+                new String[]{"application/json", "text/plain", "application/octet-stream"});
+
+        try {
+            startActivityForResult(pick, REQUEST_IMPORT_LAYOUT);
+        } catch (android.content.ActivityNotFoundException e) {
+            showMessage(getString(R.string.import_failed));
+        }
+    }
+
+    private static final int REQUEST_IMPORT_LAYOUT = 4001;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode != REQUEST_IMPORT_LAYOUT || resultCode != RESULT_OK || data == null) {
+            return;
+        }
+
+        Uri source = data.getData();
+
+        if (source == null) {
+            return;
+        }
+
+        String text;
+
+        try {
+            text = readText(source);
+        } catch (java.io.IOException e) {
+            showMessage(getString(R.string.import_failed));
+            return;
+        }
+
+        UniversalLayoutDefinition created = importForTesting(text);
+
+        if (created == null) {
+            showMessage(getString(R.string.import_failed));
+            return;
+        }
+
+        refresh();
+
+        // A layout made for another screen is not fitted here: it is fitted when it is opened,
+        // where the size of the streaming area is known. Saying so is still worth it.
+        if (importedWasForAnotherScreen) {
+            showMessage(getString(R.string.import_done_rescaled, created.getName()));
+        }
+        else {
+            showMessage(getString(R.string.import_done, created.getName()));
+        }
+    }
+
+    /**
+     * Whether the last import read a layout arranged for a screen other than this device's.
+     */
+    private boolean importedWasForAnotherScreen;
+
+    /**
+     * Reads a layout file and stores it as a layout of its own. Returns null when the text is
+     * not a layout.
+     */
+    public UniversalLayoutDefinition importForTesting(String text) {
+        UniversalLayoutExchange.Imported imported;
+
+        try {
+            imported = UniversalLayoutExchange.fromJson(text);
+        } catch (org.json.JSONException e) {
+            android.util.Log.w("UniversalLayouts", "could not read the layout file", e);
+            importedWasForAnotherScreen = false;
+            return null;
+        }
+
+        importedSourceWidth = imported.getSourceWidth();
+        importedSourceHeight = imported.getSourceHeight();
+
+        importedWasForAnotherScreen = imported.hasSourceScreen()
+                && !UniversalLayoutExchange.fitsThisDevice(this, imported.getSourceWidth(),
+                        imported.getSourceHeight());
+
+        return UniversalLayoutExchange.store(this, imported);
+    }
+
+    /**
+     * The size the last imported layout was arranged for, or 0 when the file did not say.
+     */
+    public int getImportedSourceWidthForTesting() {
+        return importedSourceWidth;
+    }
+
+    public int getImportedSourceHeightForTesting() {
+        return importedSourceHeight;
+    }
+
+    private int importedSourceWidth;
+    private int importedSourceHeight;
+
+    /**
+     * Reads a picked file, refusing anything far larger than a layout can be.
+     */
+    private String readText(Uri source) throws java.io.IOException {
+        java.io.InputStream in = getContentResolver().openInputStream(source);
+
+        if (in == null) {
+            throw new java.io.IOException("no stream for " + source);
+        }
+
+        try {
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            int read;
+            int total = 0;
+
+            while ((read = in.read(buffer)) > 0) {
+                total += read;
+
+                if (total > MAX_LAYOUT_FILE_BYTES) {
+                    throw new java.io.IOException("layout file is too big");
+                }
+
+                out.write(buffer, 0, read);
+            }
+
+            return out.toString("UTF-8");
+        } finally {
+            in.close();
+        }
+    }
+
+    private static final int MAX_LAYOUT_FILE_BYTES = 4 * 1024 * 1024;
+
+    private void showMessage(String message) {
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show();
+    }
+
+    private void showMessage(int messageId, Object... arguments) {
+        showMessage(getString(messageId, arguments));
+    }
+
+    /**
+     * The size of the area controls are placed in, which is the screen they were arranged on.
+     */
+    private int getLayoutAreaWidth() {
+        View root = findViewById(R.id.layoutsRoot);
+        return root != null && root.getWidth() > 0
+                ? root.getWidth() : getResources().getDisplayMetrics().widthPixels;
+    }
+
+    private int getLayoutAreaHeight() {
+        View root = findViewById(R.id.layoutsRoot);
+        return root != null && root.getHeight() > 0
+                ? root.getHeight() : getResources().getDisplayMetrics().heightPixels;
     }
 
     private void openEditor(UniversalLayoutDefinition layout) {

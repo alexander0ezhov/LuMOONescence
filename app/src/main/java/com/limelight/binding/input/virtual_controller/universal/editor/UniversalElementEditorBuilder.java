@@ -138,34 +138,36 @@ public class UniversalElementEditorBuilder {
 
         panel.addSection(context.getString(R.string.editor_section_actions));
 
+        // Taking the size of a control and giving it to another belong together, so they share
+        // a row. Pasting is offered from the start and is out of reach until there is a size to
+        // paste, because a row that appears and disappears moves everything under the finger.
         panel.addButtonRow(
-                new String[]{context.getString(R.string.menu_duplicate),
-                        context.getString(R.string.menu_copy_size)},
+                new String[]{context.getString(R.string.menu_copy_size),
+                        context.getString(R.string.menu_paste_size)},
                 new View.OnClickListener[]{
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                actions.duplicate();
-                            }
-                        },
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 actions.copySize();
                             }
-                        }});
+                        },
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                actions.pasteSize();
+                            }
+                        }},
+                new boolean[]{true, actions.canPasteSize()});
 
-        // Pasting only makes sense once a size has been taken, so it appears only then
-        if (actions.canPasteSize()) {
-            panel.addButton(context.getString(R.string.menu_paste_size),
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            actions.pasteSize();
-                        }
-                    });
-        }
+        panel.addButton(context.getString(R.string.menu_duplicate),
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        actions.duplicate();
+                    }
+                });
 
+        // Last of all, and the only red thing in the drawer
         panel.addDangerButton(context.getString(R.string.menu_delete),
                 new View.OnClickListener() {
                     @Override

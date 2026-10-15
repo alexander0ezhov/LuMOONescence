@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,8 +27,11 @@ import com.limelight.binding.input.virtual_controller.universal.UniversalDigital
 import com.limelight.binding.input.virtual_controller.universal.UniversalElementTypes;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutConfigurationLoader;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLeftTrigger;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutArea;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutEditorActivity;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutExchange;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutShareProvider;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutStore;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualController;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualControllerElement;
@@ -609,6 +614,13 @@ public class LayoutSmokeActivity extends Activity {
         checkPositionStopsBeforeTheEdge();
         checkTheDrawerOffersTheControlActions();
         checkDraggingAControlShowsItsDrawer();
+        checkDrawerActionRows();
+        checkLayoutsMoveBetweenScreens();
+        checkALayoutFromAnotherScreenIsFitted();
+        checkLayoutsSurviveBeingWrittenOut();
+        checkImportingDoesNotShrinkALayout();
+        checkExportThenImportKeepsEveryControl();
+        checkASharedLayoutCanBeReadBack();
     }
 
     /**
@@ -2104,6 +2116,592 @@ public class LayoutSmokeActivity extends Activity {
         return null;
     }
 
+
+    /**
+     * A layout made for one screen has to arrive correctly on another: a control keeps its
+     * place on the screen, and grows by the smaller of the two changes so it is not stretched.
+     */
+    private void checkLayoutsMoveBetweenScreens() {
+        // The example the export and import are built around: a control at a quarter of the way
+        // across and halfway down a 200x100 screen, 25x25 big
+        UniversalGeometry onSmall = new UniversalGeometry(100, 50, 25, 25);
+
+        UniversalGeometry onBig = UniversalLayoutExchange.rescale(onSmall, 200, 100, 400, 400);
+
+        android.util.Log.i("LayoutSmoke", "200x100 (100,50) 25x25 -> 400x400 ("
+                + onBig.getLeft() + "," + onBig.getTop() + ") "
+                + onBig.getWidth() + "x" + onBig.getHeight());
+
+        // Half way across and half way down stays half way across and half way down
+        check("a moved control keeps its place across the screen", onBig.getLeft() == 200);
+        check("a moved control keeps its place down the screen", onBig.getTop() == 200);
+
+        // The shorter of the two changes is 400/400 = 1, the taller is 400/100 = 4
+        check("a moved control is not stretched", onBig.getWidth() == onBig.getHeight());
+
+        // Twice as wide and the same height: the width doubles and the height stays put
+        UniversalGeometry wider = UniversalLayoutExchange.rescale(
+                new UniversalGeometry(100, 50, 25, 25), 200, 100, 400, 100);
+
+        check("a control on a wider screen doubles where it sat", wider.getLeft() == 200);
+        check("a control on a wider screen keeps its height", wider.getTop() == 50);
+        check("a control on a wider screen is not stretched sideways",
+                wider.getWidth() == wider.getHeight() && wider.getWidth() == 25);
+
+        // The same screen leaves everything exactly as it was
+        UniversalGeometry unchanged = UniversalLayoutExchange.rescale(onSmall, 200, 100, 200, 100);
+
+        check("a layout opened on its own screen is left alone",
+                unchanged.getLeft() == 100 && unchanged.getTop() == 50
+                        && unchanged.getWidth() == 25 && unchanged.getHeight() == 25);
+    }
+
+    /**
+     * A layout written out and read back on the same screen must come back exactly as it was.
+     */
+    private void checkLayoutsSurviveBeingWrittenOut() {
+        String elements = "[{\"elementId\":7,\"type\":\"button\",\"name\":\"A\","
+                + "\"geometry\":{\"left\":300,\"top\":200,\"width\":120,\"height\":90}}]";
+
+        UniversalLayoutExchange.Imported imported = null;
+        String text = null;
+
+        try {
+            text = UniversalLayoutExchange.toJson("My layout", 2510, 1156, elements);
+            imported = UniversalLayoutExchange.fromJson(text);
+        } catch (org.json.JSONException e) {
+            android.util.Log.e("LayoutSmoke", "could not round trip a layout", e);
+        }
+
+        check("a layout can be written out and read back", imported != null);
+
+        if (imported == null) {
+            return;
+        }
+
+        check("the name of a layout survives being written out",
+                "My layout".equals(imported.getName()));
+        check("a layout file says which screen it was arranged on",
+                imported.getSourceWidth() == 2510 && imported.getSourceHeight() == 1156);
+
+        UniversalGeometry kept = geometryOf(imported.getElementsJson());
+
+        check("a control comes back where it was",
+                kept != null && kept.getLeft() == 300 && kept.getTop() == 200);
+        check("a control comes back the size it was",
+                kept != null && kept.getWidth() == 120 && kept.getHeight() == 90);
+
+        // A file that is not ours is refused rather than half read
+        boolean refused = false;
+
+        try {
+            UniversalLayoutExchange.fromJson("{\"hello\":\"world\"}");
+        } catch (org.json.JSONException e) {
+            refused = true;
+        }
+
+        check("a file that is not a layout is refused", refused);
+
+        boolean refusedNewer = false;
+
+        try {
+            UniversalLayoutExchange.fromJson(
+                    "{\"format\":\"moonlight-universal-layout\",\"version\":99,"
+                            + "\"elements\":[]}");
+        } catch (org.json.JSONException e) {
+            refusedNewer = true;
+        }
+
+        check("a layout from a newer version of the app is refused", refusedNewer);
+
+        boolean refusedPlaceless = false;
+
+        try {
+            UniversalLayoutExchange.fromJson(
+                    "{\"format\":\"moonlight-universal-layout\",\"version\":1,"
+                            + "\"elements\":[{\"elementId\":1}]}");
+        } catch (org.json.JSONException e) {
+            refusedPlaceless = true;
+        }
+
+        check("a control with no place is refused", refusedPlaceless);
+
+        check("a shared layout is given a file name a file system accepts",
+                "My-layout.json".equals(UniversalLayoutExchange.fileNameFor("My layout")));
+        check("a file name cannot escape its folder",
+                !UniversalLayoutExchange.fileNameFor("../../etc/passwd").contains("/")
+                        && !UniversalLayoutExchange.fileNameFor("../../etc/passwd").contains(".."));
+    }
+
+    /**
+     * Importing must not fit a layout to the screen the import happens on.
+     *
+     * The layouts screen is a portrait list while the controls belong to the landscape streaming
+     * area, so measuring a layout against the list shrank every control to a fraction of itself
+     * and moved them about, some off the screen altogether.
+     */
+    private void checkImportingDoesNotShrinkALayout() {
+        int areaWidth = Math.max(getResources().getDisplayMetrics().widthPixels,
+                getResources().getDisplayMetrics().heightPixels);
+        int areaHeight = Math.min(getResources().getDisplayMetrics().widthPixels,
+                getResources().getDisplayMetrics().heightPixels);
+
+        // The control that came out at 74x74 in the corner of the screen instead of 160x160
+        String elements = "[{\"elementId\":6,\"type\":\"button\",\"name\":\"A\","
+                + "\"geometry\":{\"left\":2156,\"top\":337,\"width\":160,\"height\":160}}]";
+
+        UniversalLayoutDefinition created = null;
+
+        try {
+            String text = UniversalLayoutExchange.toJson("Smoke import", areaWidth, areaHeight,
+                    elements);
+            created = UniversalLayoutExchange.store(this, UniversalLayoutExchange.fromJson(text));
+        } catch (org.json.JSONException e) {
+            android.util.Log.e("LayoutSmoke", "could not import a layout", e);
+        }
+
+        check("an imported layout is created", created != null);
+
+        if (created == null) {
+            return;
+        }
+
+        SharedPreferences preferences = getSharedPreferences(
+                "OSC_UNIVERSAL_" + created.getId(), MODE_PRIVATE);
+
+        String stored = preferences.getString("elements", "");
+        UniversalGeometry geometry = geometryOf(stored);
+
+        android.util.Log.i("LayoutSmoke", "imported control: " + (geometry == null ? "nothing"
+                : geometry.getLeft() + "," + geometry.getTop() + " "
+                + geometry.getWidth() + "x" + geometry.getHeight())
+                + " saved screen " + preferences.getInt("savedWidth", 0) + "x"
+                + preferences.getInt("savedHeight", 0));
+
+        check("importing does not shrink a control",
+                geometry != null && geometry.getWidth() == 160 && geometry.getHeight() == 160);
+        check("importing does not move a control",
+                geometry != null && geometry.getLeft() == 2156 && geometry.getTop() == 337);
+
+        // The layout remembers the screen the file was arranged on, so it is fitted when it is
+        // opened, where the size of the streaming area is known
+        check("an imported layout remembers the screen it was arranged on",
+                preferences.getInt("savedWidth", 0) == areaWidth
+                        && preferences.getInt("savedHeight", 0) == areaHeight);
+        check("an imported layout is not marked as already fitted",
+                !preferences.getBoolean("rescaledToFit", false));
+
+        // Importing twice makes two layouts rather than overwriting the first
+        UniversalLayoutDefinition second = null;
+
+        try {
+            String text = UniversalLayoutExchange.toJson("Smoke import", areaWidth, areaHeight,
+                    elements);
+            second = UniversalLayoutExchange.store(this, UniversalLayoutExchange.fromJson(text));
+        } catch (org.json.JSONException e) {
+            android.util.Log.e("LayoutSmoke", "could not import a layout twice", e);
+        }
+
+        check("importing the same layout twice makes a second layout",
+                second != null && !second.getId().equals(created.getId()));
+
+        if (second != null) {
+            getSharedPreferences("OSC_UNIVERSAL_" + second.getId(), MODE_PRIVATE)
+                    .edit().clear().apply();
+            UniversalLayoutStore.getInstance(this).deleteLayout(second.getId());
+        }
+
+        getSharedPreferences("OSC_UNIVERSAL_" + created.getId(), MODE_PRIVATE)
+                .edit().clear().apply();
+        UniversalLayoutStore.getInstance(this).deleteLayout(created.getId());
+    }
+
+    /**
+     * The geometry of the first control in a written out layout.
+     */
+    private UniversalGeometry geometryOf(String elementsJson) {
+        try {
+            org.json.JSONArray elements = new org.json.JSONArray(elementsJson);
+
+            if (elements.length() == 0) {
+                return null;
+            }
+
+            return UniversalLayoutExchange.readGeometry(
+                    elements.getJSONObject(0).getJSONObject("geometry"));
+        } catch (org.json.JSONException e) {
+            return null;
+        }
+    }
+
+    /**
+     * The drawer's actions are laid out the way they are meant to be, with pasting out of reach
+     * until there is a size to paste.
+     */
+    private void checkDrawerActionRows() {
+        UniversalVirtualControllerElement element = firstElementInLayout();
+
+        if (element == null) {
+            return;
+        }
+
+        // Start from a drawer with something copied, so the order can be read in full
+        editor.copySizeOf(element);
+        editor.onElementTapped(null);
+        editor.onElementTapped(element);
+
+        java.util.List<String> labels = editor.getPanelForTesting().getButtonLabelsForTesting();
+        java.util.List<String> disabled =
+                editor.getPanelForTesting().getDisabledButtonLabelsForTesting();
+
+        int copyAt = labels.indexOf(getString(R.string.menu_copy_size));
+        int pasteAt = labels.indexOf(getString(R.string.menu_paste_size));
+        int duplicateAt = labels.indexOf(getString(R.string.menu_duplicate));
+        int deleteAt = labels.indexOf(getString(R.string.menu_delete));
+
+        android.util.Log.i("LayoutSmoke", "actions in order: copy=" + copyAt
+                + " paste=" + pasteAt + " duplicate=" + duplicateAt + " delete=" + deleteAt);
+
+        check("copying and pasting share a row", copyAt >= 0 && pasteAt == copyAt + 1);
+        check("duplicating comes after copying and pasting",
+                duplicateAt == pasteAt + 1);
+        check("deleting is the last of the actions", deleteAt == duplicateAt + 1);
+        check("nothing is out of reach once a size is copied", disabled.isEmpty());
+
+        // With nothing copied, pasting is shown but cannot be pressed
+        editor.setCopiedSizeForTesting(0, 0, 0);
+        editor.onElementTapped(null);
+        editor.onElementTapped(element);
+
+        disabled = editor.getPanelForTesting().getDisabledButtonLabelsForTesting();
+
+        android.util.Log.i("LayoutSmoke", "out of reach: " + disabled);
+
+        check("pasting is out of reach before a size is copied",
+                disabled.contains(getString(R.string.menu_paste_size)));
+        check("pasting is still shown, so the row does not move",
+                editor.getPanelForTesting().getButtonLabelsForTesting()
+                        .contains(getString(R.string.menu_paste_size)));
+
+        editor.setCopiedSizeForTesting(120, 90, 22);
+    }
+
+
+    /**
+     * A shared layout has to come back through the address that is handed to the other app,
+     * which is what makes sharing work at all.
+     */
+    private void checkASharedLayoutCanBeReadBack() {
+        String json = null;
+
+        try {
+            json = UniversalLayoutExchange.toJson("Smoke layout", 100, 100, "[]");
+        } catch (org.json.JSONException e) {
+            android.util.Log.e("LayoutSmoke", "could not write a layout", e);
+        }
+
+        check("a layout can be written out for sharing", json != null);
+
+        if (json == null) {
+            return;
+        }
+
+        java.io.File file = null;
+
+        try {
+            file = UniversalLayoutExchange.writeShareFile(this, "Smoke layout", json);
+        } catch (java.io.IOException e) {
+            android.util.Log.e("LayoutSmoke", "could not write a share file", e);
+        }
+
+        check("a layout can be written to a share file", file != null && file.exists());
+
+        if (file == null) {
+            return;
+        }
+
+        Uri address = Uri.parse("content://" + UniversalLayoutShareProvider.authority(this)
+                + "/" + file.getName());
+
+        android.util.Log.i("LayoutSmoke", "shared as " + address);
+
+        // The name and size a receiving app asks for
+        android.database.Cursor cursor = getContentResolver()
+                .query(address, null, null, null, null);
+
+        String name = null;
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int column = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);
+
+                if (column >= 0) {
+                    name = cursor.getString(column);
+                }
+            }
+
+            cursor.close();
+        }
+
+        check("the shared layout is offered under its file name",
+                "Smoke-layout.json".equals(name));
+
+        // And its contents
+        String readBack = null;
+
+        try {
+            java.io.InputStream in = getContentResolver().openInputStream(address);
+
+            if (in != null) {
+                java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int count;
+
+                while ((count = in.read(buffer)) > 0) {
+                    out.write(buffer, 0, count);
+                }
+
+                in.close();
+                readBack = out.toString("UTF-8");
+            }
+        } catch (java.io.IOException e) {
+            android.util.Log.e("LayoutSmoke", "could not read the shared layout", e);
+        }
+
+        check("the shared layout can be read back through its address", json.equals(readBack));
+
+        // An address pointing outside the folder is refused rather than served
+        boolean refused = false;
+
+        try {
+            getContentResolver().openInputStream(Uri.parse(
+                    "content://" + UniversalLayoutShareProvider.authority(this)
+                            + "/" + Uri.encode("../databases")));
+        } catch (java.io.FileNotFoundException e) {
+            refused = true;
+        } catch (IllegalArgumentException e) {
+            refused = true;
+        } catch (SecurityException e) {
+            refused = true;
+        }
+
+        check("a shared layout address cannot reach outside its folder", refused);
+    }
+
+
+    /**
+     * A layout arranged on another screen is fitted when it is opened, which is where the size
+     * of the area the controls live in is known. This is what makes a layout from a phone work
+     * on a tablet, whether it was opened from the list or imported from a file.
+     */
+    private void checkALayoutFromAnotherScreenIsFitted() {
+        UniversalVirtualControllerElement element = firstElementInLayout();
+
+        check("a control is in the layout for the fitting check", element != null);
+
+        if (element == null) {
+            return;
+        }
+
+        // A layout arranged on a screen of 200x100, which is nothing like this one.
+        //
+        // The place is set on the control's own configuration and then applied to it: the
+        // fitting reads the configuration, so setting only the view would leave it fitting
+        // whatever was there before.
+        UniversalGeometry arranged = element.getConfig().getGeometry();
+        arranged.setLeft(100);
+        arranged.setTop(50);
+        arranged.setWidth(25);
+        arranged.setHeight(25);
+        arranged.applyTo(element);
+
+        android.util.Log.i("LayoutSmoke", "before fitting: config has "
+                + element.getConfig().getGeometry().getLeft() + ","
+                + element.getConfig().getGeometry().getTop() + " "
+                + element.getConfig().getGeometry().getWidth() + "x"
+                + element.getConfig().getGeometry().getHeight());
+
+        String file = UniversalLayoutConfigurationLoader.getLayoutPreferenceFileName(
+                SCRATCH_LAYOUT_ID);
+
+        SharedPreferences preferences = getSharedPreferences(file, Context.MODE_PRIVATE);
+        preferences.edit()
+                .putInt("savedWidth", 200)
+                .putInt("savedHeight", 100)
+                .putBoolean("rescaledToFit", false)
+                .apply();
+
+        android.util.Log.i("LayoutSmoke", "layout says it was arranged on "
+                + preferences.getInt("savedWidth", 0) + "x"
+                + preferences.getInt("savedHeight", 0));
+
+        int areaWidth = UniversalLayoutArea.areaWidth(element);
+        int areaHeight = UniversalLayoutArea.areaHeight(element);
+
+        UniversalLayoutConfigurationLoader.fitToAreaForTesting(universalController, this,
+                SCRATCH_LAYOUT_ID, areaWidth, areaHeight);
+
+        UniversalGeometry fitted = element.getConfig().getGeometry();
+
+        // Worked out by hand: the place keeps its share of the screen, the size grows by the
+        // smaller of the two changes
+        int expectedLeft = Math.round(100f * areaWidth / 200);
+        int expectedTop = Math.round(50f * areaHeight / 100);
+        int expectedSize = Math.round(25f * Math.min((float) areaWidth / 200,
+                (float) areaHeight / 100));
+
+        android.util.Log.i("LayoutSmoke", "fitted from 200x100 to " + areaWidth + "x" + areaHeight
+                + ": " + fitted.getLeft() + "," + fitted.getTop() + " "
+                + fitted.getWidth() + "x" + fitted.getHeight()
+                + " expected " + expectedLeft + "," + expectedTop + " "
+                + expectedSize + "x" + expectedSize);
+
+        check("a control keeps its share of the screen across", fitted.getLeft() == expectedLeft);
+        check("a control keeps its share of the screen down", fitted.getTop() == expectedTop);
+        check("a control is not stretched by the fitting",
+                fitted.getWidth() == expectedSize && fitted.getHeight() == expectedSize);
+
+        // The fitting is a change the user has not saved, and it happens once
+        check("fitting a layout marks it as having unsaved changes",
+                universalController.isLayoutDirty());
+        check("a fitted layout is remembered as fitted",
+                preferences.getBoolean("rescaledToFit", false));
+
+        // Opening it again on the same screen changes nothing
+        UniversalGeometry afterFirstFit = new UniversalGeometry(fitted.getLeft(), fitted.getTop(),
+                fitted.getWidth(), fitted.getHeight());
+
+        UniversalLayoutConfigurationLoader.fitToAreaForTesting(universalController, this,
+                SCRATCH_LAYOUT_ID, areaWidth, areaHeight);
+
+        UniversalGeometry afterSecondFit = element.getConfig().getGeometry();
+
+        check("fitting a layout twice changes nothing the second time",
+                afterSecondFit.getLeft() == afterFirstFit.getLeft()
+                        && afterSecondFit.getTop() == afterFirstFit.getTop()
+                        && afterSecondFit.getWidth() == afterFirstFit.getWidth()
+                        && afterSecondFit.getHeight() == afterFirstFit.getHeight());
+
+        preferences.edit().clear().apply();
+        universalController.clearLayoutDirty();
+
+        // Put the control somewhere ordinary again
+        UniversalGeometry ordinary = element.getConfig().getGeometry();
+        ordinary.setLeft(100);
+        ordinary.setTop(100);
+        ordinary.setWidth(160);
+        ordinary.setHeight(160);
+        ordinary.applyTo(element);
+    }
+
+
+    /**
+     * The whole journey the user makes: a layout of many controls is written out and read back,
+     * and every control has to end up in the same place and the same size.
+     *
+     * This is the check that would have caught controls shrinking to a fraction of themselves
+     * when a layout was exported and imported again on the same device.
+     */
+    private void checkExportThenImportKeepsEveryControl() {
+        UniversalLayoutStore store = UniversalLayoutStore.getInstance(this);
+
+        UniversalLayoutDefinition source = store.addLayout(
+                store.makeUniqueName("smoke export"));
+
+        // Saved the way the editor saves it, on this device's screen in landscape
+        int areaWidth = Math.max(getResources().getDisplayMetrics().widthPixels,
+                getResources().getDisplayMetrics().heightPixels);
+        int areaHeight = Math.min(getResources().getDisplayMetrics().widthPixels,
+                getResources().getDisplayMetrics().heightPixels);
+
+        UniversalLayoutConfigurationLoader.saveProfile(universalController, this, source.getId(),
+                areaWidth, areaHeight);
+
+        String stored = readStoredElements(source.getId());
+        UniversalLayoutDefinition copy = null;
+
+        try {
+            String text = UniversalLayoutExchange.toJson(source.getName(), areaWidth, areaHeight,
+                    stored);
+
+            // Importing happens on the layouts screen, which is portrait, so the copy is made
+            // in exactly the conditions the user hit
+            copy = UniversalLayoutExchange.store(this, UniversalLayoutExchange.fromJson(text));
+        } catch (org.json.JSONException e) {
+            android.util.Log.e("LayoutSmoke", "could not export and import a layout", e);
+        }
+
+        check("a layout can be exported and imported", copy != null);
+
+        if (copy == null) {
+            return;
+        }
+
+        String importedStored = readStoredElements(copy.getId());
+
+        int compared = 0;
+        int movedOrResized = 0;
+        String firstDifference = null;
+
+        try {
+            org.json.JSONArray before = new org.json.JSONArray(stored);
+            org.json.JSONArray after = new org.json.JSONArray(importedStored);
+
+            check("the layout comes back with the same number of controls",
+                    before.length() == after.length());
+
+            for (int i = 0; i < Math.min(before.length(), after.length()); i++) {
+                org.json.JSONObject a = before.getJSONObject(i);
+                org.json.JSONObject b = after.getJSONObject(i);
+
+                compared++;
+
+                UniversalGeometry was = UniversalLayoutExchange.readGeometry(
+                        a.getJSONObject("geometry"));
+                UniversalGeometry is = UniversalLayoutExchange.readGeometry(
+                        b.getJSONObject("geometry"));
+
+                boolean same = was.getLeft() == is.getLeft() && was.getTop() == is.getTop()
+                        && was.getWidth() == is.getWidth() && was.getHeight() == is.getHeight();
+
+                if (!same) {
+                    movedOrResized++;
+
+                    if (firstDifference == null) {
+                        firstDifference = "control " + a.optInt("elementId")
+                                + " was " + was.getLeft() + "," + was.getTop() + " "
+                                + was.getWidth() + "x" + was.getHeight()
+                                + " came back " + is.getLeft() + "," + is.getTop() + " "
+                                + is.getWidth() + "x" + is.getHeight();
+                    }
+                }
+
+                if (a.optInt("elementId") != b.optInt("elementId")) {
+                    firstDifference = "control " + a.optInt("elementId")
+                            + " came back as " + b.optInt("elementId");
+                    movedOrResized++;
+                }
+            }
+        } catch (org.json.JSONException e) {
+            android.util.Log.e("LayoutSmoke", "could not compare the layouts", e);
+            movedOrResized++;
+        }
+
+        android.util.Log.i("LayoutSmoke", "export and import compared " + compared
+                + " controls, " + movedOrResized + " changed"
+                + (firstDifference == null ? "" : (", first: " + firstDifference)));
+
+        check("every control of an exported layout comes back",
+                compared > 0 && compared == universalController.getElements().size());
+        check("no control moves or changes size in an export and an import",
+                movedOrResized == 0);
+
+        getSharedPreferences("OSC_UNIVERSAL_" + copy.getId(), MODE_PRIVATE).edit().clear().apply();
+        store.deleteLayout(copy.getId());
+        getSharedPreferences("OSC_UNIVERSAL_" + source.getId(), MODE_PRIVATE).edit().clear().apply();
+        store.deleteLayout(source.getId());
+    }
+
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
             if (label.contains(needle)) {
@@ -2177,7 +2775,20 @@ public class LayoutSmokeActivity extends Activity {
                 @Override
                 public void run() {
                     editor.onElementTapped(firstElementInLayout());
-                    finish();
+
+                    // The actions are the last rows of the drawer, so it is scrolled to them
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            View panel = editor.getPanelForTesting().getView();
+
+                            if (panel instanceof ScrollView) {
+                                ((ScrollView) panel).fullScroll(View.FOCUS_DOWN);
+                            }
+
+                            finish();
+                        }
+                    }, 1500);
                 }
             }, 2000);
         }

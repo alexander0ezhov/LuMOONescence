@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- A layout is shared out of the app's own cache, so nothing else can read it -->
+    <cache-path
+        name="shared_layouts"
+        path="shared-layouts/" />
+</paths>

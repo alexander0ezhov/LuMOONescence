@@ -66,6 +66,20 @@
         android:enableOnBackInvokedCallback="false"
         android:theme="@style/AppTheme">
 
+        <!--
+            A shared layout is handed out from the app's own cache, which needs a provider to
+            give the receiving app a readable address. No storage permission is involved.
+        -->
+        <provider
+            android:name=".binding.input.virtual_controller.universal.UniversalLayoutShareProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <provider
             android:name=".PosterContentProvider"
             android:authorities="poster.${applicationId}"

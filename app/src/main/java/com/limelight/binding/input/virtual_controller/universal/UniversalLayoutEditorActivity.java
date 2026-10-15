@@ -206,7 +206,10 @@ public class UniversalLayoutEditorActivity extends Activity
         copiedWidth = width;
         copiedHeight = height;
         copiedBorderRadius = borderRadius;
-        hasCopiedSize = true;
+
+        // A size of nothing means nothing has been copied, which is how the drawer is put back
+        // into the state it starts in
+        hasCopiedSize = width > 0 && height > 0;
     }
 
     public boolean hasCopiedSize() {

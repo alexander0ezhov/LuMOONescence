@@ -33,6 +33,19 @@
         android:textColor="#FFFFFF"/>
 
     <ImageButton
+        android:id="@+id/layoutsImportButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@id/layoutsAddButton"
+        android:layout_toLeftOf="@id/layoutsAddButton"
+        android:src="@drawable/ic_import"
+        android:scaleType="fitCenter"
+        android:padding="16dp"
+        android:contentDescription="@string/title_import_layout"
+        style="?android:attr/borderlessButtonStyle"/>
+
+    <ImageButton
         android:id="@+id/layoutsAddButton"
         android:layout_width="56dp"
         android:layout_height="56dp"

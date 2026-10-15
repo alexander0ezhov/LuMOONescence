@@ -296,6 +296,12 @@
     <string name="editor_section_position">Position and size</string>
     <string name="editor_section_action">Action</string>
     <string name="editor_section_actions">This control</string>
+    <string name="menu_share_layout">Share layout</string>
+    <string name="title_import_layout">Import layout</string>
+    <string name="import_failed">Could not read that file</string>
+    <string name="import_done">Imported "%1$s"</string>
+    <string name="import_done_rescaled">Imported "%1$s", arranged for this screen</string>
+    <string name="import_logged">Could not read that file: %1$s</string>
     <string name="editor_label_name">Name</string>
     <string name="editor_label_x">X</string>
     <string name="editor_label_y">Y</string>
