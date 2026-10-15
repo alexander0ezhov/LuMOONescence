@@ -600,6 +600,9 @@ public class LayoutSmokeActivity extends Activity {
         checkAxisCombiningKeepsTheStrongerValue();
         checkStickDirectionCanSendAKey();
         checkNewControlAdoptsTheOpacity();
+        checkDpadArmsLookTheSame();
+        checkToggleOffLooksLikeUntouched();
+        checkDpadArmsAreIdentical();
     }
 
     /**
@@ -1169,15 +1172,23 @@ public class LayoutSmokeActivity extends Activity {
         check("the D-pad answers to the right button",
                 pad.getDirectionAtForTesting(250, 150) == UniversalDigitalPad.DIGITAL_PAD_DIRECTION_RIGHT);
 
-        // A diagonal needs both directions, and the place for it is the shared corner next to
-        // the middle. It is deliberately not available out at the corner of the pad, where a
-        // press is meant to be one direction only.
-        check("a diagonal near the middle presses two directions",
+        // A diagonal needs both directions, and the place for it is the corner between two
+        // buttons. It is deliberately narrow, so a press on one arm does not also press the
+        // arm beside it.
+        check("a diagonal between two arms presses two directions",
                 pad.getDirectionAtForTesting(100, 100)
                         == (UniversalDigitalPad.DIGITAL_PAD_DIRECTION_UP
                         | UniversalDigitalPad.DIGITAL_PAD_DIRECTION_LEFT));
-        check("the far corner of the D-pad presses nothing",
-                pad.getDirectionAtForTesting(45, 45) == 0);
+
+        // A press on one arm near the middle, but off to one side, must press only that arm
+        check("a press on the up arm off to one side presses only up",
+                pad.getDirectionAtForTesting(170, 60) == UniversalDigitalPad.DIGITAL_PAD_DIRECTION_UP);
+        check("a press on the left arm off to one side presses only left",
+                pad.getDirectionAtForTesting(60, 170) == UniversalDigitalPad.DIGITAL_PAD_DIRECTION_LEFT);
+
+        // Away from the pad there is nothing to press
+        check("a press outside the D-pad presses nothing",
+                pad.getDirectionAtForTesting(10, 10) == 0);
 
         // The zone is wider than the drawn button, which is the part that makes the pad
         // comfortable: the drawn button is only about a third of the pad across
@@ -1457,6 +1468,247 @@ public class LayoutSmokeActivity extends Activity {
         } finally {
             setOpacityPercent(originalPercent);
             universalController.applyElementOpacity();
+        }
+    }
+
+    /**
+     * Every arm of a D-pad must look the same when nothing is pressed, and only the arm that is
+     * pressed may light up.
+     */
+    private void checkDpadArmsLookTheSame() {
+        UniversalDigitalPad pad = null;
+        for (UniversalVirtualControllerElement element : universalController.getElements()) {
+            if (element instanceof UniversalDigitalPad) {
+                pad = (UniversalDigitalPad) element;
+                break;
+            }
+        }
+
+        if (pad == null) {
+            pad = new UniversalDigitalPad(universalController, this, 7474);
+        }
+
+        pad.measure(View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY));
+        pad.layout(0, 0, 300, 300);
+
+        pad.setDirectionForTesting(UniversalDigitalPad.DIGITAL_PAD_DIRECTION_NO_DIRECTION);
+        int[] atRest = measureArms(pad);
+
+        android.util.Log.i("LayoutSmoke", "dpad at rest: up=" + atRest[0] + " down=" + atRest[1]
+                + " left=" + atRest[2] + " right=" + atRest[3]);
+
+        int brightest = Math.max(Math.max(atRest[0], atRest[1]), Math.max(atRest[2], atRest[3]));
+        int darkest = Math.min(Math.min(atRest[0], atRest[1]), Math.min(atRest[2], atRest[3]));
+
+        check("the arms of a D-pad look the same when nothing is pressed",
+                brightest - darkest <= 12);
+
+        pad.setDirectionForTesting(UniversalDigitalPad.DIGITAL_PAD_DIRECTION_LEFT);
+        int[] leftPressed = measureArms(pad);
+
+        android.util.Log.i("LayoutSmoke", "dpad left pressed: up=" + leftPressed[0]
+                + " down=" + leftPressed[1] + " left=" + leftPressed[2]
+                + " right=" + leftPressed[3]);
+
+        check("pressing left lights the left arm", leftPressed[2] > atRest[2]);
+        check("pressing left does not light the up arm", leftPressed[0] <= atRest[0] + 2);
+        check("pressing left does not light the down arm", leftPressed[1] <= atRest[1] + 2);
+        check("pressing left does not light the right arm", leftPressed[3] <= atRest[3] + 2);
+
+        pad.setDirectionForTesting(UniversalDigitalPad.DIGITAL_PAD_DIRECTION_NO_DIRECTION);
+    }
+
+    /**
+     * The brightness of the middle of each arm, in the order up, down, left, right.
+     */
+    private int[] measureArms(UniversalDigitalPad pad) {
+        android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(
+                300, 300, android.graphics.Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(bitmap);
+        pad.draw(canvas);
+
+        int[] brightness = new int[4];
+
+        // The middle of each arm, which is where the body of it is
+        brightness[0] = brightnessAt(bitmap, 150, 55);
+        brightness[1] = brightnessAt(bitmap, 150, 245);
+        brightness[2] = brightnessAt(bitmap, 55, 150);
+        brightness[3] = brightnessAt(bitmap, 245, 150);
+
+        bitmap.recycle();
+        return brightness;
+    }
+
+    private int brightnessAt(android.graphics.Bitmap bitmap, int x, int y) {
+        int pixel = bitmap.getPixel(x, y);
+
+        return (android.graphics.Color.red(pixel)
+                + android.graphics.Color.green(pixel)
+                + android.graphics.Color.blue(pixel)) / 3
+                * android.graphics.Color.alpha(pixel) / 255;
+    }
+
+    /**
+     * A toggle button that was switched on and then off again must look exactly like a button
+     * that was never pressed.
+     */
+    private void checkToggleOffLooksLikeUntouched() {
+        UniversalVirtualController.ControllerMode originalMode = universalController.getControllerMode();
+        universalController.setControllerMode(UniversalVirtualController.ControllerMode.Active);
+
+        UniversalDigitalButton reference = new UniversalDigitalButton(universalController, 8801, 0, this);
+        UniversalDigitalButton toggle = new UniversalDigitalButton(universalController, 8802, 0, this);
+
+        try {
+            // Both carry the same label, so the only thing that can differ between them is
+            // their state
+            reference.getConfig().setName("Same");
+            toggle.getConfig().setName("Same");
+            toggle.getButtonConfig().setToggle(true);
+
+            reference.measure(View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY));
+            reference.layout(0, 0, 120, 120);
+            toggle.measure(View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY));
+            toggle.layout(0, 0, 120, 120);
+
+            check("an untouched button is not pressed", !reference.isPressed());
+
+            // Two taps: on, then off again
+            tapElement(toggle);
+            check("one tap latches the toggle on", toggle.isPressed());
+
+            tapElement(toggle);
+            check("the second tap lets the toggle go", !toggle.isPressed());
+
+            // And it must look the same as a button that was never touched
+            android.graphics.Bitmap referenceImage = renderElement(reference);
+            android.graphics.Bitmap toggleImage = renderElement(toggle);
+
+            int difference = 0;
+            for (int x = 0; x < 120; x++) {
+                for (int y = 0; y < 120; y++) {
+                    if (referenceImage.getPixel(x, y) != toggleImage.getPixel(x, y)) {
+                        difference++;
+                    }
+                }
+            }
+
+            android.util.Log.i("LayoutSmoke", "toggle off differs from untouched in "
+                    + difference + " pixels");
+
+            check("a toggle switched off looks like a button that was never pressed",
+                    difference == 0);
+
+            referenceImage.recycle();
+            toggleImage.recycle();
+        } finally {
+            universalController.setControllerMode(originalMode);
+        }
+    }
+
+    private void tapElement(final UniversalVirtualControllerElement element) {
+        element.onElementTouchEvent(motionEventFor(element, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+        element.onElementTouchEvent(motionEventFor(element, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+    }
+
+    private android.graphics.Bitmap renderElement(View element) {
+        android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(
+                element.getWidth(), element.getHeight(), android.graphics.Bitmap.Config.ARGB_8888);
+
+        element.draw(new Canvas(bitmap));
+        return bitmap;
+    }
+
+    /**
+     * The four arms of a D-pad must be drawn with the same colour and the same transparency.
+     */
+    private void checkDpadArmsAreIdentical() {
+        UniversalDigitalPad pad = null;
+        for (UniversalVirtualControllerElement element : universalController.getElements()) {
+            if (element instanceof UniversalDigitalPad) {
+                pad = (UniversalDigitalPad) element;
+                break;
+            }
+        }
+
+        if (pad == null) {
+            pad = new UniversalDigitalPad(universalController, this, 8811);
+        }
+
+        pad.measure(View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY));
+        pad.layout(0, 0, 300, 300);
+
+        pad.setDirectionForTesting(UniversalDigitalPad.DIGITAL_PAD_DIRECTION_NO_DIRECTION);
+
+        android.graphics.Bitmap bitmap = renderElement(pad);
+
+        int[] arms = new int[]{
+                bitmap.getPixel(150, 55),
+                bitmap.getPixel(150, 245),
+                bitmap.getPixel(55, 150),
+                bitmap.getPixel(245, 150),
+        };
+
+        String[] names = new String[]{"up", "down", "left", "right"};
+
+        for (int i = 0; i < arms.length; i++) {
+            float[] bounds = pad.getShapeBoundsForTesting(i);
+
+            android.util.Log.i("LayoutSmoke", "arm " + names[i] + ": rgb="
+                    + android.graphics.Color.red(arms[i]) + ","
+                    + android.graphics.Color.green(arms[i]) + ","
+                    + android.graphics.Color.blue(arms[i])
+                    + " alpha=" + android.graphics.Color.alpha(arms[i])
+                    + " bounds=" + bounds[0] + "," + bounds[1] + " " + bounds[2] + "," + bounds[3]);
+        }
+
+        int minAlpha = 255;
+        int maxAlpha = 0;
+        for (int arm : arms) {
+            minAlpha = Math.min(minAlpha, android.graphics.Color.alpha(arm));
+            maxAlpha = Math.max(maxAlpha, android.graphics.Color.alpha(arm));
+        }
+
+        check("every arm of a D-pad has the same transparency", maxAlpha - minAlpha <= 3);
+
+        int minRed = 255;
+        int maxRed = 0;
+        for (int arm : arms) {
+            minRed = Math.min(minRed, android.graphics.Color.red(arm));
+            maxRed = Math.max(maxRed, android.graphics.Color.red(arm));
+        }
+
+        // The shade differs a little by design: the body is shaded from top to bottom, and the
+        // arms are sampled at different points of it
+        check("every arm of a D-pad has the same shade", maxRed - minRed <= 6);
+
+        saveBitmapForInspection(bitmap, "dpad-at-rest.png");
+        bitmap.recycle();
+    }
+
+    /**
+     * Writes a rendered control to the app's files, so the picture itself can be pulled off the
+     * device and looked at when the numbers alone do not explain what is drawn.
+     */
+    private void saveBitmapForInspection(android.graphics.Bitmap bitmap, String name) {
+        try {
+            // The external files directory is used so the picture can be taken off the device
+            // with an ordinary adb pull
+            java.io.File directory = getExternalFilesDir(null);
+            java.io.File file = new java.io.File(directory == null ? getFilesDir() : directory, name);
+            java.io.FileOutputStream out = new java.io.FileOutputStream(file);
+
+            bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, out);
+            out.close();
+
+            android.util.Log.i("LayoutSmoke", "wrote " + file.getAbsolutePath());
+        } catch (java.io.IOException e) {
+            android.util.Log.e("LayoutSmoke", "could not write " + name, e);
         }
     }
 

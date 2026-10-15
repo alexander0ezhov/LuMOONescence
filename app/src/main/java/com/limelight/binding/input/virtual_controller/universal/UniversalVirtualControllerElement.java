@@ -349,20 +349,42 @@ public abstract class UniversalVirtualControllerElement extends View {
     protected static final int BODY_BOTTOM = 0xD01A1D23;
     protected static final int EDGE_NORMAL = 0x8AC8CDD6;
 
-    protected static final int BODY_TOP_ACTIVE = 0xD63A4049;
-    protected static final int BODY_BOTTOM_ACTIVE = 0xD61E2228;
+    /**
+     * An active control keeps exactly the transparency of an inactive one.
+     *
+     * The body of a control is translucent, so the game shows through it. Making an active
+     * body more opaque would make it look darker over a bright game, which is the opposite of
+     * what being pressed should look like; only the shade, the edge and the glow change.
+     */
+    protected static final int BODY_TOP_ACTIVE = 0xC03E4450;
+    protected static final int BODY_BOTTOM_ACTIVE = 0xD022262E;
     protected static final int EDGE_ACTIVE = 0xE0FFFFFF;
 
     /**
-     * The glow is a soft halo that fades inwards rather than a bright ring.
+     * The glow is a pool of light just inside the edge of an active control.
      *
-     * The middle of the gradient is faint and the outer stop is clear, which is what turns
-     * the edge into a gradual pool of light instead of a line. It is kept strong enough to be
-     * obvious while playing, where a control is under a thumb and is seen out of the corner of
-     * an eye.
+     * It is clear in the middle and lit at the edge, which is what makes it read as light
+     * rather than as a thicker border. It is kept strong enough to be obvious while playing,
+     * where a control is under a thumb and is seen out of the corner of an eye.
      */
-    private static final int GLOW_INNER = 0x6AFFFFFF;
-    private static final int GLOW_OUTER = 0x00FFFFFF;
+    /**
+     * Each band is faint, and there are many of them, because a band is a step: few strong
+     * bands would show as rings. Stacked up they reach about half opacity at the edge and fade
+     * to a single band inwards.
+     */
+    private static final int GLOW_BAND = 0x0CFFFFFF;
+
+    /**
+     * How many bands the light is made of. More bands make a smoother fade; the bands are what
+     * lets the light follow the outline of a shape of any form.
+     */
+    private static final int GLOW_STEPS = 16;
+
+    /**
+     * How far the light reaches into a control, as a share of its shorter side. About a half
+     * lights the whole control rather than only its border.
+     */
+    private static final float GLOW_DEPTH_SHARE = 0.46f;
 
     private final Paint shapePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint glowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -382,18 +404,22 @@ public abstract class UniversalVirtualControllerElement extends View {
 
         shapeRect.set(left, top, right, bottom);
 
-        if (active) {
-            drawInnerGlow(canvas, radius);
-        }
-
         shapePaint.setStyle(Paint.Style.FILL);
         shapePaint.setStrokeWidth(0);
+        shapePaint.setAlpha(255);
         shapePaint.setShader(new LinearGradient(0, top, 0, bottom,
                 active ? BODY_TOP_ACTIVE : BODY_TOP,
                 active ? BODY_BOTTOM_ACTIVE : BODY_BOTTOM,
                 Shader.TileMode.CLAMP));
 
         canvas.drawRoundRect(shapeRect, radius, radius, shapePaint);
+
+        // The light is laid over the body, so it fades inwards from the edge
+        if (active) {
+            glowShape.reset();
+            glowShape.addRoundRect(shapeRect, radius, radius, Path.Direction.CW);
+            drawInnerGlow(canvas, glowShape, radius, shapeRect);
+        }
 
         shapePaint.setShader(null);
         shapePaint.setStyle(Paint.Style.STROKE);
@@ -423,24 +449,13 @@ public abstract class UniversalVirtualControllerElement extends View {
                 ? new CornerPathEffect(cornerRadius) : null;
 
         if (active) {
-            float depth = Math.max(4f, getDefaultStrokeWidth() * 1.5f);
-
-            glowPaint.setStyle(Paint.Style.STROKE);
-            glowPaint.setStrokeWidth(depth * 2f);
-            glowPaint.setPathEffect(corners);
-            glowPaint.setShader(new RadialGradient(
-                    pathBounds.centerX(), pathBounds.centerY(),
-                    Math.max(pathBounds.width(), pathBounds.height()) / 2f,
-                    GLOW_INNER, GLOW_OUTER, Shader.TileMode.CLAMP));
-
-            canvas.drawPath(path, glowPaint);
-            glowPaint.setShader(null);
-            glowPaint.setPathEffect(null);
+            drawInnerGlow(canvas, path, cornerRadius, pathBounds);
         }
 
         shapePaint.setPathEffect(corners);
         shapePaint.setStyle(Paint.Style.FILL);
         shapePaint.setStrokeWidth(0);
+        shapePaint.setAlpha(255);
         shapePaint.setShader(new LinearGradient(0, pathBounds.top, 0, pathBounds.bottom,
                 active ? BODY_TOP_ACTIVE : BODY_TOP,
                 active ? BODY_BOTTOM_ACTIVE : BODY_BOTTOM,
@@ -459,27 +474,42 @@ public abstract class UniversalVirtualControllerElement extends View {
 
     private final RectF pathBounds = new RectF();
 
+    private final Path glowShape = new Path();
+
     /**
-     * Draws the lit halo of an active control.
+     * Draws the light of an active control over its body.
      *
-     * It is a thick stroke along the edge whose gradient runs from the middle of the shape
-     * outwards, so the light is strongest just inside the border and fades into the body. The
-     * body is painted over it afterwards, which leaves only the inner part visible.
+     * The light follows the outline of the shape: it is a stack of bands along the edge, each
+     * one a little wider and fainter than the last, so it pools against the border and fades
+     * inwards. The bands are clipped to the shape, so no light spills outside it.
+     *
+     * A radial gradient cannot do this. It is a function of the distance from the middle, so
+     * it paints a circle whatever the shape is, which on a wide button leaves the ends of the
+     * button unlit.
      */
-    private void drawInnerGlow(Canvas canvas, float radius) {
-        // The halo reaches further into the body than a hairline, otherwise it reads as a
-        // thicker border rather than as light
-        float depth = Math.max(4f, getDefaultStrokeWidth() * 1.5f);
+    private void drawInnerGlow(Canvas canvas, Path shape, float cornerRadius, RectF bounds) {
+        // The light reaches most of the way to the middle of the shape, so it covers the whole
+        // control rather than sitting on its edge as a rim
+        float depth = Math.min(bounds.width(), bounds.height()) * GLOW_DEPTH_SHARE;
+
+        canvas.save();
+        canvas.clipPath(shape);
 
         glowPaint.setStyle(Paint.Style.STROKE);
-        glowPaint.setStrokeWidth(depth * 2f);
-        glowPaint.setShader(new RadialGradient(
-                shapeRect.centerX(), shapeRect.centerY(),
-                Math.max(shapeRect.width(), shapeRect.height()) / 2f,
-                GLOW_INNER, GLOW_OUTER, Shader.TileMode.CLAMP));
-
-        canvas.drawRoundRect(shapeRect, radius, radius, glowPaint);
         glowPaint.setShader(null);
+        glowPaint.setAlpha(255);
+        glowPaint.setColor(GLOW_BAND);
+        glowPaint.setPathEffect(cornerRadius > 0 ? new CornerPathEffect(cornerRadius) : null);
+
+        // Widest band first: every one of them is centred on the outline and clipped to the
+        // shape, so only the inner half of each shows and the bands stack up against the edge
+        for (int step = GLOW_STEPS; step >= 1; step--) {
+            glowPaint.setStrokeWidth(depth * 2f * step / GLOW_STEPS);
+            canvas.drawPath(shape, glowPaint);
+        }
+
+        glowPaint.setPathEffect(null);
+        canvas.restore();
     }
 
     /**

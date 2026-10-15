@@ -492,6 +492,7 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
         float thumbX = stick_state == STICK_STATE.NO_MOVEMENT ? getWidth() / 2f : position_stick_x;
         float thumbY = stick_state == STICK_STATE.NO_MOVEMENT ? getHeight() / 2f : position_stick_y;
 
+        paint.setAlpha(255);
         paint.setShader(active
                 ? new LinearGradient(0, thumbY - thumbRadius, 0, thumbY + thumbRadius,
                         0xFFFFFFFF, 0xFFA8B0BA, Shader.TileMode.CLAMP)
