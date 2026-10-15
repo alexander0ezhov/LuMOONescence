@@ -92,7 +92,7 @@ public class LayoutSmokeActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         Intent intent = new Intent(this, UniversalLayoutEditorActivity.class);
-        intent.putExtra(UniversalLayoutEditorActivity.EXTRA_LAYOUT_ID, "default");
+        intent.putExtra(UniversalLayoutEditorActivity.EXTRA_LAYOUT_ID, EDITOR_LAYOUT_ID);
         startActivity(intent);
 
         postDelayed(new Runnable() {
@@ -604,6 +604,7 @@ public class LayoutSmokeActivity extends Activity {
         checkToggleOffLooksLikeUntouched();
         checkDpadArmsAreIdentical();
         checkDpadGlowMatchesAButton();
+        checkDontSaveLeavesTheLayoutAlone();
     }
 
     /**
@@ -1320,6 +1321,11 @@ public class LayoutSmokeActivity extends Activity {
     private static final String SCRATCH_LAYOUT_ID = "smoke-test-scratch";
 
     /**
+     * The layout the editor under test is opened with.
+     */
+    private static final String EDITOR_LAYOUT_ID = "default";
+
+    /**
      * The host only registers a gamepad for the players named in the mask of an input packet,
      * so a layout that is not in the mask has all of its input ignored.
      */
@@ -1783,6 +1789,56 @@ public class LayoutSmokeActivity extends Activity {
 
         buttonImage.recycle();
         padImage.recycle();
+    }
+
+    /**
+     * Editing must not write the stored layout by itself, so that answering "don't save" on the
+     * way out really does throw the changes away.
+     */
+    private void checkDontSaveLeavesTheLayoutAlone() {
+        String before = readStoredElements(EDITOR_LAYOUT_ID);
+
+        // A control that is really in the layout, so dragging it is a real edit rather than a
+        // gesture on something that was taken out of the layout by an earlier check
+        UniversalVirtualControllerElement element = null;
+        for (UniversalVirtualControllerElement candidate : universalController.getElements()) {
+            if (candidate.getLayoutParams() != null) {
+                element = candidate;
+                break;
+            }
+        }
+
+        check("a control is in the layout for the leaving check", element != null);
+
+        if (element == null) {
+            return;
+        }
+
+        // A change of its own
+        dispatchTouch(element, MotionEvent.ACTION_DOWN, 0.5f, 0.5f);
+        dispatchTouch(element, MotionEvent.ACTION_MOVE, 0.8f, 0.8f);
+        dispatchTouch(element, MotionEvent.ACTION_UP, 0.8f, 0.8f);
+
+        check("editing marks the layout as having unsaved changes",
+                universalController.isLayoutDirty());
+        check("editing does not write the stored layout",
+                readStoredElements(EDITOR_LAYOUT_ID).equals(before));
+
+        // The user answers "don't save" on the way out
+        editor.discardChanges();
+
+        check("answering don't save clears the unsaved marker",
+                !universalController.isLayoutDirty());
+        check("answering don't save leaves the stored layout as it was",
+                readStoredElements(EDITOR_LAYOUT_ID).equals(before));
+    }
+
+    /**
+     * The stored set of controls of a layout, which is what the editor writes when it saves.
+     */
+    private String readStoredElements(String layoutId) {
+        return getSharedPreferences("OSC_UNIVERSAL_" + layoutId, MODE_PRIVATE)
+                .getString("elements", "");
     }
 
     private static boolean contains(String[] labels, String needle) {

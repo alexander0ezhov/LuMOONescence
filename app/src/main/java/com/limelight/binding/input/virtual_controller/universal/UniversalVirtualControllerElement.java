@@ -116,6 +116,12 @@ public abstract class UniversalVirtualControllerElement extends View {
     }
 
     protected void moveElement(int pressed_x, int pressed_y, int x, int y) {
+        // A control that is not in the layout any more has nothing to move, and must not bring
+        // the arrangement down with an exception either
+        if (!(getLayoutParams() instanceof FrameLayout.LayoutParams)) {
+            return;
+        }
+
         int newPos_x = (int) getX() + x - pressed_x;
         int newPos_y = (int) getY() + y - pressed_y;
 
@@ -134,6 +140,10 @@ public abstract class UniversalVirtualControllerElement extends View {
     }
 
     protected void resizeElement(int pressed_x, int pressed_y, int width, int height) {
+        if (!(getLayoutParams() instanceof FrameLayout.LayoutParams)) {
+            return;
+        }
+
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) getLayoutParams();
 
         int newHeight = height + (startSize_y - pressed_y);

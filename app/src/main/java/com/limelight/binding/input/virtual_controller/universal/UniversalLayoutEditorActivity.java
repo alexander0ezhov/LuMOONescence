@@ -1158,6 +1158,7 @@ public class UniversalLayoutEditorActivity extends Activity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         saveDialogShowing = false;
+                        discardChanges();
                         finish();
                     }
                 })
@@ -1174,16 +1175,26 @@ public class UniversalLayoutEditorActivity extends Activity
         showDialog(dialog);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // Save whenever the editor leaves the foreground, so an arrangement is never lost
-        // because the user left with the home button or a notification.
-        if (controller.isLayoutDirty()) {
-            controller.saveLayoutConfiguration();
-        }
+    /**
+     * Throws the changes of this session away.
+     *
+     * Nothing is written at any other time: the layout is stored when the user asks for it and
+     * never behind their back, which is what makes this choice mean something. Leaving with
+     * the home button therefore also leaves the stored layout alone.
+     */
+    public void discardChanges() {
+        discardingChanges = true;
+        controller.clearLayoutDirty();
     }
+
+    /**
+     * True once the user has asked for the changes to be thrown away.
+     */
+    public boolean isDiscardingChanges() {
+        return discardingChanges;
+    }
+
+    private boolean discardingChanges;
 
     @Override
     protected void onDestroy() {
