@@ -16,6 +16,8 @@ import android.graphics.Canvas;
 import android.graphics.CornerPathEffect;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Path;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
@@ -481,11 +483,15 @@ public abstract class UniversalVirtualControllerElement extends View {
      *
      * The light follows the outline of the shape: it is a stack of bands along the edge, each
      * one a little wider and fainter than the last, so it pools against the border and fades
-     * inwards. The bands are clipped to the shape, so no light spills outside it.
+     * inwards. Everything outside the shape is cut away, so no light spills past the control.
      *
-     * A radial gradient cannot do this. It is a function of the distance from the middle, so
-     * it paints a circle whatever the shape is, which on a wide button leaves the ends of the
+     * A radial gradient cannot do this. It is a function of the distance from the middle, so it
+     * paints a circle whatever the shape is, which on a wide button leaves the ends of the
      * button unlit.
+     *
+     * The shape handed in must already be the one that is drawn: a rounded outline made with a
+     * path effect would not do, because the effect applies while drawing but not while
+     * clipping, so the light would fill the sharp corners that the drawn shape never reaches.
      */
     private void drawInnerGlow(Canvas canvas, Path shape, float cornerRadius, RectF bounds) {
         // The light reaches most of the way to the middle of the shape, so it covers the whole
@@ -501,8 +507,8 @@ public abstract class UniversalVirtualControllerElement extends View {
         glowPaint.setColor(GLOW_BAND);
         glowPaint.setPathEffect(cornerRadius > 0 ? new CornerPathEffect(cornerRadius) : null);
 
-        // Widest band first: every one of them is centred on the outline and clipped to the
-        // shape, so only the inner half of each shows and the bands stack up against the edge
+        // Widest band first: every one of them is centred on the outline, so only the inner
+        // half of each shows and the bands stack up against the edge
         for (int step = GLOW_STEPS; step >= 1; step--) {
             glowPaint.setStrokeWidth(depth * 2f * step / GLOW_STEPS);
             canvas.drawPath(shape, glowPaint);
@@ -510,6 +516,58 @@ public abstract class UniversalVirtualControllerElement extends View {
 
         glowPaint.setPathEffect(null);
         canvas.restore();
+    }
+
+    /**
+     * Builds a closed path through the given corners with every one of them rounded.
+     *
+     * Building the rounding into the path rather than asking a path effect for it is what lets
+     * the same path both draw a control and keep its light inside itself.
+     */
+    protected static Path roundedPolygonPath(float[] xs, float[] ys, float radius) {
+        Path path = new Path();
+        int count = xs.length;
+
+        for (int i = 0; i < count; i++) {
+            int previous = (i + count - 1) % count;
+            int next = (i + 1) % count;
+
+            float x = xs[i];
+            float y = ys[i];
+
+            float toPreviousX = xs[previous] - x;
+            float toPreviousY = ys[previous] - y;
+            float toPrevious = (float) Math.hypot(toPreviousX, toPreviousY);
+
+            float toNextX = xs[next] - x;
+            float toNextY = ys[next] - y;
+            float toNext = (float) Math.hypot(toNextX, toNextY);
+
+            if (toPrevious <= 0 || toNext <= 0) {
+                continue;
+            }
+
+            // A corner never eats more than half of the shorter edge it meets, so the rounding
+            // of two corners of one edge cannot cross the other
+            float rounding = Math.min(radius, Math.min(toPrevious, toNext) / 2f);
+
+            float startX = x + toPreviousX / toPrevious * rounding;
+            float startY = y + toPreviousY / toPrevious * rounding;
+            float endX = x + toNextX / toNext * rounding;
+            float endY = y + toNextY / toNext * rounding;
+
+            if (i == 0) {
+                path.moveTo(startX, startY);
+            }
+            else {
+                path.lineTo(startX, startY);
+            }
+
+            path.quadTo(x, y, endX, endY);
+        }
+
+        path.close();
+        return path;
     }
 
     /**

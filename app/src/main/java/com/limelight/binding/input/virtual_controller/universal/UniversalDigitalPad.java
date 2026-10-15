@@ -240,13 +240,13 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement
         // shapes do not touch, so the light of one cannot spill onto its neighbour.
         for (int i = 0; i < directionPaths.length; i++) {
             if ((direction & DIRECTION_FLAGS[i]) == 0) {
-                drawButtonPath(canvas, directionPaths[i], false, getCornerRadius() * 0.5f);
+                drawButtonPath(canvas, directionPaths[i], false, 0f);
             }
         }
 
         for (int i = 0; i < directionPaths.length; i++) {
             if ((direction & DIRECTION_FLAGS[i]) != 0) {
-                drawButtonPath(canvas, directionPaths[i], true, getCornerRadius() * 0.5f);
+                drawButtonPath(canvas, directionPaths[i], true, 0f);
             }
         }
     }
@@ -311,14 +311,18 @@ public class UniversalDigitalPad extends UniversalVirtualControllerElement
         float centerX = getWidth() / 2f;
         float centerY = getHeight() / 2f;
 
-        // The shape of the up button, which the other three are rotations of
-        Path up = new Path();
-        up.moveTo(centerX - halfWidth, centerY - tip - taper - arm);
-        up.lineTo(centerX + halfWidth, centerY - tip - taper - arm);
-        up.lineTo(centerX + halfWidth, centerY - tip - taper);
-        up.lineTo(centerX, centerY - tip);
-        up.lineTo(centerX - halfWidth, centerY - tip - taper);
-        up.close();
+        // The shape of the up button, which the other three are rotations of.
+        //
+        // The corners are built into the path rather than left to a path effect, so the shape
+        // that is drawn is exactly the shape the light of a pressed button is kept inside.
+        float rounding = getCornerRadius() * 0.5f;
+
+        Path up = roundedPolygonPath(
+                new float[]{centerX - halfWidth, centerX + halfWidth, centerX + halfWidth,
+                        centerX, centerX - halfWidth},
+                new float[]{centerY - tip - taper - arm, centerY - tip - taper - arm,
+                        centerY - tip - taper, centerY - tip, centerY - tip - taper},
+                rounding);
 
         directionPaths[0] = up;
         directionPaths[1] = rotate(up, centerX, centerY, 180f);

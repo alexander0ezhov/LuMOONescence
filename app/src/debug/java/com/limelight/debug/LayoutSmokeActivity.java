@@ -603,6 +603,7 @@ public class LayoutSmokeActivity extends Activity {
         checkDpadArmsLookTheSame();
         checkToggleOffLooksLikeUntouched();
         checkDpadArmsAreIdentical();
+        checkDpadGlowMatchesAButton();
     }
 
     /**
@@ -1554,28 +1555,31 @@ public class LayoutSmokeActivity extends Activity {
      * A toggle button that was switched on and then off again must look exactly like a button
      * that was never pressed.
      */
+    /**
+     * A toggle button that was switched on and then off again must look exactly like the same
+     * button before it was ever touched.
+     *
+     * The button is compared with itself, so no other difference between two controls can
+     * explain the result.
+     */
     private void checkToggleOffLooksLikeUntouched() {
         UniversalVirtualController.ControllerMode originalMode = universalController.getControllerMode();
         universalController.setControllerMode(UniversalVirtualController.ControllerMode.Active);
 
-        UniversalDigitalButton reference = new UniversalDigitalButton(universalController, 8801, 0, this);
         UniversalDigitalButton toggle = new UniversalDigitalButton(universalController, 8802, 0, this);
 
         try {
-            // Both carry the same label, so the only thing that can differ between them is
-            // their state
-            reference.getConfig().setName("Same");
             toggle.getConfig().setName("Same");
             toggle.getButtonConfig().setToggle(true);
 
-            reference.measure(View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY));
-            reference.layout(0, 0, 120, 120);
             toggle.measure(View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY));
             toggle.layout(0, 0, 120, 120);
 
-            check("an untouched button is not pressed", !reference.isPressed());
+            check("an untouched button is not pressed", !toggle.isPressed());
+
+            // The button as it looks before anything happens to it
+            android.graphics.Bitmap before = renderElement(toggle);
 
             // Two taps: on, then off again
             tapElement(toggle);
@@ -1584,27 +1588,49 @@ public class LayoutSmokeActivity extends Activity {
             tapElement(toggle);
             check("the second tap lets the toggle go", !toggle.isPressed());
 
-            // And it must look the same as a button that was never touched
-            android.graphics.Bitmap referenceImage = renderElement(reference);
-            android.graphics.Bitmap toggleImage = renderElement(toggle);
+            // A tap in the editor also selects the control, which draws the editor's own
+            // highlight. That is not part of how a control looks while playing, so it is
+            // cleared before the two pictures are compared.
+            toggle.setSelected(false);
+
+            android.graphics.Bitmap after = renderElement(toggle);
 
             int difference = 0;
+            int firstDifferenceAt = -1;
+
             for (int x = 0; x < 120; x++) {
                 for (int y = 0; y < 120; y++) {
-                    if (referenceImage.getPixel(x, y) != toggleImage.getPixel(x, y)) {
+                    if (before.getPixel(x, y) != after.getPixel(x, y)) {
                         difference++;
+
+                        if (firstDifferenceAt < 0) {
+                            firstDifferenceAt = y * 120 + x;
+                        }
                     }
                 }
             }
 
-            android.util.Log.i("LayoutSmoke", "toggle off differs from untouched in "
-                    + difference + " pixels");
+            android.util.Log.i("LayoutSmoke", "toggle off differs from its untouched self in "
+                    + difference + " pixels, first at " + (firstDifferenceAt % 120) + ","
+                    + (firstDifferenceAt / 120));
 
-            check("a toggle switched off looks like a button that was never pressed",
+            if (difference > 0 && firstDifferenceAt >= 0) {
+                int x = firstDifferenceAt % 120;
+                int y = firstDifferenceAt / 120;
+
+                android.util.Log.i("LayoutSmoke", "before=" + Integer.toHexString(before.getPixel(x, y))
+                        + " after=" + Integer.toHexString(after.getPixel(x, y))
+                        + " pressed=" + toggle.isPressed());
+            }
+
+            check("a toggle switched off looks like it did before it was pressed",
                     difference == 0);
 
-            referenceImage.recycle();
-            toggleImage.recycle();
+            saveBitmapForInspection(before, "toggle-before.png");
+            saveBitmapForInspection(after, "toggle-after.png");
+
+            before.recycle();
+            after.recycle();
         } finally {
             universalController.setControllerMode(originalMode);
         }
@@ -1710,6 +1736,53 @@ public class LayoutSmokeActivity extends Activity {
         } catch (java.io.IOException e) {
             android.util.Log.e("LayoutSmoke", "could not write " + name, e);
         }
+    }
+
+    /**
+     * A pressed button and a pressed arm of a D-pad must be lit to about the same strength, and
+     * the light of an arm must stay inside its rounded shape.
+     */
+    private void checkDpadGlowMatchesAButton() {
+        UniversalDigitalButton button = new UniversalDigitalButton(universalController, 8821, 0, this);
+        button.getConfig().setName("");
+        button.measure(View.MeasureSpec.makeMeasureSpec(160, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(160, View.MeasureSpec.EXACTLY));
+        button.layout(0, 0, 160, 160);
+        button.setPressed(true);
+
+        UniversalDigitalPad pad = new UniversalDigitalPad(universalController, this, 8822);
+        pad.measure(View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY));
+        pad.layout(0, 0, 300, 300);
+        pad.setDirectionForTesting(UniversalDigitalPad.DIGITAL_PAD_DIRECTION_UP);
+
+        android.graphics.Bitmap buttonImage = renderElement(button);
+        android.graphics.Bitmap padImage = renderElement(pad);
+
+        // Just inside the drawn edge of each, which is where the light pools. The body of a
+        // button is inset by its stroke, while an arm of a pad reaches the edge of the pad, so
+        // both are sampled the same distance inside their own outline.
+        int buttonEdge = android.graphics.Color.alpha(buttonImage.getPixel(80, 16));
+        int armEdge = android.graphics.Color.alpha(padImage.getPixel(150, 6));
+
+        android.util.Log.i("LayoutSmoke", "glow at the edge: button=" + buttonEdge
+                + " dpad arm=" + armEdge);
+
+        check("a pressed arm of a D-pad is lit like a pressed button",
+                armEdge >= buttonEdge * 0.75 && armEdge <= buttonEdge * 1.25);
+
+        // The corner of the arm's outline, which the rounded shape does not reach, must be left
+        // alone: this is the light that used to stick out with sharp corners
+        int cornerAlpha = android.graphics.Color.alpha(padImage.getPixel(113, 3));
+
+        android.util.Log.i("LayoutSmoke", "alpha at the sharp corner of an arm: " + cornerAlpha);
+
+        check("the light of an arm does not stick out past its rounded corner", cornerAlpha <= 8);
+
+        saveBitmapForInspection(padImage, "dpad-pressed.png");
+
+        buttonImage.recycle();
+        padImage.recycle();
     }
 
     private static boolean contains(String[] labels, String needle) {
