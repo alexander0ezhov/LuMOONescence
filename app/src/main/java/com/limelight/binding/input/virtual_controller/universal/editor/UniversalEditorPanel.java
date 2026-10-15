@@ -1,6 +1,7 @@
 package com.limelight.binding.input.virtual_controller.universal.editor;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -340,12 +341,8 @@ public class UniversalEditorPanel {
     }
 
     public void addButton(String text, View.OnClickListener listener) {
-        Button button = new Button(context);
-        button.setText(text);
-        button.setMinWidth(0);
-        button.setAllCaps(false);
-        button.setOnClickListener(listener);
-        content.addView(button, matchWidth());
+        content.addView(makeButton(text, listener, BUTTON_TEXT, BUTTON_FILL, BUTTON_EDGE),
+                matchWidth());
     }
 
     /**
@@ -356,19 +353,103 @@ public class UniversalEditorPanel {
         row.setOrientation(LinearLayout.HORIZONTAL);
 
         for (int i = 0; i < texts.length; i++) {
-            Button button = new Button(context);
-            button.setText(texts[i]);
-            button.setMinWidth(0);
-            button.setAllCaps(false);
-            button.setOnClickListener(listeners[i]);
+            Button button = makeButton(texts[i], listeners[i], BUTTON_TEXT, BUTTON_FILL,
+                    BUTTON_EDGE);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+
+            // The buttons of a row keep a gap between them, so they read as separate things
+            if (i > 0) {
+                params.setMarginStart(dp(6));
+            }
+
             row.addView(button, params);
         }
 
         content.addView(row, matchWidth());
     }
+
+    /**
+     * Adds a button for something that cannot be undone.
+     *
+     * It is drawn in red, on a red wash, so the one entry of the drawer that destroys work
+     * never looks like the others and is never pressed by accident.
+     */
+    public void addDangerButton(String text, View.OnClickListener listener) {
+        content.addView(makeButton(text, listener, DANGER_TEXT, DANGER_FILL, DANGER_EDGE),
+                matchWidth());
+    }
+
+    private Button makeButton(String text, View.OnClickListener listener, int textColor,
+                              int fillColor, int edgeColor) {
+        Button button = new Button(context);
+
+        button.setText(text);
+        button.setTextColor(textColor);
+        button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        button.setMinWidth(0);
+        button.setMinimumWidth(0);
+        button.setAllCaps(false);
+        button.setPadding(dp(8), dp(8), dp(8), dp(8));
+        button.setBackground(makeButtonBackground(fillColor, edgeColor));
+        button.setOnClickListener(listener);
+
+        return button;
+    }
+
+    private GradientDrawable makeButtonBackground(int fillColor, int edgeColor) {
+        GradientDrawable background = new GradientDrawable();
+
+        background.setColor(fillColor);
+        background.setCornerRadius(dp(8));
+
+        if (edgeColor != 0) {
+            background.setStroke(Math.max(1, dp(1) / 2), edgeColor);
+        }
+
+        return background;
+    }
+
+    private int dp(float value) {
+        return Math.round(value * context.getResources().getDisplayMetrics().density);
+    }
+
+    /**
+     * The text of every button in the panel, in the order they appear. Used by the debug smoke
+     * test to check that the drawer offers what it should.
+     */
+    public java.util.List<String> getButtonLabelsForTesting() {
+        java.util.List<String> labels = new java.util.ArrayList<>();
+
+        collectButtonLabels(content, labels);
+        return labels;
+    }
+
+    private static void collectButtonLabels(ViewGroup group, java.util.List<String> labels) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof Button) {
+                labels.add(((Button) child).getText().toString());
+            }
+            else if (child instanceof ViewGroup) {
+                collectButtonLabels((ViewGroup) child, labels);
+            }
+        }
+    }
+
+    /**
+     * The look of an ordinary button of the drawer: a faint light fill with a soft edge, which
+     * is quiet enough not to compete with the values it sits under.
+     */
+    private static final int BUTTON_TEXT = 0xFFE8EAF0;
+    private static final int BUTTON_FILL = 0x1FFFFFFF;
+    private static final int BUTTON_EDGE = 0x33FFFFFF;
+
+    private static final int DANGER_TEXT = 0xFFFF7B72;
+    private static final int DANGER_FILL = 0x2EFF5A50;
+    private static final int DANGER_EDGE = 0x66FF6B60;
 
     private void addFieldLabel(String label) {
         TextView view = new TextView(context);

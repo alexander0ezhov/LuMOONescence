@@ -267,6 +267,7 @@ public class UniversalLayoutEditorActivity extends Activity
         });
 
         editorBuilder = new UniversalElementEditorBuilder(this, panel);
+        editorBuilder.setActions(new ElementActions());
         editorBuilder.setOnRebuildRequested(new Runnable() {
             @Override
             public void run() {
@@ -350,6 +351,13 @@ public class UniversalLayoutEditorActivity extends Activity
      */
     private void setPanelVisible(boolean visible) {
         panelContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Whether the drawer is on screen, for the debug smoke test.
+     */
+    public boolean isPanelVisibleForTesting() {
+        return panelContainer != null && panelContainer.getVisibility() == View.VISIBLE;
     }
 
     /**
@@ -622,8 +630,10 @@ public class UniversalLayoutEditorActivity extends Activity
         // Recorded so the release that follows a hold does not also close the drawer
         longPressHandled = true;
 
+        // Holding a control picks it up, which is the same thing a tap does. There is no
+        // separate menu any more: everything that can be done to a control is a row of the
+        // drawer, so there is nothing to look for in two places.
         selectElement(element);
-        showElementMenu(element);
         return true;
     }
 
@@ -775,10 +785,18 @@ public class UniversalLayoutEditorActivity extends Activity
         UniversalGeometry geometry = selectedElement.getConfig().getGeometry();
         UniversalGeometry onScreen = UniversalGeometry.of(selectedElement);
 
-        geometry.setLeft(readSlider(R.string.editor_label_x, onScreen.getLeft()));
-        geometry.setTop(readSlider(R.string.editor_label_y, onScreen.getTop()));
-        geometry.setWidth(readSlider(R.string.editor_label_width, onScreen.getWidth()));
-        geometry.setHeight(readSlider(R.string.editor_label_height, onScreen.getHeight()));
+        int newWidth = readSlider(R.string.editor_label_width, onScreen.getWidth());
+        int newHeight = readSlider(R.string.editor_label_height, onScreen.getHeight());
+
+        // The position is held inside the area even when it is typed rather than dragged, so a
+        // control can never be put where it cannot be reached and dragged back. A wider control
+        // may go further right, because more of it is left on screen.
+        geometry.setLeft(UniversalLayoutArea.clampLeft(selectedElement,
+                readSlider(R.string.editor_label_x, onScreen.getLeft()), newWidth));
+        geometry.setTop(UniversalLayoutArea.clampTop(selectedElement,
+                readSlider(R.string.editor_label_y, onScreen.getTop()), newHeight));
+        geometry.setWidth(newWidth);
+        geometry.setHeight(newHeight);
 
         geometry.applyTo(selectedElement);
         panel.showGeometry(geometry);
@@ -801,70 +819,55 @@ public class UniversalLayoutEditorActivity extends Activity
         controller.markConfigurationDirty();
     }
 
-    // ---------------------------------------------------------------- element menu
+    // ---------------------------------------------------------------- element actions
 
-    private void showElementMenu(final UniversalVirtualControllerElement element) {
-        final java.util.List<String> entries = new java.util.ArrayList<>();
-        final java.util.List<Runnable> actions = new java.util.ArrayList<>();
-
-        entries.add(getString(R.string.menu_duplicate));
-        actions.add(new Runnable() {
-            @Override
-            public void run() {
-                UniversalVirtualControllerElement copy = controller.duplicateElement(element);
-                if (copy != null) {
-                    markDirty();
-                    selectElement(copy);
-                }
+    /**
+     * The rows at the foot of the drawer. They act on the control being edited, which is the
+     * one the drawer belongs to.
+     */
+    private final class ElementActions implements UniversalElementEditorBuilder.Actions {
+        @Override
+        public void duplicate() {
+            if (selectedElement == null) {
+                return;
             }
-        });
 
-        entries.add(getString(R.string.menu_copy_size));
-        actions.add(new Runnable() {
-            @Override
-            public void run() {
-                copySizeOf(element);
+            UniversalVirtualControllerElement copy = controller.duplicateElement(selectedElement);
+
+            if (copy != null) {
+                markDirty();
+                selectElement(copy);
             }
-        });
-
-        // "Edit" simply opens this control in the panel on the left, which is what the
-        // selected control is already shown in; it is offered so the way to edit a control
-        // is discoverable from the control itself.
-        entries.add(getString(R.string.menu_edit));
-        actions.add(new Runnable() {
-            @Override
-            public void run() {
-                selectElement(element);
-            }
-        });
-
-        if (hasCopiedSize) {
-            entries.add(getString(R.string.menu_paste_size));
-            actions.add(new Runnable() {
-                @Override
-                public void run() {
-                    pasteSizeOnto(element);
-                }
-            });
         }
 
-        entries.add(getString(R.string.menu_delete));
-        actions.add(new Runnable() {
-            @Override
-            public void run() {
-                showDeleteElementDialog(element);
-            }
-        });
+        @Override
+        public void copySize() {
+            if (selectedElement != null) {
+                copySizeOf(selectedElement);
 
-        showDialog(new AlertDialog.Builder(this)
-                .setTitle(element.getElementName())
-                .setItems(entries.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        actions.get(which).run();
-                    }
-                })
-                .create());
+                // The "paste size" row appears now that there is something to paste
+                refreshPanel();
+            }
+        }
+
+        @Override
+        public boolean canPasteSize() {
+            return hasCopiedSize;
+        }
+
+        @Override
+        public void pasteSize() {
+            if (selectedElement != null) {
+                pasteSizeOnto(selectedElement);
+            }
+        }
+
+        @Override
+        public void delete() {
+            if (selectedElement != null) {
+                showDeleteElementDialog(selectedElement);
+            }
+        }
     }
 
     private void showDeleteElementDialog(final UniversalVirtualControllerElement element) {
@@ -1212,8 +1215,12 @@ public class UniversalLayoutEditorActivity extends Activity
         // selection here is what used to lose a plain drag on the way out.
         markDirty();
 
-        // Only the control that is being edited has sliders to bring back in step
-        if (element == selectedElement) {
+        // Dragging a control brings up its settings, just as tapping it does: after moving
+        // something, the numbers of where it ended up are what the user wants next
+        if (element != selectedElement) {
+            selectElement(element);
+        }
+        else {
             refreshPanel();
         }
     }

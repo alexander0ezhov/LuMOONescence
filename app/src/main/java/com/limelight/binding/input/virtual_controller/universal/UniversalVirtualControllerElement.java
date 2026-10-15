@@ -127,8 +127,10 @@ public abstract class UniversalVirtualControllerElement extends View {
 
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) getLayoutParams();
 
-        layoutParams.leftMargin = newPos_x > 0 ? newPos_x : 0;
-        layoutParams.topMargin = newPos_y > 0 ? newPos_y : 0;
+        // A drag stops where the control would be too far out to press again, so dragging can
+        // never lose a control off the edge of the screen
+        layoutParams.leftMargin = UniversalLayoutArea.clampLeft(this, newPos_x, getWidth());
+        layoutParams.topMargin = UniversalLayoutArea.clampTop(this, newPos_y, getHeight());
         layoutParams.rightMargin = 0;
         layoutParams.bottomMargin = 0;
 
@@ -137,6 +139,13 @@ public abstract class UniversalVirtualControllerElement extends View {
         // The configuration follows every step of the drag, so anything that reads it while
         // the control is being moved sees where it is
         syncConfigGeometry();
+    }
+
+    /**
+     * Moves the control as a drag would, for the debug smoke test.
+     */
+    public void moveElementForTesting(int pressedX, int pressedY, int x, int y) {
+        moveElement(pressedX, pressedY, x, y);
     }
 
     protected void resizeElement(int pressed_x, int pressed_y, int width, int height) {

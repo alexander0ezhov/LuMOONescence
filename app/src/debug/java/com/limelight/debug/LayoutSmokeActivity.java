@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 
 import android.graphics.Canvas;
+import com.limelight.R;
 import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.binding.input.ControllerHandler;
 import com.limelight.binding.input.virtual_controller.universal.UniversalAnalogStick;
@@ -605,6 +606,9 @@ public class LayoutSmokeActivity extends Activity {
         checkDpadArmsAreIdentical();
         checkDpadGlowMatchesAButton();
         checkDontSaveLeavesTheLayoutAlone();
+        checkPositionStopsBeforeTheEdge();
+        checkTheDrawerOffersTheControlActions();
+        checkDraggingAControlShowsItsDrawer();
     }
 
     /**
@@ -1841,6 +1845,265 @@ public class LayoutSmokeActivity extends Activity {
                 .getString("elements", "");
     }
 
+
+    /**
+     * The position sliders must stop before a control leaves the screen, so it can always be
+     * grabbed again and pulled back.
+     */
+    private void checkPositionStopsBeforeTheEdge() {
+        UniversalVirtualControllerElement element = firstElementInLayout();
+        check("a control is in the layout for the position check", element != null);
+
+        if (element == null) {
+            return;
+        }
+
+        editor.onElementTapped(element);
+
+        int areaWidth = editor.getEditorRootView().getWidth();
+        int areaHeight = editor.getEditorRootView().getHeight();
+
+        check("the editor knows how big the layout area is", areaWidth > 0 && areaHeight > 0);
+
+        // The panel itself is not a view tree a slider can be found in, so the editor's own
+        // content is searched
+        View editorContent = editor.findViewById(android.R.id.content);
+
+        android.widget.SeekBar xSlider = findSeekBar(editorContent, R.string.editor_label_x);
+        android.widget.SeekBar ySlider = findSeekBar(editorContent, R.string.editor_label_y);
+
+        check("the drawer has a position slider for x", xSlider != null);
+        check("the drawer has a position slider for y", ySlider != null);
+
+        if (xSlider == null || ySlider == null) {
+            return;
+        }
+
+        android.util.Log.i("LayoutSmoke", "area=" + areaWidth + "x" + areaHeight
+                + " x slider max=" + xSlider.getMax() + " y slider max=" + ySlider.getMax());
+
+        // A slider cannot reach past the area, so a dragged control always keeps a piece on
+        // screen
+        check("the x slider stops before the right edge", xSlider.getMax() < areaWidth);
+        check("the y slider stops before the bottom edge", ySlider.getMax() < areaHeight);
+
+        // And a position typed by hand is held back too
+        int width = element.getWidth() > 0 ? element.getWidth() : 160;
+        int height = element.getHeight() > 0 ? element.getHeight() : 160;
+
+        // A typed number is kept by the row even when the slider cannot show it, which is the
+        // path a value typed by hand takes into the editor
+        UniversalEditorPanel.SliderRow xRow =
+                editor.getPanelForTesting().getSliderRow(getString(R.string.editor_label_x));
+        UniversalEditorPanel.SliderRow yRow =
+                editor.getPanelForTesting().getSliderRow(getString(R.string.editor_label_y));
+
+        xRow.setValue(9999);
+        yRow.setValue(9999);
+
+        check("the row keeps a typed value the slider cannot show", xRow.getValue() == 9999);
+
+        editor.applyGeometryForTesting(9999, 9999, width, height);
+
+        // The placed position comes from the configuration, which is what the edit wrote. The
+        // view's own left edge only catches up on the next layout pass, so reading it here
+        // would read the position from before the change.
+        UniversalGeometry placed = element.getConfig().getGeometry();
+
+        android.util.Log.i("LayoutSmoke", "typed 9999,9999 placed at "
+                + placed.getLeft() + "," + placed.getTop() + " within "
+                + areaWidth + "x" + areaHeight);
+
+        check("a typed position keeps the control inside the layout",
+                placed.getLeft() < areaWidth && placed.getTop() < areaHeight);
+        check("a typed position keeps a piece of the control on screen",
+                placed.getLeft() + width > 0 && placed.getLeft() < areaWidth);
+        check("a typed position is held back rather than thrown to zero",
+                placed.getLeft() > 0 && placed.getTop() > 0);
+
+        // The piece that is left is what makes it reachable again: the control can be dragged
+        // back from there
+        check("the piece left on screen is wide enough to press", areaWidth - placed.getLeft() >= 24);
+
+        // Put it back where it can be seen
+        editor.applyGeometryForTesting(100, 100, width, height);
+
+        // Dragging is the other way a control can be pushed out: grabbing its left edge and
+        // pulling right would carry it off the screen entirely
+        editor.applyGeometryForTesting(100, 100, width, height);
+
+        dispatchTouch(element, MotionEvent.ACTION_DOWN, 0.0f, 0.5f);
+        dispatchTouch(element, MotionEvent.ACTION_MOVE, 1.0f, 0.5f);
+
+        int draggedTo = element.getConfig().getGeometry().getLeft();
+
+        // The pointer cannot report a position past the screen, but a control follows it there,
+        // so the limit has to hold on its own. The control is asked to go far past the edge.
+        element.moveElementForTesting(0, 0, areaWidth * 3, areaHeight * 3);
+
+        UniversalGeometry afterDrag = element.getConfig().getGeometry();
+
+        android.util.Log.i("LayoutSmoke", "dragged to left=" + draggedTo
+                + " forced to " + afterDrag.getLeft() + "," + afterDrag.getTop()
+                + " within " + areaWidth + "x" + areaHeight);
+
+        check("dragging a control to the right edge keeps a piece on screen",
+                afterDrag.getLeft() < areaWidth);
+        check("dragging a control to the bottom edge keeps a piece on screen",
+                afterDrag.getTop() < areaHeight);
+        check("a control dragged to the limit can still be pressed",
+                areaWidth - afterDrag.getLeft() >= 24 && areaHeight - afterDrag.getTop() >= 24);
+
+        dispatchTouch(element, MotionEvent.ACTION_UP, 1.0f, 0.5f);
+        editor.applyGeometryForTesting(100, 100, width, height);
+    }
+
+    private android.widget.SeekBar findSeekBar(View root, int labelId) {
+        String label = getString(labelId);
+        return findSeekBar(root, label);
+    }
+
+    private android.widget.SeekBar findSeekBar(View root, String label) {
+        if (!(root instanceof ViewGroup)) {
+            return null;
+        }
+
+        ViewGroup group = (ViewGroup) root;
+
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof android.widget.SeekBar) {
+                // A slider row is the label followed by the slider, so the label of a row is
+                // looked up through its own children
+                ViewGroup row = (ViewGroup) child.getParent();
+                String rowLabel = labelOfRow(row);
+
+                if (label.equals(rowLabel)) {
+                    return (android.widget.SeekBar) child;
+                }
+            }
+        }
+
+        for (int i = 0; i < group.getChildCount(); i++) {
+            android.widget.SeekBar found = findSeekBar(group.getChildAt(i), label);
+
+            if (found != null) {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    private String labelOfRow(ViewGroup row) {
+        if (row == null) {
+            return "";
+        }
+
+        for (int i = 0; i < row.getChildCount(); i++) {
+            View child = row.getChildAt(i);
+
+            if (child instanceof android.widget.TextView
+                    && !(child instanceof android.widget.SeekBar)) {
+                return ((android.widget.TextView) child).getText().toString();
+            }
+        }
+
+        return "";
+    }
+
+    /**
+     * Everything that can be done to a control is a row of the drawer, and deleting is the one
+     * row that is drawn differently.
+     */
+    private void checkTheDrawerOffersTheControlActions() {
+        UniversalVirtualControllerElement element = firstElementInLayout();
+        check("a control is in the layout for the actions check", element != null);
+
+        if (element == null) {
+            return;
+        }
+
+        editor.onElementTapped(element);
+
+        java.util.List<String> labels = editor.getPanelForTesting().getButtonLabelsForTesting();
+
+        android.util.Log.i("LayoutSmoke", "drawer buttons: " + labels);
+
+        check("the drawer offers duplicating a control",
+                labels.contains(getString(R.string.menu_duplicate)));
+        check("the drawer offers copying the size of a control",
+                labels.contains(getString(R.string.menu_copy_size)));
+        check("the drawer offers deleting a control",
+                labels.contains(getString(R.string.menu_delete)));
+
+        // Pasting appears exactly when there is a size to paste, which a check that ran earlier
+        // in this run may already have copied
+        check("pasting is offered exactly when a size has been copied",
+                labels.contains(getString(R.string.menu_paste_size)) == editor.hasCopiedSize());
+
+        editor.copySizeOf(element);
+        editor.onElementTapped(element);
+
+        labels = editor.getPanelForTesting().getButtonLabelsForTesting();
+
+        check("pasting is offered once a size is copied",
+                labels.contains(getString(R.string.menu_paste_size)));
+
+        // A long press must not open a menu any more
+        editor.onElementTapped(null);
+        editor.onElementLongPressed(element);
+
+        check("holding a control selects it instead of opening a menu",
+                editor.getSelectedElementForTesting() == element);
+        check("holding a control leaves no dialog behind",
+                editor.getVisibleDialogForTesting() == null);
+    }
+
+    /**
+     * Dragging a control brings its settings up, the same way tapping it does.
+     */
+    private void checkDraggingAControlShowsItsDrawer() {
+        UniversalVirtualControllerElement element = null;
+
+        for (UniversalVirtualControllerElement candidate : universalController.getElements()) {
+            if (candidate.getLayoutParams() != null) {
+                element = candidate;
+                break;
+            }
+        }
+
+        check("a control is in the layout for the drag check", element != null);
+
+        if (element == null) {
+            return;
+        }
+
+        // Nothing is selected, so the drawer is closed
+        editor.onElementTapped(null);
+        check("no control is selected to begin with", editor.getSelectedElementForTesting() == null);
+        check("the drawer is closed with nothing selected", !editor.isPanelVisibleForTesting());
+
+        // Drag the control
+        dispatchTouch(element, MotionEvent.ACTION_DOWN, 0.5f, 0.5f);
+        dispatchTouch(element, MotionEvent.ACTION_MOVE, 0.6f, 0.6f);
+        dispatchTouch(element, MotionEvent.ACTION_UP, 0.6f, 0.6f);
+
+        check("dragging a control selects it", editor.getSelectedElementForTesting() == element);
+        check("dragging a control opens its drawer", editor.isPanelVisibleForTesting());
+    }
+
+    private UniversalVirtualControllerElement firstElementInLayout() {
+        for (UniversalVirtualControllerElement candidate : universalController.getElements()) {
+            if (candidate.getLayoutParams() != null) {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
             if (label.contains(needle)) {
@@ -1905,6 +2168,19 @@ public class LayoutSmokeActivity extends Activity {
     private void report() {
         Log.i(TAG, "RESULT " + (failures == 0 ? "PASSED" : "FAILED")
                 + " checks=" + checks + " failures=" + failures);
+
+        // Starting this activity with --ez showDrawer true leaves the editor on screen with a
+        // control's drawer open, so the drawer itself can be looked at. Touch cannot be
+        // injected on every device, so this is how the editor's own look is inspected.
+        if (getIntent().getBooleanExtra("showDrawer", false)) {
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    editor.onElementTapped(firstElementInLayout());
+                    finish();
+                }
+            }, 2000);
+        }
     }
 
     /**

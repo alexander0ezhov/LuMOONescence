@@ -2,6 +2,7 @@ package com.limelight.binding.input.virtual_controller.universal.editor;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.view.View;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.limelight.binding.input.virtual_controller.universal.action.GamepadBu
 import com.limelight.binding.input.virtual_controller.universal.action.InputEvent;
 import com.limelight.binding.input.virtual_controller.universal.action.InputEventNames;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalButtonConfig;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutArea;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalHostAxis;
 import com.limelight.binding.input.virtual_controller.universal.config.UniversalPadConfig;
@@ -89,17 +91,88 @@ public class UniversalElementEditorBuilder {
 
         if (element.getPadConfigIfAny() != null) {
             buildPadSection(element, callbacks);
-            return;
         }
-
-        if (element.getStickConfigIfAny() != null) {
+        else if (element.getStickConfigIfAny() != null) {
             buildStickSection(element, callbacks);
-            return;
         }
-
-        if (element.getButtonConfigIfAny() != null) {
+        else if (element.getButtonConfigIfAny() != null) {
             buildButtonSection(element, callbacks);
         }
+
+        buildActionsSection();
+    }
+
+    /**
+     * What can be done to a whole control, as opposed to one of its settings.
+     *
+     * These used to live in a menu that opened on a long press. They are rows of the drawer now,
+     * because the drawer is where a control is already being handled: one place to look, and
+     * one gesture to learn.
+     */
+    public interface Actions {
+        void duplicate();
+
+        void copySize();
+
+        /**
+         * Whether there is a size waiting to be pasted, which decides whether that row is
+         * offered at all.
+         */
+        boolean canPasteSize();
+
+        void pasteSize();
+
+        void delete();
+    }
+
+    private Actions actions;
+
+    public void setActions(Actions actions) {
+        this.actions = actions;
+    }
+
+    private void buildActionsSection() {
+        if (actions == null) {
+            return;
+        }
+
+        panel.addSection(context.getString(R.string.editor_section_actions));
+
+        panel.addButtonRow(
+                new String[]{context.getString(R.string.menu_duplicate),
+                        context.getString(R.string.menu_copy_size)},
+                new View.OnClickListener[]{
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                actions.duplicate();
+                            }
+                        },
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                actions.copySize();
+                            }
+                        }});
+
+        // Pasting only makes sense once a size has been taken, so it appears only then
+        if (actions.canPasteSize()) {
+            panel.addButton(context.getString(R.string.menu_paste_size),
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            actions.pasteSize();
+                        }
+                    });
+        }
+
+        panel.addDangerButton(context.getString(R.string.menu_delete),
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        actions.delete();
+                    }
+                });
     }
 
     private void buildControlSection(UniversalVirtualControllerElement element,
@@ -140,8 +213,14 @@ public class UniversalElementEditorBuilder {
         // the sliders from undoing a drag with a stale value.
         final UniversalGeometry geometry = readGeometry(element);
 
-        panel.addSliderRow(context.getString(R.string.editor_label_x), geometry.getLeft(),
-                MAX_POSITION, new UniversalEditorPanel.OnValueChangedListener() {
+        // The sliders stop where the control would be too far out to be grabbed again, so a
+        // slider can never hide a control from its own editor
+        final int maxLeft = UniversalLayoutArea.maxLeft(element, geometry.getWidth());
+        final int maxTop = UniversalLayoutArea.maxTop(element, geometry.getHeight());
+
+        panel.addSliderRow(context.getString(R.string.editor_label_x),
+                Math.min(geometry.getLeft(), maxLeft), maxLeft,
+                new UniversalEditorPanel.OnValueChangedListener() {
                     @Override
                     public void onValueChanged(int value) {
                         callbacks.onGeometryChanged(value, geometry.getTop(),
@@ -149,8 +228,9 @@ public class UniversalElementEditorBuilder {
                     }
                 });
 
-        panel.addSliderRow(context.getString(R.string.editor_label_y), geometry.getTop(),
-                MAX_POSITION, new UniversalEditorPanel.OnValueChangedListener() {
+        panel.addSliderRow(context.getString(R.string.editor_label_y),
+                Math.min(geometry.getTop(), maxTop), maxTop,
+                new UniversalEditorPanel.OnValueChangedListener() {
                     @Override
                     public void onValueChanged(int value) {
                         callbacks.onGeometryChanged(geometry.getLeft(), value,

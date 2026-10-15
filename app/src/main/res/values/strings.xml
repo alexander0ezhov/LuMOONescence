@@ -295,6 +295,7 @@
     <string name="editor_section_element">Control</string>
     <string name="editor_section_position">Position and size</string>
     <string name="editor_section_action">Action</string>
+    <string name="editor_section_actions">This control</string>
     <string name="editor_label_name">Name</string>
     <string name="editor_label_x">X</string>
     <string name="editor_label_y">Y</string>
