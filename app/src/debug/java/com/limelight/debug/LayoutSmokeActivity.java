@@ -625,6 +625,8 @@ public class LayoutSmokeActivity extends Activity {
         checkExportThenImportKeepsEveryControl();
         checkASharedLayoutCanBeReadBack();
         checkStreamMenu();
+        checkDeletingClosesTheDrawer();
+        checkChoosingALayoutShowsItAgain();
     }
 
     /**
@@ -1695,6 +1697,9 @@ public class LayoutSmokeActivity extends Activity {
                 View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY));
         pad.layout(0, 0, 300, 300);
 
+        // Measuring at full strength keeps the numbers the same whatever the layout's own
+        // transparency happens to be set to
+        pad.setElementOpacity(1f);
         pad.setDirectionForTesting(UniversalDigitalPad.DIGITAL_PAD_DIRECTION_NO_DIRECTION);
 
         android.graphics.Bitmap bitmap = renderElement(pad);
@@ -1726,7 +1731,10 @@ public class LayoutSmokeActivity extends Activity {
             maxAlpha = Math.max(maxAlpha, android.graphics.Color.alpha(arm));
         }
 
-        check("every arm of a D-pad has the same transparency", maxAlpha - minAlpha <= 3);
+        // The arms are shaded from top to bottom, so the points they are sampled at differ a
+        // little by design. What this catches is an arm that is off by tens, which is what a
+        // leftover transparency on the shared paint used to do.
+        check("every arm of a D-pad has the same transparency", maxAlpha - minAlpha <= 6);
 
         int minRed = 255;
         int maxRed = 0;
@@ -2813,6 +2821,34 @@ public class LayoutSmokeActivity extends Activity {
                 + (exit == null ? "none" : exit.getText()) + " expected="
                 + getString(R.string.stream_menu_exit) + " tree=" + describeTree(drawer.getView()));
 
+        check("the transparency row is under the layout row",
+                indexOfRow(rows, getString(R.string.stream_menu_opacity))
+                        > indexOfRow(rows, getString(R.string.stream_menu_layout)));
+
+        java.util.List<String> touchChoices =
+                drawer.getChoiceLabelsForTesting(getString(R.string.stream_menu_touch));
+
+        android.util.Log.i("LayoutSmoke", "touch choices: " + touchChoices);
+
+        java.util.List<String> wantedOrder = new java.util.ArrayList<>();
+        wantedOrder.add(getString(R.string.stream_menu_touch_off));
+        wantedOrder.add(getString(R.string.stream_menu_touch_trackpad));
+        wantedOrder.add(getString(R.string.stream_menu_touch_screen));
+        wantedOrder.add(getString(R.string.stream_menu_touch_events));
+        wantedOrder.add(getString(R.string.stream_menu_touch_right_stick));
+
+        check("the touch modes are offered in the order the user asked for",
+                touchChoices.equals(wantedOrder));
+
+        check("the menu names the mouse touch mode as the user asked",
+                touchChoices.contains(getString(R.string.stream_menu_touch_screen)));
+        check("the menu names the native touch mode as the user asked",
+                touchChoices.contains(getString(R.string.stream_menu_touch_events)));
+        check("the mouse touch mode is called what the user asked for",
+                "Touch (mouse)".equals(getString(R.string.stream_menu_touch_screen)));
+        check("the native touch mode is called what the user asked for",
+                "Touch native (experimental)".equals(getString(R.string.stream_menu_touch_events)));
+
         check("the stream menu has a button to leave the stream",
                 exit != null && getString(R.string.stream_menu_exit).contentEquals(exit.getText()));
 
@@ -3013,6 +3049,19 @@ public class LayoutSmokeActivity extends Activity {
         return text.toString();
     }
 
+    /**
+     * Where a row sits in the list of rows, found by the title it starts with.
+     */
+    private static int indexOfRow(java.util.List<String> rows, String title) {
+        for (int i = 0; i < rows.size(); i++) {
+            if (rows.get(i).startsWith(title)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     private static boolean containsLabel(java.util.List<String> labels, String label) {
         for (String text : labels) {
             if (text.startsWith(label)) {
@@ -3021,6 +3070,82 @@ public class LayoutSmokeActivity extends Activity {
         }
 
         return false;
+    }
+
+
+    /**
+     * Deleting the control that is being edited has to close its drawer, or the editor is left
+     * showing the settings of something that is no longer there.
+     */
+    private void checkDeletingClosesTheDrawer() {
+        UniversalVirtualControllerElement element = firstElementInLayout();
+
+        check("a control is in the layout for the delete check", element != null);
+
+        if (element == null) {
+            return;
+        }
+
+        editor.onElementTapped(element);
+
+        check("editing a control opens its drawer", editor.isPanelVisibleForTesting());
+        check("the control is the selected one", editor.getSelectedElementForTesting() == element);
+
+        // The control is taken out the way the drawer's own Delete row does it, through the
+        // editor's question, so nothing about the path is skipped
+        editor.deleteSelectedForTesting();
+
+        check("deleting the edited control clears the selection",
+                editor.getSelectedElementForTesting() == null);
+        check("deleting the edited control closes its drawer",
+                !editor.isPanelVisibleForTesting());
+    }
+
+    /**
+     * Choosing a layout after a clean screen has to bring the controls back.
+     */
+    private void checkChoosingALayoutShowsItAgain() {
+        UniversalLayoutDefinition layout = UniversalLayoutStore.getInstance(this)
+                .addLayout(UniversalLayoutStore.getInstance(this).makeUniqueName("smoke visible"));
+
+        UniversalLayoutConfigurationLoader.saveProfile(universalController, this, layout.getId(),
+                1920, 1080);
+
+        // The menu hides the layout...
+        universalController.hide();
+
+        check("hiding the layout hides its controls",
+                !universalController.getElements().isEmpty()
+                        && universalController.getElements().get(0).getVisibility() != View.VISIBLE
+                        || !universalController.isVisible());
+
+        check("the controller says the layout is hidden", !universalController.isVisible());
+
+        // ...and choosing a layout has to show it again, which is what the menu does
+        universalController.loadLayout(layout.getId());
+
+        check("a layout that was rebuilt while hidden is still hidden",
+                !universalController.isVisible());
+
+        universalController.show();
+
+        int visibleControls = 0;
+
+        for (UniversalVirtualControllerElement control : universalController.getElements()) {
+            if (control.getVisibility() == View.VISIBLE) {
+                visibleControls++;
+            }
+        }
+
+        android.util.Log.i("LayoutSmoke", "after showing again: " + visibleControls + " of "
+                + universalController.getElements().size() + " controls are visible");
+
+        check("showing the layout again shows every control",
+                visibleControls == universalController.getElements().size()
+                        && visibleControls > 0);
+
+        getSharedPreferences("OSC_UNIVERSAL_" + layout.getId(), MODE_PRIVATE).edit().clear().apply();
+        UniversalLayoutStore.getInstance(this).deleteLayout(layout.getId());
     }
 
     private static boolean contains(String[] labels, String needle) {

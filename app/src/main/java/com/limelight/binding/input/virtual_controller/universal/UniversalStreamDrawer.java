@@ -173,8 +173,8 @@ public class UniversalStreamDrawer {
 
         content.addView(buildKeyboardRow(), matchWidth());
         content.addView(buildTouchModeRow(), matchWidth());
-        content.addView(buildOpacityRow(), matchWidth());
         content.addView(buildLayoutRow(), matchWidth());
+        content.addView(buildOpacityRow(), matchWidth());
     }
 
     private int panelWidth() {
@@ -231,15 +231,15 @@ public class UniversalStreamDrawer {
                 host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN,
                 PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN);
 
-        addChoice(choices, getString(R.string.stream_menu_touch_right_stick),
-                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK,
-                PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK);
-
         // Real touch events, the way a Windows tablet sends them. Marked as an experiment
         // because it only does anything on a host that takes touch input.
         addChoice(choices, getString(R.string.stream_menu_touch_events),
                 host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS,
                 PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS);
+
+        addChoice(choices, getString(R.string.stream_menu_touch_right_stick),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK,
+                PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK);
 
         return row.withChoices(choices);
     }
@@ -845,6 +845,33 @@ public class UniversalStreamDrawer {
         }
 
         return null;
+    }
+
+    /**
+     * The labels of the choices of a row, for the debug smoke test.
+     */
+    public List<String> getChoiceLabelsForTesting(String title) {
+        List<String> labels = new java.util.ArrayList<>();
+        View row = findRow(content, title, true);
+
+        if (row instanceof ViewGroup && ((ViewGroup) row).getParent() instanceof ViewGroup) {
+            collectChoices((ViewGroup) ((ViewGroup) row).getParent(), labels);
+        }
+
+        return labels;
+    }
+
+    private void collectChoices(ViewGroup group, List<String> labels) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof RadioButton) {
+                labels.add(((RadioButton) child).getText().toString());
+            }
+            else if (child instanceof ViewGroup) {
+                collectChoices((ViewGroup) child, labels);
+            }
+        }
     }
 
     /**

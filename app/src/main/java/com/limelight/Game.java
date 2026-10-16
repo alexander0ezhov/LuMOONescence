@@ -667,6 +667,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         if (universalVirtualController != null) {
             universalLayoutHidden = false;
             universalVirtualController.loadLayout(layoutId);
+
+            // A layout that was hidden stays hidden through a rebuild, because the visibility
+            // is carried over to the controls as they are made. Asking for it again is what
+            // brings them back after a clean screen.
+            universalVirtualController.show();
             return;
         }
 

@@ -880,17 +880,35 @@ public class UniversalLayoutEditorActivity extends Activity
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (selectedElement == element) {
-                            selectedElement = null;
-                        }
-
-                        controller.removeElement(element);
-                        markDirty();
-                        refreshPanel();
+                        deleteElement(element);
                     }
                 })
                 .setNegativeButton(R.string.no, null)
                 .create());
+    }
+
+    /**
+     * Takes a control out of the layout and tidies up after it.
+     */
+    private void deleteElement(UniversalVirtualControllerElement element) {
+        // Going through the selection is what clears the control, closes the drawer that
+        // belongs to it and puts the title back
+        if (selectedElement == element) {
+            selectElement(null);
+        }
+
+        controller.removeElement(element);
+        markDirty();
+        refreshPanel();
+    }
+
+    /**
+     * Deletes the control being edited, for the debug smoke test.
+     */
+    public void deleteSelectedForTesting() {
+        if (selectedElement != null) {
+            deleteElement(selectedElement);
+        }
     }
 
     // ---------------------------------------------------------------- general menu
