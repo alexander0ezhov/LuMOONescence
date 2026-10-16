@@ -291,6 +291,9 @@
     <string name="stream_menu_touch_trackpad">Touchpad</string>
     <string name="stream_menu_touch_screen">Touch screen</string>
     <string name="stream_menu_touch_right_stick">Right stick</string>
+    <string name="stream_menu_touch_events">Real touch (experimental)</string>
+    <string name="stream_menu_opacity">Opacity</string>
+    <string name="stream_menu_layout_none">None (clean screen)</string>
     <string name="stream_menu_layout">Layout</string>
     <string name="stream_menu_no_layouts">No layouts</string>
     <string name="stream_menu_exit">Exit stream</string>

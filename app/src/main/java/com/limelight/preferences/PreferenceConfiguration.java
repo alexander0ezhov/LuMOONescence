@@ -87,6 +87,13 @@ public class PreferenceConfiguration {
 
     /** The touchscreen pushes the right analog stick. */
     public static final int TOUCH_MODE_RIGHT_STICK = 3;
+
+    /**
+     * The touchscreen is sent on as real touch events rather than as a mouse, the way a Windows
+     * tablet sends them. It is an experiment: it does nothing on a host that does not take
+     * touch input.
+     */
+    public static final int TOUCH_MODE_TOUCH_EVENTS = 4;
     private static final String LATENCY_TOAST_PREF_STRING = "checkbox_enable_post_stream_toast";
     private static final String FRAME_PACING_PREF_STRING = "frame_pacing";
     private static final String ABSOLUTE_MOUSE_MODE_PREF_STRING = "checkbox_absolute_mouse_mode";
@@ -379,6 +386,26 @@ public class PreferenceConfiguration {
         return getDefaultBitrate(
                 prefs.getString(RESOLUTION_PREF_STRING, DEFAULT_RESOLUTION),
                 prefs.getString(FPS_PREF_STRING, DEFAULT_FPS));
+    }
+
+    /**
+     * The transparency of the on-screen layout, as a percentage.
+     */
+    public static int getUniversalLayoutOpacity(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(UNIVERSAL_LAYOUT_OPACITY_PREF_STRING, UNIVERSAL_LAYOUT_OPACITY_DEFAULT);
+    }
+
+    /**
+     * Stores the transparency of the on-screen layout. The layout on screen is told separately,
+     * so the change is seen at once.
+     */
+    public static void setUniversalLayoutOpacity(Context context, int percent) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(UNIVERSAL_LAYOUT_OPACITY_PREF_STRING,
+                        Math.max(UNIVERSAL_LAYOUT_OPACITY_MIN,
+                                Math.min(100, percent)))
+                .apply();
     }
 
     /**

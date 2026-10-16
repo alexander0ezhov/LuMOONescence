@@ -2718,6 +2718,8 @@ public class LayoutSmokeActivity extends Activity {
         final String[] chosenLayout = new String[]{null};
         final boolean[] keyboardAsked = new boolean[]{false};
         final boolean[] exited = new boolean[]{false};
+        final boolean[] hidden = new boolean[]{false};
+        final int[] opacity = new int[]{100};
 
         final java.util.List<UniversalLayoutDefinition> layouts = new java.util.ArrayList<>();
         layouts.add(new UniversalLayoutDefinition("one", "First layout", "", 0));
@@ -2761,6 +2763,26 @@ public class LayoutSmokeActivity extends Activity {
                     @Override
                     public void onLayoutChosen(String layoutId) {
                         chosenLayout[0] = layoutId;
+                    }
+
+                    @Override
+                    public boolean isLayoutHidden() {
+                        return hidden[0];
+                    }
+
+                    @Override
+                    public void onLayoutHidden() {
+                        hidden[0] = true;
+                    }
+
+                    @Override
+                    public int getLayoutOpacity() {
+                        return opacity[0];
+                    }
+
+                    @Override
+                    public void onLayoutOpacityChanged(int percent) {
+                        opacity[0] = percent;
                     }
                 });
 
@@ -2852,6 +2874,114 @@ public class LayoutSmokeActivity extends Activity {
         exit.performClick();
 
         check("the button at the bottom leaves the stream", exited[0]);
+
+        // Every row that unfolds has an arrow at its right edge, which turns over while its
+        // list is showing
+        drawer.show();
+
+        android.widget.ImageView touchArrow =
+                drawer.getArrowForTesting(getString(R.string.stream_menu_touch));
+
+        check("a row that unfolds has an arrow", touchArrow != null);
+        check("the arrow of a closed row points down", touchArrow != null
+                && touchArrow.getRotation() == 0f);
+
+        drawer.clickRowForTesting(getString(R.string.stream_menu_touch));
+
+        check("the arrow turns over while the row is open",
+                touchArrow != null && touchArrow.getRotation() == 180f);
+
+        drawer.clickRowForTesting(getString(R.string.stream_menu_touch));
+
+        check("the arrow points down again once the row is closed",
+                touchArrow != null && touchArrow.getRotation() == 0f);
+
+        check("a row that unfolds has an arrow on the layout row too",
+                drawer.getArrowForTesting(getString(R.string.stream_menu_layout)) != null);
+        check("a row that does not unfold has no arrow",
+                drawer.getArrowForTesting(getString(R.string.stream_menu_keyboard)) == null);
+
+        // The choices of a row share one group, which is what stops every choice the user has
+        // pressed from staying marked
+        check("the choices of a row are exclusive",
+                drawer.getChoiceGroupsForTesting(getString(R.string.stream_menu_touch)) == 1);
+
+        drawer.clickRowForTesting(getString(R.string.stream_menu_touch));
+
+        check("only one touch mode is marked at a time",
+                drawer.getMarkedChoicesForTesting(getString(R.string.stream_menu_touch)) == 1);
+
+        drawer.clickChoiceForTesting(getString(R.string.stream_menu_touch_off));
+        drawer.show();
+        drawer.clickRowForTesting(getString(R.string.stream_menu_touch));
+
+        check("choosing another mode leaves one marked",
+                drawer.getMarkedChoicesForTesting(getString(R.string.stream_menu_touch)) == 1);
+
+        // The experimental mode is offered like any other
+        check("the experimental real touch mode can be chosen",
+                drawer.clickChoiceForTesting(getString(R.string.stream_menu_touch_events)));
+        check("the experimental mode is reported",
+                chosenTouchMode[0]
+                        == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS);
+
+        // A clean screen is one of the choices of the layout row
+        drawer.show();
+        drawer.clickRowForTesting(getString(R.string.stream_menu_layout));
+
+        check("a clean screen can be chosen",
+                drawer.clickChoiceForTesting(getString(R.string.stream_menu_layout_none)));
+        check("a clean screen is reported", hidden[0]);
+        check("choosing a clean screen closes the menu", !drawer.isOpen());
+
+        // The transparency slider is there and reports what it is moved to
+        drawer.show();
+
+        android.widget.SeekBar opacitySlider = findOpacitySlider(drawer.getView());
+
+        check("the menu has an opacity slider", opacitySlider != null);
+
+        // The slider has to be laid out before a touch on it means anything
+        int menuWidth = getResources().getDisplayMetrics().widthPixels;
+        int menuHeight = getResources().getDisplayMetrics().heightPixels;
+        View menu = drawer.getView();
+
+        menu.measure(View.MeasureSpec.makeMeasureSpec(menuWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(menuHeight, View.MeasureSpec.EXACTLY));
+        menu.layout(0, 0, menuWidth, menuHeight);
+
+        check("the opacity slider can be dragged",
+                drawer.dragOpacityToForTesting(45));
+
+        android.util.Log.i("LayoutSmoke", "opacity from the menu slider: " + opacity[0]);
+
+        // The thumb takes up part of the width of a slider, so where a touch lands is near the
+        // value it means rather than exactly on it
+        check("dragging the opacity slider reports a new value",
+                opacity[0] >= 40 && opacity[0] <= 50);
+    }
+
+    /**
+     * The slider of the opacity row, which is the only one in the menu.
+     */
+    private android.widget.SeekBar findOpacitySlider(View view) {
+        if (view instanceof android.widget.SeekBar) {
+            return (android.widget.SeekBar) view;
+        }
+
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+
+            for (int i = 0; i < group.getChildCount(); i++) {
+                android.widget.SeekBar found = findOpacitySlider(group.getChildAt(i));
+
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -3041,6 +3171,24 @@ public class LayoutSmokeActivity extends Activity {
 
                     @Override
                     public void onLayoutChosen(String layoutId) {
+                    }
+
+                    @Override
+                    public boolean isLayoutHidden() {
+                        return false;
+                    }
+
+                    @Override
+                    public void onLayoutHidden() {
+                    }
+
+                    @Override
+                    public int getLayoutOpacity() {
+                        return 60;
+                    }
+
+                    @Override
+                    public void onLayoutOpacityChanged(int percent) {
                     }
                 });
 

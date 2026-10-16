@@ -554,6 +554,16 @@ public class Game extends Activity implements SurfaceHolder.Callback,
      */
     private UniversalStreamDrawer streamDrawer;
 
+    /**
+     * Puts the menu back above the on-screen controls, which are added to the same layout again
+     * whenever the layout is rebuilt.
+     */
+    private void bringStreamDrawerToFront() {
+        if (streamDrawer != null) {
+            streamDrawer.bringToFront();
+        }
+    }
+
     private void setUpStreamDrawer() {
         FrameLayout area = (FrameLayout) streamView.getParent();
 
@@ -569,10 +579,19 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
             @Override
             public void onShowKeyboard() {
-                InputMethodManager inputManager =
-                        (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.showSoftInput(getWindow().getDecorView(),
-                        InputMethodManager.SHOW_IMPLICIT);
+                // The stream has no text field for a keyboard to belong to, so asking for it
+                // politely does nothing. This is the call the three finger tap already uses to
+                // bring it up.
+                //
+                // It waits for the menu to finish sliding away, because the keyboard is shown
+                // against the window and a window that is still being redrawn ignores the
+                // request
+                getWindow().getDecorView().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toggleKeyboard();
+                    }
+                }, 250);
             }
 
             @Override
@@ -599,8 +618,44 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             public void onLayoutChosen(String layoutId) {
                 chooseUniversalLayout(layoutId);
             }
+
+            @Override
+            public boolean isLayoutHidden() {
+                return universalLayoutHidden;
+            }
+
+            @Override
+            public void onLayoutHidden() {
+                universalLayoutHidden = true;
+
+                if (universalVirtualController != null) {
+                    universalVirtualController.hide();
+                }
+            }
+
+            @Override
+            public int getLayoutOpacity() {
+                return PreferenceConfiguration.getUniversalLayoutOpacity(Game.this);
+            }
+
+            @Override
+            public void onLayoutOpacityChanged(int percent) {
+                PreferenceConfiguration.setUniversalLayoutOpacity(Game.this, percent);
+
+                if (universalVirtualController != null) {
+                    universalVirtualController.applyElementOpacity();
+                }
+            }
         });
     }
+
+    /**
+     * Whether the user asked for a clean screen during this stream.
+     *
+     * It is deliberately not remembered: the switch on the layouts screen is what decides
+     * whether a layout is used at all, and this is only about the stream in front of the user.
+     */
+    private boolean universalLayoutHidden;
 
     /**
      * Shows another layout, now if the on-screen layout is running and at the next stream if it
@@ -610,6 +665,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         UniversalLayoutStore.getInstance(this).setSelectedLayoutId(layoutId);
 
         if (universalVirtualController != null) {
+            universalLayoutHidden = false;
             universalVirtualController.loadLayout(layoutId);
             return;
         }
@@ -2188,7 +2244,16 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                 // If this is the parent view, we'll offset our coordinates to appear as if they
                 // are relative to the StreamView like our StreamView touch events are.
                 float xOffset, yOffset;
-                if (view != streamView && !prefConfig.touchscreenTrackpad) {
+
+                // A touch that reaches the game through the covering view is measured against
+                // that view, while the video lives in a smaller view of its own that is centred
+                // in it. Placing the pointer means measuring against the video, so the touch is
+                // moved by however far along that view sits. Trackpad and stick input only care
+                // about movement, so they need no offset at all.
+                boolean placedByPosition = prefConfig.touchMode ==
+                        PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN;
+
+                if (view != streamView && placedByPosition) {
                     xOffset = -streamView.getX();
                     yOffset = -streamView.getY();
                 }
@@ -2217,14 +2282,19 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                     return true;
                 }
 
-                // TODO: Re-enable native touch when have a better solution for handling
-                // cancelled touches from Android gestures and 3 finger taps to activate
-                // the software keyboard.
-                /*if (!prefConfig.touchscreenTrackpad && trySendTouchEvent(view, event)) {
-                    // If this host supports touch events and absolute touch is enabled,
-                    // send it directly as a touch event.
-                    return true;
-                }*/
+                // Real touch events, which the host receives as touch rather than as a mouse.
+                // This is what makes a game that reads touch input itself work. It is offered
+                // as an experiment because it does nothing unless the host takes touch, and
+                // because Android cancels touches of its own that cannot be passed on.
+                if (prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS) {
+                    if (trySendTouchEvent(view, event)) {
+                        return true;
+                    }
+
+                    // The host does not take touch, so there is nothing this mode can do with
+                    // the press
+                    return false;
+                }
 
                 TouchContext context = getTouchContext(actionIndex);
                 if (context == null) {

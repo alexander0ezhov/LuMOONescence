@@ -2,21 +2,26 @@ package com.limelight.binding.input.virtual_controller.universal;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.limelight.R;
+import com.limelight.preferences.PreferenceConfiguration;
 
 import java.util.List;
 
@@ -47,14 +52,28 @@ public class UniversalStreamDrawer {
         void onTouchModeChanged(int mode);
 
         /**
-         * The names and ids of the layouts the user has made, or null when there are none to
-         * choose from.
+         * The layouts the user has made, or null when there are none.
          */
         List<UniversalLayoutDefinition> getLayouts();
 
         String getSelectedLayoutId();
 
         void onLayoutChosen(String layoutId);
+
+        /**
+         * Whether the on-screen layout is currently hidden, which is how the screen is seen
+         * without any controls on it.
+         */
+        boolean isLayoutHidden();
+
+        void onLayoutHidden();
+
+        /**
+         * The transparency of the on-screen layout, as a percentage.
+         */
+        int getLayoutOpacity();
+
+        void onLayoutOpacityChanged(int percent);
     }
 
     private final Activity activity;
@@ -62,25 +81,34 @@ public class UniversalStreamDrawer {
 
     private final FrameLayout root;
     private final LinearLayout panel;
+    private final LinearLayout content;
 
     private boolean open;
 
     /**
-     * The row that is unfolded, or null when the menu is showing only its rows.
+     * The row that is unfolded, or null when only the rows themselves are showing.
      */
     private LinearLayout expandedBody;
+
+    private ImageView expandedArrow;
 
     /**
      * How wide the panel is: a quarter of the screen, so the game stays visible beside it.
      */
     private static final float WIDTH_SHARE = 0.25f;
 
-    private static final int PANEL_WIDTH_MIN_DP = 260;
+    private static final int PANEL_WIDTH_MIN_DP = 280;
 
     /**
      * What sits between the title of a row and what is chosen in it.
      */
     private static final String ROW_SEPARATOR = "   \u00b7   ";
+
+    /**
+     * The lowest transparency the slider offers. Below this the controls are hard to see at all,
+     * which makes them look broken rather than faint.
+     */
+    private static final int OPACITY_MIN = 20;
 
     public UniversalStreamDrawer(Activity activity, FrameLayout parent, Host host) {
         this.activity = activity;
@@ -112,10 +140,19 @@ public class UniversalStreamDrawer {
             }
         });
 
+        content = new LinearLayout(activity);
+        content.setOrientation(LinearLayout.VERTICAL);
+
+        ScrollView scroll = new ScrollView(activity);
+        scroll.addView(content, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
         panel.addView(buildTitle(), matchWidth());
-        panel.addView(buildScroll(), new LinearLayout.LayoutParams(
+        panel.addView(scroll, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
         panel.addView(buildExitButton(), matchWidth());
+
+        buildRows();
 
         FrameLayout.LayoutParams panelParams = new FrameLayout.LayoutParams(
                 panelWidth(), ViewGroup.LayoutParams.MATCH_PARENT);
@@ -124,6 +161,20 @@ public class UniversalStreamDrawer {
         root.addView(panel, panelParams);
         parent.addView(root, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    /**
+     * Builds the rows again, so the marks and the values follow what was chosen.
+     */
+    private void buildRows() {
+        content.removeAllViews();
+        expandedBody = null;
+        expandedArrow = null;
+
+        content.addView(buildKeyboardRow(), matchWidth());
+        content.addView(buildTouchModeRow(), matchWidth());
+        content.addView(buildOpacityRow(), matchWidth());
+        content.addView(buildLayoutRow(), matchWidth());
     }
 
     private int panelWidth() {
@@ -144,26 +195,11 @@ public class UniversalStreamDrawer {
         return title;
     }
 
-    private View buildScroll() {
-        ScrollView scroll = new ScrollView(activity);
-        LinearLayout content = new LinearLayout(activity);
-
-        content.setOrientation(LinearLayout.VERTICAL);
-        content.addView(buildKeyboardRow(), matchWidth());
-        content.addView(buildTouchModeRow(), matchWidth());
-        content.addView(buildLayoutRow(), matchWidth());
-
-        scroll.addView(content, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        return scroll;
-    }
-
     /**
      * The row that brings up the software keyboard. It is not a choice, so it has no arrow.
      */
     private View buildKeyboardRow() {
-        TextView row = makeRow(getString(R.string.stream_menu_keyboard), null);
+        TextView row = makePlainRow(getString(R.string.stream_menu_keyboard));
 
         row.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -177,102 +213,139 @@ public class UniversalStreamDrawer {
     }
 
     /**
-     * A row that unfolds into a list of choices, with the chosen one marked.
+     * A row that unfolds into what the touchscreen can do.
      */
     private View buildTouchModeRow() {
-        final TextView row = makeRow(getString(R.string.stream_menu_touch), touchModeName());
-        final LinearLayout body = makeChoiceBody();
+        ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_touch), touchModeName());
+        RadioGroup choices = makeChoiceGroup();
 
-        row.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                unfold(body);
-            }
-        });
+        addChoice(choices, getString(R.string.stream_menu_touch_off),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_OFF,
+                PreferenceConfiguration.TOUCH_MODE_OFF);
 
-        addChoice(body, getString(R.string.stream_menu_touch_off),
-                host.getTouchMode() == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_OFF,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        chooseTouchMode(com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_OFF);
-                    }
-                });
+        addChoice(choices, getString(R.string.stream_menu_touch_trackpad),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TRACKPAD,
+                PreferenceConfiguration.TOUCH_MODE_TRACKPAD);
 
-        addChoice(body, getString(R.string.stream_menu_touch_trackpad),
-                host.getTouchMode() == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TRACKPAD,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        chooseTouchMode(com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TRACKPAD);
-                    }
-                });
+        addChoice(choices, getString(R.string.stream_menu_touch_screen),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN,
+                PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN);
 
-        addChoice(body, getString(R.string.stream_menu_touch_screen),
-                host.getTouchMode() == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        chooseTouchMode(com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN);
-                    }
-                });
+        addChoice(choices, getString(R.string.stream_menu_touch_right_stick),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK,
+                PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK);
 
-        addChoice(body, getString(R.string.stream_menu_touch_right_stick),
-                host.getTouchMode() == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        chooseTouchMode(com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK);
-                    }
-                });
+        // Real touch events, the way a Windows tablet sends them. Marked as an experiment
+        // because it only does anything on a host that takes touch input.
+        addChoice(choices, getString(R.string.stream_menu_touch_events),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS,
+                PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS);
 
-        LinearLayout holder = new LinearLayout(activity);
-        holder.setOrientation(LinearLayout.VERTICAL);
-        holder.addView(row, matchWidth());
-        holder.addView(body, matchWidth());
-
-        return holder;
+        return row.withChoices(choices);
     }
 
     /**
-     * A row that unfolds into the layouts the user has made.
+     * The transparency of the on-screen layout, which is the one setting worth having at hand
+     * while playing: what reads well over one game is invisible over the next.
+     */
+    private View buildOpacityRow() {
+        LinearLayout row = new LinearLayout(activity);
+
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(16), dp(12), dp(16), dp(12));
+        row.setBackground(rowBackground());
+
+        TextView title = new TextView(activity);
+        title.setText(R.string.stream_menu_opacity);
+        title.setTextColor(0xFFE8EAF0);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+        final TextView value = new TextView(activity);
+        value.setTextColor(0xFFE8EAF0);
+        value.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        value.setText(String.valueOf(host.getLayoutOpacity()));
+        value.setMinWidth(dp(38));
+        value.setGravity(Gravity.END);
+
+        final SeekBar slider = new SeekBar(activity);
+        slider.setMax(100 - OPACITY_MIN);
+        slider.setProgress(Math.max(0, Math.min(100 - OPACITY_MIN,
+                host.getLayoutOpacity() - OPACITY_MIN)));
+        slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int percent = OPACITY_MIN + progress;
+
+                value.setText(String.valueOf(percent));
+
+                if (fromUser) {
+                    host.onLayoutOpacityChanged(percent);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        LinearLayout.LayoutParams sliderParams = new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        sliderParams.setMarginStart(dp(10));
+
+        row.addView(title, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        row.addView(slider, sliderParams);
+        row.addView(value);
+
+        return row;
+    }
+
+    /**
+     * A row that unfolds into the layouts the user has made, with the choice to have none at all.
      */
     private View buildLayoutRow() {
-        final TextView row = makeRow(getString(R.string.stream_menu_layout), selectedLayoutName());
-        final LinearLayout body = makeChoiceBody();
+        ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_layout),
+                host.isLayoutHidden()
+                        ? getString(R.string.stream_menu_layout_none)
+                        : selectedLayoutName());
+        RadioGroup choices = makeChoiceGroup();
 
-        row.setOnClickListener(new View.OnClickListener() {
+        // A screen with no controls on it at all, for when the layout is in the way
+        RadioButton none = addChoice(choices, getString(R.string.stream_menu_layout_none),
+                host.isLayoutHidden(), -1);
+
+        none.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                unfold(body);
+                host.onLayoutHidden();
+                close();
             }
         });
 
         List<UniversalLayoutDefinition> layouts = host.getLayouts();
         String selectedId = host.getSelectedLayoutId();
 
-        if (layouts == null || layouts.isEmpty()) {
-            addChoice(body, getString(R.string.stream_menu_no_layouts), true, null);
-        }
-        else {
+        if (layouts != null) {
             for (final UniversalLayoutDefinition layout : layouts) {
-                addChoice(body, layout.getName(), layout.getId().equals(selectedId),
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                host.onLayoutChosen(layout.getId());
-                                close();
-                            }
-                        });
+                RadioButton choice = addChoice(choices, layout.getName(),
+                        !host.isLayoutHidden() && layout.getId().equals(selectedId), -1);
+
+                choice.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        host.onLayoutChosen(layout.getId());
+                        close();
+                    }
+                });
             }
         }
 
-        LinearLayout holder = new LinearLayout(activity);
-        holder.setOrientation(LinearLayout.VERTICAL);
-        holder.addView(row, matchWidth());
-        holder.addView(body, matchWidth());
-
-        return holder;
+        return row.withChoices(choices);
     }
 
     private View buildExitButton() {
@@ -292,7 +365,6 @@ public class UniversalStreamDrawer {
         LinearLayout.LayoutParams params = matchWidth();
         params.setMargins(dp(12), dp(10), dp(12), dp(14));
         exit.setBackground(shape);
-        exit.setLayoutParams(params);
 
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -308,10 +380,13 @@ public class UniversalStreamDrawer {
         return holder;
     }
 
-    private TextView makeRow(String title, String value) {
+    /**
+     * A row with nothing to unfold.
+     */
+    private TextView makePlainRow(String title) {
         TextView row = new TextView(activity);
 
-        row.setText(value == null ? title : title + "   ·   " + value);
+        row.setText(title);
         row.setTextColor(0xFFE8EAF0);
         row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
         row.setPadding(dp(16), dp(14), dp(16), dp(14));
@@ -320,7 +395,66 @@ public class UniversalStreamDrawer {
         return row;
     }
 
-    private android.graphics.drawable.Drawable rowBackground() {
+    /**
+     * A row with the chosen value and an arrow at its right edge.
+     */
+    private ExpandableRow makeExpandableRow(String title, String value) {
+        return new ExpandableRow(title, value);
+    }
+
+    /**
+     * A row that can be unfolded, and the list that belongs to it.
+     */
+    private final class ExpandableRow {
+        private final LinearLayout row;
+        private final ImageView arrow;
+
+        ExpandableRow(String title, String value) {
+            row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(dp(16), dp(14), dp(14), dp(14));
+            row.setBackground(rowBackground());
+
+            TextView titleView = new TextView(activity);
+            titleView.setText(value == null || value.isEmpty()
+                    ? title : title + ROW_SEPARATOR + value);
+            titleView.setTextColor(0xFFE8EAF0);
+            titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+            arrow = new ImageView(activity);
+            arrow.setImageResource(R.drawable.ic_expand_more);
+            arrow.setAlpha(0.75f);
+
+            LinearLayout.LayoutParams arrowParams = new LinearLayout.LayoutParams(dp(18), dp(18));
+            arrowParams.setMarginStart(dp(8));
+
+            row.addView(titleView, new LinearLayout.LayoutParams(0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            row.addView(arrow, arrowParams);
+        }
+
+        /**
+         * Returns the row together with its list, and arranges for the arrow to unfold it.
+         */
+        View withChoices(final RadioGroup choices) {
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    unfold(choices, arrow);
+                }
+            });
+
+            LinearLayout holder = new LinearLayout(activity);
+            holder.setOrientation(LinearLayout.VERTICAL);
+            holder.addView(row, matchWidth());
+            holder.addView(choices, matchWidth());
+
+            return holder;
+        }
+    }
+
+    private Drawable rowBackground() {
         StateListDrawable states = new StateListDrawable();
 
         GradientDrawable pressed = new GradientDrawable();
@@ -335,74 +469,93 @@ public class UniversalStreamDrawer {
         return states;
     }
 
-    private LinearLayout makeChoiceBody() {
-        LinearLayout body = new LinearLayout(activity);
+    /**
+     * The list of choices of one row.
+     *
+     * All the choices of a row go into one group, which is what makes them exclusive: a group of
+     * one per choice would leave every choice the user has ever pressed looking as if it were
+     * still on.
+     */
+    private RadioGroup makeChoiceGroup() {
+        RadioGroup group = new RadioGroup(activity);
 
-        body.setOrientation(LinearLayout.VERTICAL);
-        body.setVisibility(View.GONE);
+        group.setOrientation(RadioGroup.VERTICAL);
+        group.setVisibility(View.GONE);
 
-        return body;
+        return group;
     }
 
-    private void addChoice(LinearLayout body, String label, boolean checked, final Runnable action) {
+    private RadioButton addChoice(RadioGroup group, String label, boolean checked, int touchMode) {
         RadioButton choice = new RadioButton(activity);
 
         choice.setText(label);
         choice.setTextColor(0xFFD8DBE2);
         choice.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
-        choice.setChecked(checked);
         choice.setPadding(dp(24), dp(4), dp(12), dp(4));
+        choice.setTag(touchMode);
 
-        if (action != null) {
+        // The mark is set after the listener would fire, so setting it does not report a choice
+        // the user did not make
+        choice.setChecked(checked);
+
+        if (touchMode >= 0) {
             choice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    action.run();
+                    Object tag = view.getTag();
+
+                    if (tag instanceof Integer) {
+                        host.onTouchModeChanged((Integer) tag);
+                    }
+
+                    close();
                 }
             });
         }
-        else {
-            choice.setEnabled(false);
-        }
 
-        // A radio button in a group of its own is only a mark: the choice is applied at once,
-        // so nothing has to be read back from a group
-        RadioGroup group = new RadioGroup(activity);
         group.addView(choice, matchWidth());
-        body.addView(group, matchWidth());
+        return choice;
     }
 
     /**
      * Opens one of the rows and closes whichever other row was open, so only one list is out at
-     * a time.
+     * a time. The arrow turns over while its list is showing.
      */
-    private void unfold(LinearLayout body) {
+    private void unfold(RadioGroup body, ImageView arrow) {
+        boolean wasOpen = body.getVisibility() == View.VISIBLE;
+
         if (expandedBody != null && expandedBody != body) {
             expandedBody.setVisibility(View.GONE);
+
+            if (expandedArrow != null) {
+                expandedArrow.setRotation(0f);
+            }
         }
 
-        body.setVisibility(body.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-        expandedBody = body.getVisibility() == View.VISIBLE ? body : null;
-    }
+        body.setVisibility(wasOpen ? View.GONE : View.VISIBLE);
+        arrow.setRotation(wasOpen ? 0f : 180f);
 
-    private void chooseTouchMode(int mode) {
-        host.onTouchModeChanged(mode);
-        close();
+        expandedBody = wasOpen ? null : body;
+        expandedArrow = wasOpen ? null : arrow;
     }
 
     private String touchModeName() {
         int mode = host.getTouchMode();
 
-        if (mode == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_OFF) {
+        if (mode == PreferenceConfiguration.TOUCH_MODE_OFF) {
             return getString(R.string.stream_menu_touch_off);
         }
 
-        if (mode == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TRACKPAD) {
+        if (mode == PreferenceConfiguration.TOUCH_MODE_TRACKPAD) {
             return getString(R.string.stream_menu_touch_trackpad);
         }
 
-        if (mode == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN) {
+        if (mode == PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN) {
             return getString(R.string.stream_menu_touch_screen);
+        }
+
+        if (mode == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS) {
+            return getString(R.string.stream_menu_touch_events);
         }
 
         return getString(R.string.stream_menu_touch_right_stick);
@@ -412,17 +565,15 @@ public class UniversalStreamDrawer {
         List<UniversalLayoutDefinition> layouts = host.getLayouts();
         String selectedId = host.getSelectedLayoutId();
 
-        if (layouts == null) {
-            return getString(R.string.stream_menu_no_layouts);
-        }
-
-        for (UniversalLayoutDefinition layout : layouts) {
-            if (layout.getId().equals(selectedId)) {
-                return layout.getName();
+        if (layouts != null) {
+            for (UniversalLayoutDefinition layout : layouts) {
+                if (layout.getId().equals(selectedId)) {
+                    return layout.getName();
+                }
             }
         }
 
-        return getString(R.string.stream_menu_no_layouts);
+        return getString(R.string.stream_menu_layout_none);
     }
 
     private LinearLayout.LayoutParams matchWidth() {
@@ -447,12 +598,27 @@ public class UniversalStreamDrawer {
             return;
         }
 
+        // The rows are rebuilt on every opening, so the marks and the values are what they are
+        // now, whatever changed them in between
+        buildRows();
+
         open = true;
         root.setVisibility(View.VISIBLE);
+
+        // The on-screen controls live in the same layout and are added again whenever the layout
+        // is rebuilt, so the menu asks to be on top rather than assuming it still is
+        root.bringToFront();
 
         // Slides in from the edge of the screen
         panel.setTranslationX(panelWidth());
         panel.animate().translationX(0f).setDuration(180).start();
+    }
+
+    /**
+     * Puts the menu above everything else in its layout.
+     */
+    public void bringToFront() {
+        root.bringToFront();
     }
 
     public void hide() {
@@ -489,9 +655,6 @@ public class UniversalStreamDrawer {
         return true;
     }
 
-    /**
-     * Puts the menu back to its rows, with no list unfolded.
-     */
     private void close() {
         collapse();
         hide();
@@ -502,59 +665,81 @@ public class UniversalStreamDrawer {
             expandedBody.setVisibility(View.GONE);
             expandedBody = null;
         }
+
+        if (expandedArrow != null) {
+            expandedArrow.setRotation(0f);
+            expandedArrow = null;
+        }
     }
 
     /**
-     * Rebuilds the rows, so the marked choices follow what was chosen.
+     * Puts the menu in place with no animation, for the debug smoke test, which draws it into a
+     * picture rather than onto the screen.
      */
-    public void refresh() {
-        // The rows are cheap to rebuild, and rebuilding is what keeps the marks right when the
-        // layout or the touch mode is changed from here
-        View scroll = panel.getChildAt(1);
+    public void settleForTesting() {
+        open = true;
+        root.setVisibility(View.VISIBLE);
+        panel.setTranslationX(0f);
+    }
 
-        if (scroll instanceof ScrollView) {
-            LinearLayout content = (LinearLayout) ((ScrollView) scroll).getChildAt(0);
+    /**
+     * Drags the opacity slider the way a finger does, for the debug smoke test.
+     *
+     * Setting the progress of a slider reports a change that came from the code rather than
+     * from the user, which is deliberately not passed on, so a check has to touch it.
+     */
+    public boolean dragOpacityToForTesting(int percent) {
+        SeekBar slider = findOpacitySlider(content);
 
-            if (content != null) {
-                content.removeAllViews();
-                content.addView(buildKeyboardRow(), matchWidth());
-                content.addView(buildTouchModeRow(), matchWidth());
-                content.addView(buildLayoutRow(), matchWidth());
-            }
+        if (slider == null || slider.getWidth() <= 0) {
+            return false;
         }
 
-        expandedBody = null;
+        int wanted = Math.max(OPACITY_MIN, Math.min(100, percent));
+        float x = slider.getWidth() * (wanted - OPACITY_MIN) / (float)(100 - OPACITY_MIN);
+        float y = slider.getHeight() / 2f;
+        long now = android.os.SystemClock.uptimeMillis();
+
+        MotionEvent down = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, x, y, 0);
+        MotionEvent move = MotionEvent.obtain(now, now, MotionEvent.ACTION_MOVE, x, y, 0);
+        MotionEvent up = MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, x, y, 0);
+
+        slider.dispatchTouchEvent(down);
+        slider.dispatchTouchEvent(move);
+        slider.dispatchTouchEvent(up);
+
+        down.recycle();
+        move.recycle();
+        up.recycle();
+
+        return true;
     }
 
-    /**
-     * The rows of the menu, for the debug smoke test and for checking that nothing was missed.
-     */
-    public List<String> getRowTitlesForTesting() {
-        List<String> titles = new java.util.ArrayList<>();
-
-        collectRows(panel, titles);
-        return titles;
-    }
-
-    private void collectRows(ViewGroup group, List<String> titles) {
+    private SeekBar findOpacitySlider(ViewGroup group) {
         for (int i = 0; i < group.getChildCount(); i++) {
             View child = group.getChildAt(i);
 
-            if (child instanceof TextView && !(child instanceof RadioButton)
-                    && !(child instanceof Button)) {
-                titles.add(((TextView) child).getText().toString());
+            if (child instanceof SeekBar) {
+                return (SeekBar) child;
             }
-            else if (child instanceof ViewGroup) {
-                collectRows((ViewGroup) child, titles);
+
+            if (child instanceof ViewGroup) {
+                SeekBar found = findOpacitySlider((ViewGroup) child);
+
+                if (found != null) {
+                    return found;
+                }
             }
         }
+
+        return null;
     }
 
     /**
      * Presses the row with this title, for the debug smoke test.
      */
     public boolean clickRowForTesting(String title) {
-        View row = findRow(panel, title, true);
+        View row = findRow(content, title, true);
 
         if (row == null) {
             return false;
@@ -568,7 +753,7 @@ public class UniversalStreamDrawer {
      * Presses the choice with this label, for the debug smoke test.
      */
     public boolean clickChoiceForTesting(String label) {
-        View choice = findRow(panel, label, false);
+        View choice = findRow(content, label, false);
 
         if (choice == null) {
             return false;
@@ -578,25 +763,24 @@ public class UniversalStreamDrawer {
         return true;
     }
 
-    /**
-     * The label of a row is its title followed by what is chosen, so a row and a choice can be
-     * told apart by whether the separator is there.
-     */
     private View findRow(ViewGroup group, String label, boolean row) {
         for (int i = 0; i < group.getChildCount(); i++) {
             View child = group.getChildAt(i);
 
             if (child instanceof TextView) {
                 String text = ((TextView) child).getText().toString();
-                boolean isRow = text.startsWith(label + ROW_SEPARATOR);
 
-                if (row ? isRow : (child instanceof RadioButton && text.equals(label))) {
+                if (row && text.startsWith(label + ROW_SEPARATOR)) {
+                    return (View) child.getParent();
+                }
+
+                if (row && text.equals(label) && child.isClickable()
+                        && !(child instanceof RadioButton)) {
+                    // A row with nothing unfolded and no value: the keyboard row
                     return child;
                 }
 
-                // A row with nothing chosen yet is just its title
-                if (row && text.equals(label) && child.isClickable()
-                        && !(child instanceof RadioButton)) {
+                if (!row && child instanceof RadioButton && text.equals(label)) {
                     return child;
                 }
             }
@@ -643,13 +827,100 @@ public class UniversalStreamDrawer {
     }
 
     /**
-     * Puts the menu in place with no animation, for the debug smoke test, which draws it into a
-     * picture rather than onto the screen.
+     * The arrow of a row, for the debug smoke test.
      */
-    public void settleForTesting() {
-        open = true;
-        root.setVisibility(View.VISIBLE);
-        panel.setTranslationX(0f);
+    public ImageView getArrowForTesting(String title) {
+        View row = findRow(content, title, true);
+
+        if (!(row instanceof ViewGroup)) {
+            return null;
+        }
+
+        ViewGroup group = (ViewGroup) row;
+
+        for (int i = group.getChildCount() - 1; i >= 0; i--) {
+            if (group.getChildAt(i) instanceof ImageView) {
+                return (ImageView) group.getChildAt(i);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * How many groups the choices of a row are spread over. One is what makes them exclusive.
+     */
+    public int getChoiceGroupsForTesting(String title) {
+        View row = findRow(content, title, true);
+
+        if (!(row instanceof ViewGroup) || !(((ViewGroup) row).getParent() instanceof ViewGroup)) {
+            return 0;
+        }
+
+        ViewGroup holder = (ViewGroup) ((ViewGroup) row).getParent();
+        int groups = 0;
+
+        for (int i = 0; i < holder.getChildCount(); i++) {
+            if (holder.getChildAt(i) instanceof RadioGroup) {
+                groups++;
+            }
+        }
+
+        return groups;
+    }
+
+    /**
+     * How many choices of a row are marked. Only ever one.
+     */
+    public int getMarkedChoicesForTesting(String title) {
+        View row = findRow(content, title, true);
+
+        if (!(row instanceof ViewGroup) || !(((ViewGroup) row).getParent() instanceof ViewGroup)) {
+            return -1;
+        }
+
+        return countChecked((ViewGroup) ((ViewGroup) row).getParent());
+    }
+
+    private int countChecked(ViewGroup group) {
+        int checked = 0;
+
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof RadioButton && ((RadioButton) child).isChecked()) {
+                checked++;
+            }
+            else if (child instanceof ViewGroup) {
+                checked += countChecked((ViewGroup) child);
+            }
+        }
+
+        return checked;
+    }
+
+    /**
+     * The rows of the menu, for the debug smoke test and for checking that nothing was missed.
+     */
+    public List<String> getRowTitlesForTesting() {
+        List<String> titles = new java.util.ArrayList<>();
+
+        collectRows(content, titles);
+        return titles;
+    }
+
+    private void collectRows(ViewGroup group, List<String> titles) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof TextView && !(child instanceof RadioButton)
+                    && !(child instanceof Button)) {
+                titles.add(((TextView) child).getText().toString());
+            }
+            else if (child instanceof ViewGroup) {
+                collectRows((ViewGroup) child, titles);
+            }
+        }
     }
 
     /**
@@ -659,9 +930,6 @@ public class UniversalStreamDrawer {
         return root;
     }
 
-    /**
-     * Whether the sheet that closes the menu covers the whole screen.
-     */
     public View getSheetForTesting() {
         return root;
     }

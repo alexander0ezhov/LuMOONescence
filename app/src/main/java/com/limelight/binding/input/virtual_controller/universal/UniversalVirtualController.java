@@ -592,9 +592,7 @@ public class UniversalVirtualController {
      * The transparency of the layout, 0..1. One means fully opaque.
      */
     public float getElementOpacity() {
-        int percent = PreferenceManager.getDefaultSharedPreferences(context)
-                .getInt(PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING,
-                        PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_DEFAULT);
+        int percent = PreferenceConfiguration.getUniversalLayoutOpacity(context);
 
         return Math.max(0.05f, Math.min(1f, percent / 100f));
     }
