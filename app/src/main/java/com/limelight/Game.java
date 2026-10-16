@@ -8,6 +8,8 @@ import com.limelight.binding.input.KeyboardTranslator;
 import com.limelight.binding.input.capture.InputCaptureManager;
 import com.limelight.binding.input.capture.InputCaptureProvider;
 import com.limelight.binding.input.touch.AbsoluteTouchContext;
+import com.limelight.binding.input.touch.OffTouchContext;
+import com.limelight.binding.input.touch.RightStickTouchContext;
 import com.limelight.binding.input.touch.RelativeTouchContext;
 import com.limelight.binding.input.driver.UsbDriverService;
 import com.limelight.binding.input.evdev.EvdevListener;
@@ -15,6 +17,7 @@ import com.limelight.binding.input.touch.TouchContext;
 import com.limelight.binding.input.virtual_controller.VirtualController;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutStore;
+import com.limelight.binding.input.virtual_controller.universal.UniversalStreamDrawer;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualController;
 import com.limelight.binding.video.CrashListener;
 import com.limelight.binding.video.MediaCodecDecoderRenderer;
@@ -88,6 +91,7 @@ import java.lang.reflect.Method;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -497,16 +501,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         inputManager.registerInputDeviceListener(keyboardTranslator, null);
 
         // Initialize touch contexts
-        for (int i = 0; i < touchContextMap.length; i++) {
-            if (!prefConfig.touchscreenTrackpad) {
-                touchContextMap[i] = new AbsoluteTouchContext(conn, i, streamView);
-            }
-            else {
-                touchContextMap[i] = new RelativeTouchContext(conn, i,
-                        REFERENCE_HORIZ_RES, REFERENCE_VERT_RES,
-                        streamView, prefConfig);
-            }
-        }
+        setUpTouchContexts();
 
         if (prefConfig.onscreenController) {
             // create virtual onscreen controller
@@ -529,6 +524,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             universalVirtualController.refreshLayout();
         }
 
+        // The menu of the stream is added last, so it is above the on-screen controls
+        setUpStreamDrawer();
+
         if (prefConfig.usbDriver) {
             // Start the USB driver
             bindService(new Intent(this, UsbDriverService.class),
@@ -549,6 +547,92 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         // The connection will be started when the surface gets created
         streamView.getHolder().addCallback(this);
+    }
+
+    /**
+     * The menu that slides in from the right, which the back button opens.
+     */
+    private UniversalStreamDrawer streamDrawer;
+
+    private void setUpStreamDrawer() {
+        FrameLayout area = (FrameLayout) streamView.getParent();
+
+        if (area == null) {
+            return;
+        }
+
+        streamDrawer = new UniversalStreamDrawer(this, area, new UniversalStreamDrawer.Host() {
+            @Override
+            public void onExitStream() {
+                finish();
+            }
+
+            @Override
+            public void onShowKeyboard() {
+                InputMethodManager inputManager =
+                        (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(getWindow().getDecorView(),
+                        InputMethodManager.SHOW_IMPLICIT);
+            }
+
+            @Override
+            public int getTouchMode() {
+                return prefConfig.touchMode;
+            }
+
+            @Override
+            public void onTouchModeChanged(int mode) {
+                applyTouchMode(mode);
+            }
+
+            @Override
+            public List<UniversalLayoutDefinition> getLayouts() {
+                return UniversalLayoutStore.getInstance(Game.this).getLayouts();
+            }
+
+            @Override
+            public String getSelectedLayoutId() {
+                return UniversalLayoutStore.getInstance(Game.this).getSelectedLayoutId();
+            }
+
+            @Override
+            public void onLayoutChosen(String layoutId) {
+                chooseUniversalLayout(layoutId);
+            }
+        });
+    }
+
+    /**
+     * Shows another layout, now if the on-screen layout is running and at the next stream if it
+     * is not.
+     */
+    private void chooseUniversalLayout(String layoutId) {
+        UniversalLayoutStore.getInstance(this).setSelectedLayoutId(layoutId);
+
+        if (universalVirtualController != null) {
+            universalVirtualController.loadLayout(layoutId);
+            return;
+        }
+
+        // The layout feature is switched off, so there is nothing on screen to replace. The
+        // choice is kept rather than shown, so the switch in the layouts screen still means
+        // what it says.
+        UniversalLayoutDefinition chosen =
+                UniversalLayoutStore.getInstance(this).getLayout(layoutId);
+
+        Toast.makeText(this, getString(R.string.stream_menu_layout_next_time,
+                chosen == null ? layoutId : chosen.getName()), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Back opens the stream menu rather than ending the stream outright. A press while the
+        // menu is open leaves the stream, which is what the button at the bottom of it does.
+        if (streamDrawer != null && streamDrawer.handleBack()) {
+            return;
+        }
+
+        super.onBackPressed();
     }
 
     private void setPreferredOrientationForCurrentDisplay() {
@@ -1523,6 +1607,46 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         conn.sendUtf8Text(event.getCharacters());
         return true;
+    }
+
+    /**
+     * Builds the touch handlers for what the touchscreen is set to do.
+     *
+     * It is a method rather than a loop in the setup because the stream menu can change the
+     * setting while streaming, and the change has to take effect at once.
+     */
+    private void setUpTouchContexts() {
+        for (int i = 0; i < touchContextMap.length; i++) {
+            switch (prefConfig.touchMode) {
+                case PreferenceConfiguration.TOUCH_MODE_OFF:
+                    touchContextMap[i] = new OffTouchContext(i);
+                    break;
+
+                case PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK:
+                    touchContextMap[i] = new RightStickTouchContext(controllerHandler, i, streamView);
+                    break;
+
+                case PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN:
+                    touchContextMap[i] = new AbsoluteTouchContext(conn, i, streamView);
+                    break;
+
+                default:
+                    touchContextMap[i] = new RelativeTouchContext(conn, i,
+                            REFERENCE_HORIZ_RES, REFERENCE_VERT_RES,
+                            streamView, prefConfig);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Changes what the touchscreen does, now and for the next stream.
+     */
+    public void applyTouchMode(int mode) {
+        prefConfig.touchMode = mode;
+        PreferenceConfiguration.setTouchMode(this, mode);
+
+        setUpTouchContexts();
     }
 
     private TouchContext getTouchContext(int actionIndex)

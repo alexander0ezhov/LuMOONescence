@@ -249,8 +249,7 @@ public class UniversalLayoutsActivity extends Activity {
 
     private void showDeleteDialog(final UniversalLayoutDefinition layout) {
         new AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_title_delete_layout)
-                .setMessage(getString(R.string.dialog_text_delete_layout, layout.getName()))
+                .setTitle(getString(R.string.dialog_title_delete_control, layout.getName()))
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

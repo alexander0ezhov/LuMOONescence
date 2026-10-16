@@ -67,6 +67,26 @@ public class PreferenceConfiguration {
     private static final String VIBRATE_FALLBACK_STRENGTH_PREF_STRING = "seekbar_vibrate_fallback_strength";
     private static final String FLIP_FACE_BUTTONS_PREF_STRING = "checkbox_flip_face_buttons";
     private static final String TOUCHSCREEN_TRACKPAD_PREF_STRING = "checkbox_touchscreen_trackpad";
+
+    /**
+     * What the touchscreen does while streaming, which the stream's own menu can change.
+     *
+     * This is one setting rather than the pair of switches it replaces, because the choices are
+     * exclusive: a touch cannot both move the mouse and push a stick.
+     */
+    private static final String TOUCH_MODE_PREF_STRING = "touch_screen_mode";
+
+    /** The touchscreen does nothing. */
+    public static final int TOUCH_MODE_OFF = 0;
+
+    /** The touchscreen moves the mouse like a trackpad. */
+    public static final int TOUCH_MODE_TRACKPAD = 1;
+
+    /** The touchscreen moves the mouse pointer to where the finger is. */
+    public static final int TOUCH_MODE_TOUCHSCREEN = 2;
+
+    /** The touchscreen pushes the right analog stick. */
+    public static final int TOUCH_MODE_RIGHT_STICK = 3;
     private static final String LATENCY_TOAST_PREF_STRING = "checkbox_enable_post_stream_toast";
     private static final String FRAME_PACING_PREF_STRING = "frame_pacing";
     private static final String ABSOLUTE_MOUSE_MODE_PREF_STRING = "checkbox_absolute_mouse_mode";
@@ -156,6 +176,11 @@ public class PreferenceConfiguration {
     public boolean vibrateFallbackToDevice;
     public int vibrateFallbackToDeviceStrength;
     public boolean touchscreenTrackpad;
+
+    /**
+     * What the touchscreen does, one of the TOUCH_MODE_ values.
+     */
+    public int touchMode;
     public MoonBridge.AudioConfiguration audioConfiguration;
     public int framePacing;
     public boolean absoluteMouseMode;
@@ -354,6 +379,18 @@ public class PreferenceConfiguration {
         return getDefaultBitrate(
                 prefs.getString(RESOLUTION_PREF_STRING, DEFAULT_RESOLUTION),
                 prefs.getString(FPS_PREF_STRING, DEFAULT_FPS));
+    }
+
+    /**
+     * Stores what the touchscreen should do while streaming.
+     *
+     * The running stream is told separately, so the choice takes effect at once rather than at
+     * the next connection.
+     */
+    public static void setTouchMode(Context context, int mode) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(TOUCH_MODE_PREF_STRING, mode)
+                .apply();
     }
 
     private static FormatOption getVideoFormatValue(Context context) {
@@ -604,6 +641,21 @@ public class PreferenceConfiguration {
         config.vibrateFallbackToDeviceStrength = prefs.getInt(VIBRATE_FALLBACK_STRENGTH_PREF_STRING, DEFAULT_VIBRATE_FALLBACK_STRENGTH);
         config.flipFaceButtons = prefs.getBoolean(FLIP_FACE_BUTTONS_PREF_STRING, DEFAULT_FLIP_FACE_BUTTONS);
         config.touchscreenTrackpad = prefs.getBoolean(TOUCHSCREEN_TRACKPAD_PREF_STRING, DEFAULT_TOUCHSCREEN_TRACKPAD);
+
+        // The switches above are what an existing user already had, so they decide what the
+        // touchscreen does until the mode is chosen in the stream's menu
+        int legacyTouchMode;
+        if (!config.mouseEmulation) {
+            legacyTouchMode = TOUCH_MODE_OFF;
+        }
+        else if (config.touchscreenTrackpad) {
+            legacyTouchMode = TOUCH_MODE_TRACKPAD;
+        }
+        else {
+            legacyTouchMode = TOUCH_MODE_TOUCHSCREEN;
+        }
+
+        config.touchMode = prefs.getInt(TOUCH_MODE_PREF_STRING, legacyTouchMode);
         config.enableLatencyToast = prefs.getBoolean(LATENCY_TOAST_PREF_STRING, DEFAULT_LATENCY_TOAST);
         config.absoluteMouseMode = prefs.getBoolean(ABSOLUTE_MOUSE_MODE_PREF_STRING, DEFAULT_ABSOLUTE_MOUSE_MODE);
         config.enableAudioFx = prefs.getBoolean(ENABLE_AUDIO_FX_PREF_STRING, DEFAULT_ENABLE_AUDIO_FX);

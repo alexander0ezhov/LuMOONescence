@@ -170,7 +170,8 @@ public class UniversalLayoutEditorActivity extends Activity
         copiedBorderRadius = element.getConfig().getBorderRadius();
         hasCopiedSize = true;
 
-        Toast.makeText(this, R.string.menu_copy_size, Toast.LENGTH_SHORT).show();
+        // Nothing is announced: the drawer shows "Paste size" becoming available, which says
+        // the same thing without covering the layout the user is looking at
     }
 
     /**
@@ -875,8 +876,7 @@ public class UniversalLayoutEditorActivity extends Activity
 
     private void showDeleteElementDialog(final UniversalVirtualControllerElement element) {
         showDialog(new AlertDialog.Builder(this)
-                .setTitle(R.string.menu_delete)
-                .setMessage(getString(R.string.dialog_text_delete_layout, element.getElementName()))
+                .setTitle(getString(R.string.dialog_title_delete_control, element.getElementName()))
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

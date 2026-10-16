@@ -102,7 +102,7 @@ public class UniversalVirtualController {
     private final ControllerHandler controllerHandler;
     private final Context context;
     private final Handler handler;
-    private final String layoutId;
+    private String layoutId;
 
     private final Runnable delayedRetransmitRunnable = new Runnable() {
         @Override
@@ -121,7 +121,6 @@ public class UniversalVirtualController {
     ControllerMode currentMode = ControllerMode.Active;
     ControllerInputContext inputContext = new ControllerInputContext();
 
-    private Button buttonConfigure = null;
 
     private List<UniversalVirtualControllerElement> elements = new ArrayList<>();
 
@@ -181,36 +180,6 @@ public class UniversalVirtualController {
         this.layoutId = layoutId;
         this.handler = new Handler(Looper.getMainLooper());
 
-        buttonConfigure = new Button(context);
-        buttonConfigure.setAlpha(0.25f);
-        buttonConfigure.setFocusable(false);
-        buttonConfigure.setBackgroundResource(R.drawable.ic_settings);
-        buttonConfigure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message;
-
-                if (currentMode == ControllerMode.Active){
-                    currentMode = ControllerMode.MoveButtons;
-                    message = "Entering configuration mode (Move buttons)";
-                } else if (currentMode == ControllerMode.MoveButtons) {
-                    currentMode = ControllerMode.ResizeButtons;
-                    message = "Entering configuration mode (Resize buttons)";
-                } else {
-                    currentMode = ControllerMode.Active;
-                    saveLayoutConfiguration();
-                    message = "Exiting configuration mode";
-                }
-
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-
-                buttonConfigure.invalidate();
-
-                for (UniversalVirtualControllerElement element : elements) {
-                    element.invalidate();
-                }
-            }
-        });
     }
 
     public ControllerHandler getControllerHandler() {
@@ -289,7 +258,6 @@ public class UniversalVirtualController {
      */
     public void setConfigurationButtonVisible(boolean visible) {
         configurationButtonEnabled = visible;
-        buttonConfigure.setVisibility(visible && this.visible ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -334,7 +302,6 @@ public class UniversalVirtualController {
         }
         elements.clear();
 
-        frame_layout.removeView(buttonConfigure);
 
         destroyed = true;
     }
@@ -418,7 +385,6 @@ public class UniversalVirtualController {
 
         this.visible = visible;
 
-        buttonConfigure.setVisibility(getConfigurationButtonVisibility());
 
         for (UniversalVirtualControllerElement element : elements) {
             element.setVisibility(getViewVisibility());
@@ -433,13 +399,6 @@ public class UniversalVirtualController {
         return visible ? View.VISIBLE : View.INVISIBLE;
     }
 
-    private int getConfigurationButtonVisibility() {
-        if (!configurationButtonEnabled) {
-            return View.GONE;
-        }
-
-        return getViewVisibility();
-    }
 
     public void removeElements() {
         for (UniversalVirtualControllerElement element : elements) {
@@ -447,7 +406,6 @@ public class UniversalVirtualController {
         }
         elements.clear();
 
-        frame_layout.removeView(buttonConfigure);
     }
 
     public void addElement(UniversalVirtualControllerElement element, int x, int y, int width, int height) {
@@ -571,21 +529,25 @@ public class UniversalVirtualController {
      * Rebuilds the layout from scratch: the built-in default layout first, then the
      * geometry the user saved on top of it. The visibility of the layout is preserved.
      */
+    /**
+     * Shows another layout in place of this one, without interrupting the stream.
+     *
+     * The controls of the old layout are taken away by rebuilding, so nothing of it is left
+     * behind and the new one is placed, made visible and announced to the host exactly as it
+     * would have been at the start of the stream.
+     */
+    public void loadLayout(String layoutId) {
+        this.layoutId = layoutId;
+
+        refreshLayout();
+    }
+
     public void refreshLayout() {
         if (destroyed) {
             return;
         }
 
         removeElements();
-
-        DisplayMetrics screen = context.getResources().getDisplayMetrics();
-
-        int buttonSize = (int)(screen.heightPixels*0.06f);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(buttonSize, buttonSize);
-        params.leftMargin = 15;
-        params.topMargin = 15;
-        frame_layout.addView(buttonConfigure, params);
-        buttonConfigure.setVisibility(getConfigurationButtonVisibility());
 
         UniversalLayoutConfigurationLoader.createDefaultLayout(this, context);
         UniversalLayoutConfigurationLoader.loadFromPreferences(this, context, layoutId);

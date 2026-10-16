@@ -32,6 +32,9 @@ import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutD
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutEditorActivity;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutExchange;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutShareProvider;
+import com.limelight.binding.input.virtual_controller.universal.UniversalStreamDrawer;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutStore;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualController;
 import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualControllerElement;
@@ -621,6 +624,7 @@ public class LayoutSmokeActivity extends Activity {
         checkImportingDoesNotShrinkALayout();
         checkExportThenImportKeepsEveryControl();
         checkASharedLayoutCanBeReadBack();
+        checkStreamMenu();
     }
 
     /**
@@ -2702,6 +2706,193 @@ public class LayoutSmokeActivity extends Activity {
         store.deleteLayout(source.getId());
     }
 
+
+    /**
+     * The menu that takes the place of the back button ending the stream.
+     *
+     * It is checked on its own with a stand-in stream, because a real one needs a host to
+     * connect to.
+     */
+    private void checkStreamMenu() {
+        final int[] chosenTouchMode = new int[]{-1};
+        final String[] chosenLayout = new String[]{null};
+        final boolean[] keyboardAsked = new boolean[]{false};
+        final boolean[] exited = new boolean[]{false};
+
+        final java.util.List<UniversalLayoutDefinition> layouts = new java.util.ArrayList<>();
+        layouts.add(new UniversalLayoutDefinition("one", "First layout", "", 0));
+        layouts.add(new UniversalLayoutDefinition("two", "Second layout", "", 0));
+
+        FrameLayout area = new FrameLayout(this);
+        UniversalStreamDrawer drawer = new UniversalStreamDrawer(this, area,
+                new UniversalStreamDrawer.Host() {
+                    @Override
+                    public void onExitStream() {
+                        exited[0] = true;
+                    }
+
+                    @Override
+                    public void onShowKeyboard() {
+                        keyboardAsked[0] = true;
+                    }
+
+                    @Override
+                    public int getTouchMode() {
+                        return chosenTouchMode[0] < 0
+                                ? com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TRACKPAD
+                                : chosenTouchMode[0];
+                    }
+
+                    @Override
+                    public void onTouchModeChanged(int mode) {
+                        chosenTouchMode[0] = mode;
+                    }
+
+                    @Override
+                    public java.util.List<UniversalLayoutDefinition> getLayouts() {
+                        return layouts;
+                    }
+
+                    @Override
+                    public String getSelectedLayoutId() {
+                        return "one";
+                    }
+
+                    @Override
+                    public void onLayoutChosen(String layoutId) {
+                        chosenLayout[0] = layoutId;
+                    }
+                });
+
+        check("the stream menu starts closed", !drawer.isOpen());
+
+        // The sheet that closes the menu has to be on screen and touchable, or a tap outside
+        // would fall through to the game
+        check("the stream menu has a sheet over the screen",
+                drawer.getSheetForTesting() != null && drawer.getSheetForTesting().isClickable());
+
+        check("the first press of back opens the stream menu", drawer.handleBack());
+        check("the stream menu is open after back", drawer.isOpen());
+
+        java.util.List<String> rows = drawer.getRowTitlesForTesting();
+
+        android.util.Log.i("LayoutSmoke", "stream menu rows: " + rows);
+
+        check("the stream menu offers the keyboard",
+                containsLabel(rows, getString(R.string.stream_menu_keyboard)));
+        check("the stream menu offers the touch setting",
+                containsLabel(rows, getString(R.string.stream_menu_touch)));
+        check("the stream menu offers the layout",
+                containsLabel(rows, getString(R.string.stream_menu_layout)));
+
+        Button exit = drawer.getExitButtonForTesting();
+
+        android.util.Log.i("LayoutSmoke", "exit button: " + exit + " text="
+                + (exit == null ? "none" : exit.getText()) + " expected="
+                + getString(R.string.stream_menu_exit) + " tree=" + describeTree(drawer.getView()));
+
+        check("the stream menu has a button to leave the stream",
+                exit != null && getString(R.string.stream_menu_exit).contentEquals(exit.getText()));
+
+        // A press of back while the menu is open leaves the stream
+        check("a press of back while the menu is open is used", drawer.handleBack());
+        check("a press of back while the menu is open leaves the stream", exited[0]);
+
+        exited[0] = false;
+
+        // Tapping outside closes the menu and does nothing else
+        drawer.show();
+        drawer.getSheetForTesting().performClick();
+
+        check("tapping outside the stream menu closes it", !drawer.isOpen());
+        check("tapping outside the stream menu does not leave the stream", !exited[0]);
+
+        // The rows unfold, and a choice is applied at once
+        drawer.show();
+
+        check("the touch setting unfolds",
+                drawer.clickRowForTesting(getString(R.string.stream_menu_touch)));
+        check("the touch setting offers turning the touchscreen off",
+                drawer.clickChoiceForTesting(getString(R.string.stream_menu_touch_off)));
+
+        check("choosing a touch mode reports it",
+                chosenTouchMode[0] == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_OFF);
+        check("choosing a touch mode closes the menu", !drawer.isOpen());
+
+        drawer.show();
+
+        check("the touch setting unfolds again",
+                drawer.clickRowForTesting(getString(R.string.stream_menu_touch)));
+        check("the touch setting offers the right stick",
+                drawer.clickChoiceForTesting(getString(R.string.stream_menu_touch_right_stick)));
+
+        check("the right stick can be chosen",
+                chosenTouchMode[0] == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK);
+
+        drawer.show();
+
+        check("the layout row unfolds",
+                drawer.clickRowForTesting(getString(R.string.stream_menu_layout)));
+        check("a layout can be chosen",
+                drawer.clickChoiceForTesting("Second layout"));
+
+        check("choosing a layout reports it", "two".equals(chosenLayout[0]));
+        check("choosing a layout closes the menu", !drawer.isOpen());
+
+        // The keyboard row closes the menu and asks for the keyboard, rather than toggling it
+        drawer.show();
+
+        check("the keyboard row answers a press",
+                drawer.clickRowForTesting(getString(R.string.stream_menu_keyboard)));
+        check("the keyboard row asks for the keyboard", keyboardAsked[0]);
+        check("the keyboard row closes the menu", !drawer.isOpen());
+
+        // And the button at the bottom is the other way out
+        drawer.show();
+        exit.performClick();
+
+        check("the button at the bottom leaves the stream", exited[0]);
+    }
+
+    /**
+     * What is in a view tree, which is how a check can tell that something was never added.
+     */
+    private String describeTree(View view) {
+        StringBuilder text = new StringBuilder(view.getClass().getSimpleName());
+
+        if (view instanceof android.widget.TextView) {
+            text.append("(").append(((android.widget.TextView) view).getText()).append(")");
+        }
+
+        if (view instanceof ViewGroup) {
+            text.append("[");
+
+            ViewGroup group = (ViewGroup) view;
+
+            for (int i = 0; i < group.getChildCount(); i++) {
+                if (i > 0) {
+                    text.append(", ");
+                }
+
+                text.append(describeTree(group.getChildAt(i)));
+            }
+
+            text.append("]");
+        }
+
+        return text.toString();
+    }
+
+    private static boolean containsLabel(java.util.List<String> labels, String label) {
+        for (String text : labels) {
+            if (text.startsWith(label)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
             if (label.contains(needle)) {
@@ -2770,6 +2961,17 @@ public class LayoutSmokeActivity extends Activity {
         // Starting this activity with --ez showDrawer true leaves the editor on screen with a
         // control's drawer open, so the drawer itself can be looked at. Touch cannot be
         // injected on every device, so this is how the editor's own look is inspected.
+        // Starting this activity with --ez showStreamMenu true leaves the stream menu on screen,
+        // so its look can be inspected. A real stream needs a host to connect to.
+        if (getIntent().getBooleanExtra("showStreamMenu", false)) {
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showStreamMenuForInspection();
+                }
+            }, 1500);
+        }
+
         if (getIntent().getBooleanExtra("showDrawer", false)) {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
@@ -2792,6 +2994,81 @@ public class LayoutSmokeActivity extends Activity {
                 }
             }, 2000);
         }
+    }
+
+    /**
+     * Puts the stream menu on screen with a stand-in stream behind it.
+     */
+    private void showStreamMenuForInspection() {
+        java.util.List<UniversalLayoutDefinition> demo = new java.util.ArrayList<>();
+        demo.add(new UniversalLayoutDefinition("one", "Phone", "", 0));
+        demo.add(new UniversalLayoutDefinition("two", "Tablet", "", 0));
+
+        View content = findViewById(android.R.id.content);
+
+        if (!(content instanceof FrameLayout)) {
+            return;
+        }
+
+        UniversalStreamDrawer drawer = new UniversalStreamDrawer(this, (FrameLayout) content,
+                new UniversalStreamDrawer.Host() {
+                    @Override
+                    public void onExitStream() {
+                    }
+
+                    @Override
+                    public void onShowKeyboard() {
+                    }
+
+                    @Override
+                    public int getTouchMode() {
+                        return com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN;
+                    }
+
+                    @Override
+                    public void onTouchModeChanged(int mode) {
+                    }
+
+                    @Override
+                    public java.util.List<UniversalLayoutDefinition> getLayouts() {
+                        return demo;
+                    }
+
+                    @Override
+                    public String getSelectedLayoutId() {
+                        return "one";
+                    }
+
+                    @Override
+                    public void onLayoutChosen(String layoutId) {
+                    }
+                });
+
+        drawer.settleForTesting();
+
+        // The touch row is left open, so the choices are in the picture as well
+        drawer.clickRowForTesting(getString(R.string.stream_menu_touch));
+
+        // Drawn into a picture rather than left on the screen: what is on the screen belongs to
+        // whichever activity is in front, and this one may already have stepped back
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels;
+
+        View view = drawer.getView();
+        view.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY));
+        view.layout(0, 0, width, height);
+
+        android.graphics.Bitmap picture = android.graphics.Bitmap.createBitmap(width, height,
+                android.graphics.Bitmap.Config.ARGB_8888);
+
+        // A dark backdrop stands in for the game behind the menu
+        Canvas canvas = new Canvas(picture);
+        canvas.drawColor(0xFF202020);
+        view.draw(canvas);
+
+        saveBitmapForInspection(picture, "stream-menu.png");
+        picture.recycle();
     }
 
     /**
