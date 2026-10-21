@@ -664,6 +664,23 @@ public abstract class UniversalVirtualControllerElement extends View {
             pressWatchActive = false;
         }
 
+        // A control that passes movement on keeps its own press while the same finger goes on to
+        // look around: holding it keeps firing, and moving the finger turns the view. Only a
+        // stream has anything to pass the movement to.
+        if (event.getActionMasked() == MotionEvent.ACTION_MOVE
+                && getConfig().isPassThrough()
+                && controller.getControllerMode() == UniversalVirtualController.ControllerMode.Active) {
+            // The control sits directly in the layout area, so its own corner plus the touch
+            // inside it is a place in the area
+            controller.notifyPassThroughMoved((int)(getX() + event.getX()),
+                    (int)(getY() + event.getY()));
+        }
+        else if ((event.getActionMasked() == MotionEvent.ACTION_UP
+                || event.getActionMasked() == MotionEvent.ACTION_CANCEL)
+                && getConfig().isPassThrough()) {
+            controller.notifyPassThroughEnded();
+        }
+
         boolean handled;
 
         if (controller.getControllerMode() == UniversalVirtualController.ControllerMode.Active) {

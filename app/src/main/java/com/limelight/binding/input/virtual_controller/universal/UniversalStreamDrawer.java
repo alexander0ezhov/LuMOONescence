@@ -61,12 +61,12 @@ public class UniversalStreamDrawer {
         void onLayoutChosen(String layoutId);
 
         /**
-         * Whether the on-screen layout is currently hidden, which is how the screen is seen
-         * without any controls on it.
+         * Whether the on-screen controls are shown at all. Like the touch setting, this is
+         * remembered, so the next stream starts the same way.
          */
-        boolean isLayoutHidden();
+        boolean isOnScreenControlsEnabled();
 
-        void onLayoutHidden();
+        void onOnScreenControlsToggled(boolean enabled);
 
         /**
          * The transparency of the on-screen layout, as a percentage.
@@ -173,6 +173,7 @@ public class UniversalStreamDrawer {
 
         content.addView(buildKeyboardRow(), matchWidth());
         content.addView(buildTouchModeRow(), matchWidth());
+        content.addView(buildControlsRow(), matchWidth());
         content.addView(buildLayoutRow(), matchWidth());
         content.addView(buildOpacityRow(), matchWidth());
     }
@@ -245,6 +246,50 @@ public class UniversalStreamDrawer {
     }
 
     /**
+     * The switch that turns the on-screen controls off altogether, which is how the screen is
+     * seen with nothing on it.
+     */
+    private View buildControlsRow() {
+        LinearLayout row = new LinearLayout(activity);
+
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(16), dp(10), dp(14), dp(10));
+        row.setBackground(rowBackground());
+
+        TextView title = new TextView(activity);
+        title.setText(R.string.stream_menu_controls);
+        title.setTextColor(0xFFE8EAF0);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+        final android.widget.Switch toggle = new android.widget.Switch(activity);
+
+        // The mark is set before the listener is attached, so building the row does not report
+        // a change nobody made
+        toggle.setChecked(host.isOnScreenControlsEnabled());
+        toggle.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(android.widget.CompoundButton button, boolean checked) {
+                host.onOnScreenControlsToggled(checked);
+            }
+        });
+
+        // The whole row works as the switch, which is easier to hit than the switch itself
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggle.setChecked(!toggle.isChecked());
+            }
+        });
+
+        row.addView(title, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        row.addView(toggle);
+
+        return row;
+    }
+
+    /**
      * The transparency of the on-screen layout, which is the one setting worth having at hand
      * while playing: what reads well over one game is invisible over the next.
      */
@@ -310,22 +355,8 @@ public class UniversalStreamDrawer {
      */
     private View buildLayoutRow() {
         ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_layout),
-                host.isLayoutHidden()
-                        ? getString(R.string.stream_menu_layout_none)
-                        : selectedLayoutName());
+                selectedLayoutName());
         RadioGroup choices = makeChoiceGroup();
-
-        // A screen with no controls on it at all, for when the layout is in the way
-        RadioButton none = addChoice(choices, getString(R.string.stream_menu_layout_none),
-                host.isLayoutHidden(), -1);
-
-        none.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                host.onLayoutHidden();
-                close();
-            }
-        });
 
         List<UniversalLayoutDefinition> layouts = host.getLayouts();
         String selectedId = host.getSelectedLayoutId();
@@ -333,7 +364,7 @@ public class UniversalStreamDrawer {
         if (layouts != null) {
             for (final UniversalLayoutDefinition layout : layouts) {
                 RadioButton choice = addChoice(choices, layout.getName(),
-                        !host.isLayoutHidden() && layout.getId().equals(selectedId), -1);
+                        layout.getId().equals(selectedId), -1);
 
                 choice.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -573,7 +604,7 @@ public class UniversalStreamDrawer {
             }
         }
 
-        return getString(R.string.stream_menu_layout_none);
+        return "";
     }
 
     private LinearLayout.LayoutParams matchWidth() {
@@ -774,10 +805,21 @@ public class UniversalStreamDrawer {
                     return (View) child.getParent();
                 }
 
-                if (row && text.equals(label) && child.isClickable()
-                        && !(child instanceof RadioButton)) {
-                    // A row with nothing unfolded and no value: the keyboard row
-                    return child;
+                if (row && text.equals(label) && !(child instanceof RadioButton)) {
+                    // A row with nothing unfolded and no value. It may be the title itself that
+                    // is pressed, or the line around it, which is what makes a switch easier to
+                    // hit than the switch alone.
+                    View pressable = child;
+
+                    while (pressable != null && !pressable.isClickable()
+                            && pressable != content) {
+                        android.view.ViewParent parent = pressable.getParent();
+                        pressable = parent instanceof View ? (View) parent : null;
+                    }
+
+                    if (pressable != null && pressable.isClickable() && pressable != content) {
+                        return pressable;
+                    }
                 }
 
                 if (!row && child instanceof RadioButton && text.equals(label)) {

@@ -389,6 +389,21 @@ public class PreferenceConfiguration {
     }
 
     /**
+     * Whether the on-screen layout is used at all. It is the switch on the layouts screen and
+     * the switch in the stream menu, which is why both write it here.
+     */
+    public static boolean isUniversalLayoutEnabled(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(UNIVERSAL_LAYOUT_PREF_STRING, UNIVERSAL_LAYOUT_DEFAULT);
+    }
+
+    public static void setUniversalLayoutEnabled(Context context, boolean enabled) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putBoolean(UNIVERSAL_LAYOUT_PREF_STRING, enabled)
+                .apply();
+    }
+
+    /**
      * The transparency of the on-screen layout, as a percentage.
      */
     public static int getUniversalLayoutOpacity(Context context) {

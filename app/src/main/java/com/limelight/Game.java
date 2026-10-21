@@ -517,9 +517,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         if (universalLayoutDefinition != null) {
             // create the customizable on-screen layout. It is shown as soon as it is
             // created, so no explicit show() call is needed here.
-            universalVirtualController = new UniversalVirtualController(controllerHandler,
-                    (FrameLayout)streamView.getParent(),
-                    this,
+            universalVirtualController = createUniversalController(
                     universalLayoutDefinition.getId());
             universalVirtualController.refreshLayout();
         }
@@ -620,17 +618,13 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             }
 
             @Override
-            public boolean isLayoutHidden() {
-                return universalLayoutHidden;
+            public boolean isOnScreenControlsEnabled() {
+                return universalVirtualController != null && universalVirtualController.isVisible();
             }
 
             @Override
-            public void onLayoutHidden() {
-                universalLayoutHidden = true;
-
-                if (universalVirtualController != null) {
-                    universalVirtualController.hide();
-                }
+            public void onOnScreenControlsToggled(boolean enabled) {
+                setOnScreenControlsEnabled(enabled);
             }
 
             @Override
@@ -649,13 +643,175 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         });
     }
 
+    // Where a pass-through press started, and where it was last seen
+    private boolean passThroughActive;
+    private int passThroughOriginX;
+    private int passThroughOriginY;
+    private int passThroughLastX;
+    private int passThroughLastY;
+
     /**
-     * Whether the user asked for a clean screen during this stream.
+     * A pressed control's finger moved, so the selected touch input is given the movement.
      *
-     * It is deliberately not remembered: the switch on the layouts screen is what decides
-     * whether a layout is used at all, and this is only about the stream in front of the user.
+     * This is what lets one finger both hold a control and look around: the control keeps its
+     * press, and whichever touch input is selected does what it would have done had the control
+     * not been in the way.
+     *
+     * @param x the finger's place in the layout area
      */
-    private boolean universalLayoutHidden;
+    private void onPassThroughMoved(int x, int y) {
+        if (!passThroughActive) {
+            passThroughActive = true;
+            passThroughOriginX = x;
+            passThroughOriginY = y;
+            passThroughLastX = x;
+            passThroughLastY = y;
+
+            // The first movement only sets the starting point, so pressing a control does not
+            // itself move the view
+            return;
+        }
+
+        int deltaX = x - passThroughLastX;
+        int deltaY = y - passThroughLastY;
+
+        passThroughLastX = x;
+        passThroughLastY = y;
+
+        switch (prefConfig.touchMode) {
+            case PreferenceConfiguration.TOUCH_MODE_TRACKPAD: {
+                // The same scaling the trackpad itself uses, so the movement feels the same
+                double xFactor = REFERENCE_HORIZ_RES / (double) streamView.getWidth();
+                double yFactor = REFERENCE_VERT_RES / (double) streamView.getHeight();
+
+                conn.sendMouseMove((short) Math.round(deltaX * xFactor),
+                        (short) Math.round(deltaY * yFactor));
+                break;
+            }
+
+            case PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN: {
+                // The pointer follows the finger, measured against the video rather than the
+                // whole screen
+                int placedX = x - (int) streamView.getX();
+                int placedY = y - (int) streamView.getY();
+
+                conn.sendMousePosition(
+                        (short) Math.max(0, Math.min(placedX, streamView.getWidth())),
+                        (short) Math.max(0, Math.min(placedY, streamView.getHeight())),
+                        (short) streamView.getWidth(), (short) streamView.getHeight());
+                break;
+            }
+
+            case PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK: {
+                // The press is the centre of a stick, the same way the right stick mode works
+                int shorter = Math.min(streamView.getWidth(), streamView.getHeight());
+                float travel = Math.max(1f, shorter * 0.18f);
+
+                float offsetX = x - passThroughOriginX;
+                float offsetY = y - passThroughOriginY;
+                float distance = (float) Math.hypot(offsetX, offsetY);
+                float reach = distance <= 0 ? 0 : Math.min(1f, distance / travel);
+
+                short axisX = distance <= 0 ? (short) 0
+                        : (short) Math.round(offsetX / distance * reach * 32767);
+                short axisY = distance <= 0 ? (short) 0
+                        : (short) Math.round(offsetY / distance * reach * 32767);
+
+                controllerHandler.reportOscState(0, (short) 0, (short) 0, axisX, axisY,
+                        (byte) 0, (byte) 0);
+                break;
+            }
+
+            default:
+                // Off, and real touch: a touch the host expects to begin with a press of its own
+                // cannot be continued from underneath a control
+                break;
+        }
+    }
+
+    /**
+     * The pass-through press ended, so anything it left behind is let go.
+     */
+    private void onPassThroughEnded() {
+        if (!passThroughActive) {
+            return;
+        }
+
+        passThroughActive = false;
+
+        if (prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK) {
+            controllerHandler.reportOscState(0, (short) 0, (short) 0, (short) 0, (short) 0,
+                    (byte) 0, (byte) 0);
+        }
+    }
+
+    /**
+     * Connects a layout to the stream, including where a pressed control's movement goes.
+     */
+    private UniversalVirtualController createUniversalController(String layoutId) {
+        FrameLayout area = (FrameLayout) streamView.getParent();
+
+        UniversalVirtualController controller = new UniversalVirtualController(controllerHandler,
+                area, this, layoutId);
+
+        controller.setPassThroughListener(new UniversalVirtualController.PassThroughListener() {
+            @Override
+            public void onPassThroughMoved(int x, int y) {
+                Game.this.onPassThroughMoved(x, y);
+            }
+
+            @Override
+            public void onPassThroughEnded() {
+                Game.this.onPassThroughEnded();
+            }
+        });
+
+        return controller;
+    }
+
+    /**
+     * Shows or hides the on-screen controls, now and for the next stream.
+     *
+     * It is the same setting the layouts screen has, so the two cannot disagree about whether
+     * the controls are used.
+     */
+    private void setOnScreenControlsEnabled(boolean enabled) {
+        prefConfig.universalLayout = enabled;
+        PreferenceConfiguration.setUniversalLayoutEnabled(this, enabled);
+
+        if (!enabled) {
+            if (universalVirtualController != null) {
+                universalVirtualController.hide();
+            }
+
+            return;
+        }
+
+        if (universalVirtualController != null) {
+            universalVirtualController.show();
+            bringStreamDrawerToFront();
+            return;
+        }
+
+        // The switch was turned on in a stream that started without any controls, so the layout
+        // is created now rather than at the next connection
+        UniversalLayoutDefinition layout =
+                UniversalLayoutStore.getInstance(this).getSelectedLayout();
+
+        if (layout == null) {
+            return;
+        }
+
+        FrameLayout area = (FrameLayout) streamView.getParent();
+
+        if (area == null) {
+            return;
+        }
+
+        universalVirtualController = createUniversalController(layout.getId());
+        universalVirtualController.refreshLayout();
+        bringStreamDrawerToFront();
+    }
 
     /**
      * Shows another layout, now if the on-screen layout is running and at the next stream if it
@@ -665,7 +821,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         UniversalLayoutStore.getInstance(this).setSelectedLayoutId(layoutId);
 
         if (universalVirtualController != null) {
-            universalLayoutHidden = false;
+            prefConfig.universalLayout = true;
+            PreferenceConfiguration.setUniversalLayoutEnabled(this, true);
             universalVirtualController.loadLayout(layoutId);
 
             // A layout that was hidden stays hidden through a rebuild, because the visibility

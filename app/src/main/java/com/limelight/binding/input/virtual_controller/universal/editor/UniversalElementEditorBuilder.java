@@ -189,6 +189,18 @@ public class UniversalElementEditorBuilder {
                     }
                 });
 
+        // Whether holding this control keeps it pressed while the same finger looks around.
+        // It is what makes a control usable in a shooter: fire and aim with one finger.
+        panel.addCheckBox(context.getString(R.string.editor_label_pass_through),
+                element.getConfig().isPassThrough(),
+                new UniversalEditorPanel.OnCheckedListener() {
+                    @Override
+                    public void onCheckedChanged(boolean checked) {
+                        element.getConfig().setPassThrough(checked);
+                        callbacks.onElementChanged();
+                    }
+                });
+
         // How round the control is drawn. It is a share of the shorter side, so the shape
         // stays the same whatever the control is resized to.
         panel.addSliderRow(context.getString(R.string.editor_label_corner_radius),

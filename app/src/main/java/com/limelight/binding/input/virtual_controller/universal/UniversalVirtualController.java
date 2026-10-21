@@ -206,6 +206,39 @@ public class UniversalVirtualController {
      * Registers the listener that receives gestures on the controls. Only the layout
      * editor uses this.
      */
+    /**
+     * Where the movement of a finger that is pressing a pass-through control goes.
+     */
+    public interface PassThroughListener {
+        /**
+         * The finger moved, in pixels of the layout area.
+         */
+        void onPassThroughMoved(int x, int y);
+
+        /**
+         * The finger that was passing movement on let go, or the press was cancelled.
+         */
+        void onPassThroughEnded();
+    }
+
+    private PassThroughListener passThroughListener;
+
+    public void setPassThroughListener(PassThroughListener listener) {
+        this.passThroughListener = listener;
+    }
+
+    void notifyPassThroughMoved(int x, int y) {
+        if (passThroughListener != null) {
+            passThroughListener.onPassThroughMoved(x, y);
+        }
+    }
+
+    void notifyPassThroughEnded() {
+        if (passThroughListener != null) {
+            passThroughListener.onPassThroughEnded();
+        }
+    }
+
     public void setElementInteractionListener(ElementInteractionListener listener) {
         this.elementInteractionListener = listener;
     }

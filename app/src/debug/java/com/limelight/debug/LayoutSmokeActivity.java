@@ -216,7 +216,25 @@ public class LayoutSmokeActivity extends Activity {
         check("the duplicate is added", universalController.getElements().size() == before + 1);
 
         if (copy != null) {
+            android.util.Log.i("LayoutSmoke", "duplicate: first=" + first.getElementId()
+                    + " copy=" + copy.getElementId()
+                    + " next=" + universalController.peekNextElementId());
+
             check("the duplicate has its own ID", copy.getElementId() != first.getElementId());
+
+            // Its own ID is only useful if no other control already has it, which is what a
+            // saved layout relies on to tell them apart
+            int sharingTheId = 0;
+
+            for (UniversalVirtualControllerElement element : universalController.getElements()) {
+                if (element != copy && element.getElementId() == copy.getElementId()) {
+                    sharingTheId++;
+                }
+            }
+
+            android.util.Log.i("LayoutSmoke", "controls sharing the duplicate's ID: " + sharingTheId);
+
+            check("no other control shares the duplicate's ID", sharingTheId == 0);
 
             UniversalGeometry copiedSize = UniversalGeometry.of(first).copy();
             copiedSize.applyTo(copy);
@@ -627,6 +645,7 @@ public class LayoutSmokeActivity extends Activity {
         checkStreamMenu();
         checkDeletingClosesTheDrawer();
         checkChoosingALayoutShowsItAgain();
+        checkPassThrough();
     }
 
     /**
@@ -1367,10 +1386,18 @@ public class LayoutSmokeActivity extends Activity {
      * configured for it, exactly as the built-in on-screen trigger does.
      */
     private void checkTriggersWorkOnTheirOwn() {
-        UniversalVirtualController controller = universalController;
+        // A layout of its own with nothing saved under it, so the check sees the arrangement the
+        // app starts with rather than whatever this device happens to have stored. Earlier runs
+        // of this suite change the stored layout, and a check that reads it then measures its
+        // own leftovers.
+        UniversalLayoutDefinition scratch = UniversalLayoutStore.getInstance(this)
+                .addLayout(UniversalLayoutStore.getInstance(this).makeUniqueName("smoke trigger"));
+        UniversalVirtualController controller = new UniversalVirtualController(
+                universalController.getControllerHandler(), (FrameLayout) universalController
+                .getLayoutArea(), this, scratch.getId());
 
-        // The left trigger of the layout that is on screen, which is how the built-in one is
-        // made: it carries the left trigger's own element id
+        controller.refreshLayout();
+
         UniversalVirtualControllerElement lt = null;
         for (UniversalVirtualControllerElement element : controller.getElements()) {
             if (element instanceof UniversalLeftTrigger) {
@@ -1379,9 +1406,11 @@ public class LayoutSmokeActivity extends Activity {
             }
         }
 
-        check("the layout has a left trigger", lt != null);
+        check("the built-in layout has a left trigger", lt != null);
 
         if (lt == null) {
+            controller.destroy();
+            UniversalLayoutStore.getInstance(this).deleteLayout(scratch.getId());
             return;
         }
 
@@ -1405,6 +1434,11 @@ public class LayoutSmokeActivity extends Activity {
             lt.releaseConfiguredActions();
             controller.getControllerInputContext().leftTrigger = 0;
             controller.setControllerMode(originalMode);
+
+            // The scratch layout is taken down again, so its controls do not sit on top of the
+            // real ones
+            controller.destroy();
+            UniversalLayoutStore.getInstance(this).deleteLayout(scratch.getId());
         }
     }
 
@@ -2726,7 +2760,7 @@ public class LayoutSmokeActivity extends Activity {
         final String[] chosenLayout = new String[]{null};
         final boolean[] keyboardAsked = new boolean[]{false};
         final boolean[] exited = new boolean[]{false};
-        final boolean[] hidden = new boolean[]{false};
+        final boolean[] controlsShown = new boolean[]{true};
         final int[] opacity = new int[]{100};
 
         final java.util.List<UniversalLayoutDefinition> layouts = new java.util.ArrayList<>();
@@ -2774,13 +2808,13 @@ public class LayoutSmokeActivity extends Activity {
                     }
 
                     @Override
-                    public boolean isLayoutHidden() {
-                        return hidden[0];
+                    public boolean isOnScreenControlsEnabled() {
+                        return controlsShown[0];
                     }
 
                     @Override
-                    public void onLayoutHidden() {
-                        hidden[0] = true;
+                    public void onOnScreenControlsToggled(boolean enabled) {
+                        controlsShown[0] = enabled;
                     }
 
                     @Override
@@ -2961,14 +2995,29 @@ public class LayoutSmokeActivity extends Activity {
                 chosenTouchMode[0]
                         == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS);
 
-        // A clean screen is one of the choices of the layout row
+        // The switch for the on-screen controls sits between the touch setting and the layout
+        check("the switch for the on-screen controls is its own row",
+                containsLabel(rows, getString(R.string.stream_menu_controls)));
+
+        check("the controls are shown to begin with", controlsShown[0]);
+
+        drawer.clickRowForTesting(getString(R.string.stream_menu_controls));
+        check("the switch turns the controls off", !controlsShown[0]);
+
+        drawer.clickRowForTesting(getString(R.string.stream_menu_controls));
+        check("the switch turns the controls back on", controlsShown[0]);
+
+        // The layout row no longer offers a screen with no controls, the switch does that
         drawer.show();
         drawer.clickRowForTesting(getString(R.string.stream_menu_layout));
 
-        check("a clean screen can be chosen",
-                drawer.clickChoiceForTesting(getString(R.string.stream_menu_layout_none)));
-        check("a clean screen is reported", hidden[0]);
-        check("choosing a clean screen closes the menu", !drawer.isOpen());
+        java.util.List<String> layoutChoices =
+                drawer.getChoiceLabelsForTesting(getString(R.string.stream_menu_layout));
+
+        android.util.Log.i("LayoutSmoke", "layout choices: " + layoutChoices);
+
+        check("the layout list holds only layouts", layoutChoices.size() == 2
+                && layoutChoices.contains("First layout") && layoutChoices.contains("Second layout"));
 
         // The transparency slider is there and reports what it is moved to
         drawer.show();
@@ -3148,6 +3197,86 @@ public class LayoutSmokeActivity extends Activity {
         UniversalLayoutStore.getInstance(this).deleteLayout(layout.getId());
     }
 
+
+    /**
+     * A control can be told to pass a held finger's movement on, which is what lets one finger
+     * fire and aim at the same time.
+     */
+    private void checkPassThrough() {
+        UniversalDigitalButton button = new UniversalDigitalButton(universalController, 8901, 0, this);
+
+        check("a control does not pass movement on unless it is told to",
+                !button.getConfig().isPassThrough());
+
+        button.getConfig().setPassThrough(true);
+        check("a control can be told to pass movement on", button.getConfig().isPassThrough());
+
+        // It survives a save and a load, which is what a layout does between streams
+        boolean kept = false;
+
+        try {
+            UniversalElementConfig reloaded = new UniversalElementConfig();
+            reloaded.loadFromJson(button.getConfig().toJson());
+            kept = reloaded.isPassThrough();
+        } catch (org.json.JSONException e) {
+            kept = false;
+        }
+
+        check("passing movement on survives being saved", kept);
+
+        // And it is copied along with the rest of a control
+        check("copying a control copies the setting",
+                button.getConfig().copy().isPassThrough());
+
+        // The layout only reports movement for a control that has it
+        final int[] moved = new int[]{0};
+
+        universalController.setPassThroughListener(
+                new UniversalVirtualController.PassThroughListener() {
+                    @Override
+                    public void onPassThroughMoved(int x, int y) {
+                        moved[0]++;
+                    }
+
+                    @Override
+                    public void onPassThroughEnded() {
+                    }
+                });
+
+        button.measure(View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY));
+        button.layout(0, 0, 120, 120);
+
+        UniversalVirtualController.ControllerMode originalMode = universalController.getControllerMode();
+        universalController.setControllerMode(UniversalVirtualController.ControllerMode.Active);
+
+        try {
+            // A press, then a drag with the same finger
+            dispatchTouch(button, MotionEvent.ACTION_DOWN, 0.5f, 0.5f);
+            dispatchTouch(button, MotionEvent.ACTION_MOVE, 0.6f, 0.5f);
+            dispatchTouch(button, MotionEvent.ACTION_MOVE, 0.7f, 0.5f);
+
+            android.util.Log.i("LayoutSmoke", "movements passed on: " + moved[0]);
+
+            check("a held control passes its finger's movement on", moved[0] >= 2);
+
+            // With the setting off, nothing is passed on
+            button.getConfig().setPassThrough(false);
+            moved[0] = 0;
+
+            dispatchTouch(button, MotionEvent.ACTION_DOWN, 0.5f, 0.5f);
+            dispatchTouch(button, MotionEvent.ACTION_MOVE, 0.6f, 0.5f);
+            dispatchTouch(button, MotionEvent.ACTION_MOVE, 0.7f, 0.5f);
+
+            check("a control without the setting passes nothing on", moved[0] == 0);
+
+            dispatchTouch(button, MotionEvent.ACTION_UP, 0.7f, 0.5f);
+        } finally {
+            universalController.setControllerMode(originalMode);
+            universalController.setPassThroughListener(null);
+        }
+    }
+
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
             if (label.contains(needle)) {
@@ -3299,12 +3428,12 @@ public class LayoutSmokeActivity extends Activity {
                     }
 
                     @Override
-                    public boolean isLayoutHidden() {
-                        return false;
+                    public boolean isOnScreenControlsEnabled() {
+                        return true;
                     }
 
                     @Override
-                    public void onLayoutHidden() {
+                    public void onOnScreenControlsToggled(boolean enabled) {
                     }
 
                     @Override

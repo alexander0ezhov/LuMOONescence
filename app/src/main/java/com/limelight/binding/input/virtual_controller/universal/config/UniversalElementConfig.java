@@ -18,6 +18,14 @@ public class UniversalElementConfig {
     private static final String KEY_BORDER_RADIUS = "borderRadius";
 
     /**
+     * Whether a press on this control passes the finger's movement on to the touch input.
+     *
+     * It is what makes a control usable in a shooter: holding it keeps firing while the same
+     * finger still looks around, instead of the finger being spent on the button.
+     */
+    private static final String KEY_PASS_THROUGH = "passThrough";
+
+    /**
      * Corner radius of a control that has not been given one, as a share of its shorter
      * side. A share rather than a number of pixels, so the shape survives every resize.
      */
@@ -39,6 +47,16 @@ public class UniversalElementConfig {
     public void setName(String name) {
         this.name = name == null ? "" : name;
     }
+
+    public boolean isPassThrough() {
+        return passThrough;
+    }
+
+    public void setPassThrough(boolean passThrough) {
+        this.passThrough = passThrough;
+    }
+
+    private boolean passThrough;
 
     public int getBorderRadius() {
         return borderRadius;
@@ -76,6 +94,7 @@ public class UniversalElementConfig {
         json.put(KEY_NAME, name);
         json.put(KEY_GEOMETRY, geometry.toJson());
         json.put(KEY_BORDER_RADIUS, borderRadius);
+        json.put(KEY_PASS_THROUGH, passThrough);
         json.put(KEY_OPTIONS, createOptionsJson());
         return json;
     }
@@ -85,6 +104,7 @@ public class UniversalElementConfig {
 
         // A layout written before the corner radius existed keeps the default
         borderRadius = json.optInt(KEY_BORDER_RADIUS, DEFAULT_BORDER_RADIUS_PERCENT);
+        passThrough = json.optBoolean(KEY_PASS_THROUGH, false);
 
         // Geometry can be missing in a config that was written before this model existed
         if (json.has(KEY_GEOMETRY) || json.has("LEFT")) {
@@ -114,6 +134,7 @@ public class UniversalElementConfig {
         copy.name = name;
         copy.geometry = geometry.copy();
         copy.borderRadius = borderRadius;
+        copy.passThrough = passThrough;
         copy.copyOptionsFrom(this);
         return copy;
     }

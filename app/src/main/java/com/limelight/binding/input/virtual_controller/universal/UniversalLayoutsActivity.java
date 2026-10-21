@@ -165,14 +165,15 @@ public class UniversalLayoutsActivity extends Activity {
         return PreferenceManager.getDefaultSharedPreferences(this);
     }
 
+    /**
+     * The one switch for the whole feature, in the same place the stream menu writes it.
+     */
     private boolean isUniversalLayoutEnabled() {
-        return getPreferences().getBoolean(PreferenceConfiguration.UNIVERSAL_LAYOUT_PREF_STRING, false);
+        return PreferenceConfiguration.isUniversalLayoutEnabled(this);
     }
 
     private void setUniversalLayoutEnabled(boolean enabled) {
-        getPreferences().edit()
-                .putBoolean(PreferenceConfiguration.UNIVERSAL_LAYOUT_PREF_STRING, enabled)
-                .apply();
+        PreferenceConfiguration.setUniversalLayoutEnabled(this, enabled);
     }
 
     private void refresh() {

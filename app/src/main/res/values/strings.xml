@@ -293,7 +293,8 @@
     <string name="stream_menu_touch_right_stick">Right stick</string>
     <string name="stream_menu_touch_events">Touch native (experimental)</string>
     <string name="stream_menu_opacity">Opacity</string>
-    <string name="stream_menu_layout_none">None (clean screen)</string>
+    <string name="stream_menu_controls">On-screen controls</string>
+    <string name="editor_label_pass_through">Pass through to touch</string>
     <string name="stream_menu_layout">Layout</string>
     <string name="stream_menu_no_layouts">No layouts</string>
     <string name="stream_menu_exit">Exit stream</string>
