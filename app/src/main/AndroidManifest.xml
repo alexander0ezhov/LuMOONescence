@@ -202,6 +202,10 @@
             android:label="Usb Driver Service" />
 
         <activity
+            android:name=".OpenSourceLicensesActivity"
+            android:label="@string/title_open_source_licenses"
+            android:exported="false" />
+        <activity
             android:name=".HelpActivity"
             android:resizeableActivity="true"
             android:enableOnBackInvokedCallback="true"

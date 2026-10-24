@@ -42,3 +42,11 @@ app/.externalNativeBuild/
 
 # NDK stuff
 .cxx/
+
+build-diagnostics/shots
+
+# Signing material: keep it out of the repository
+*.jks
+*.keystore
+keystore.properties
+signing.properties

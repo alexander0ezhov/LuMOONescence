@@ -8,7 +8,8 @@
     them when the device forbids injecting input events. The manifest merger combines this
     with the declaration in the main manifest, so nothing else about them changes.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application>
         <activity
@@ -32,6 +33,12 @@
             android:name=".debug.StylePreviewActivity"
             android:exported="true"
             android:label="Control style preview" />
+        <!-- Exported in debug builds so the licenses screen can be opened on its own and
+             looked at, since touch cannot be injected on every device. -->
+        <activity
+            android:name="com.limelight.OpenSourceLicensesActivity"
+            tools:replace="android:exported"
+            android:exported="true" />
     </application>
 
 </manifest>

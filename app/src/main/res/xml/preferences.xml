@@ -297,4 +297,13 @@
             android:summary="@string/summary_privacy_policy"
             url="https://moonlight-stream.org/privacy.html"/>
     </PreferenceCategory-->
+
+    <PreferenceCategory android:title="@string/category_about"
+        android:key="category_about">
+        <Preference
+            android:key="open_source_licenses"
+            android:title="@string/title_open_source_licenses"
+            android:summary="@string/summary_open_source_licenses"
+            android:persistent="false"/>
+    </PreferenceCategory>
 </PreferenceScreen>
