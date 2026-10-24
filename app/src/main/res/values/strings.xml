@@ -293,6 +293,10 @@
     <string name="stream_menu_touch_right_stick">Right stick</string>
     <string name="stream_menu_touch_events">Touch native (experimental)</string>
     <string name="stream_menu_opacity">Opacity</string>
+    <string name="stream_menu_touchpad_mode">Touchpad mode</string>
+    <string name="stream_menu_touchpad_standard">Trackpad</string>
+    <string name="stream_menu_touchpad_direct">Direct cursor</string>
+    <string name="stream_menu_touchpad_no_clicks">No clicks</string>
     <string name="stream_menu_controls">On-screen controls</string>
     <string name="editor_label_pass_through">Pass through to touch</string>
     <string name="stream_menu_layout">Layout</string>

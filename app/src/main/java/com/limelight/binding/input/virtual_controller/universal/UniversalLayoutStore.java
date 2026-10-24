@@ -74,10 +74,35 @@ public class UniversalLayoutStore {
 
         selectedLayoutId = getPreferences().getString(KEY_SELECTED_LAYOUT_ID, "");
 
+        // The built-in layout is what everything falls back to, so it is put back on the way in
+        // rather than hoped for
+        boolean restoredDefault = ensureDefaultLayout();
+
         // The user may have deleted the layout that was selected
         if (getLayout(selectedLayoutId) == null) {
             selectedLayoutId = layouts.isEmpty() ? "" : layouts.get(0).getId();
+            restoredDefault = true;
         }
+
+        if (restoredDefault) {
+            persist();
+        }
+    }
+
+    /**
+     * Puts the built-in layout back when it is missing.
+     *
+     * @return whether it had to be added
+     */
+    private boolean ensureDefaultLayout() {
+        if (getLayout(DEFAULT_LAYOUT_ID) != null) {
+            return false;
+        }
+
+        layouts.add(new UniversalLayoutDefinition(DEFAULT_LAYOUT_ID, "Default",
+                UniversalLayoutDefinition.DEFAULT_IMAGE_PATH, System.currentTimeMillis()));
+        sortLayouts();
+        return true;
     }
 
     private void sortLayouts() {
@@ -114,17 +139,13 @@ public class UniversalLayoutStore {
     }
 
     /**
-     * Returns all layouts, creating the built-in one if the user has none. The built-in
-     * layout is only created once, so a user who deletes it keeps it deleted.
+     * Returns all layouts, making sure the built-in one is among them.
+     *
+     * The built-in layout is what the app falls back to when nothing else is left, so it is put
+     * back whenever it is missing. Losing it would leave the app with no arrangement to show,
+     * and would take the controls away from anyone who had not made a layout of their own.
      */
     public synchronized List<UniversalLayoutDefinition> getLayouts() {
-        if (layouts.isEmpty()) {
-            layouts.add(new UniversalLayoutDefinition(DEFAULT_LAYOUT_ID, "Default",
-                    UniversalLayoutDefinition.DEFAULT_IMAGE_PATH, System.currentTimeMillis()));
-            selectedLayoutId = DEFAULT_LAYOUT_ID;
-            persist();
-        }
-
         return new ArrayList<>(layouts);
     }
 
@@ -192,6 +213,12 @@ public class UniversalLayoutStore {
     public synchronized void deleteLayout(String id) {
         UniversalLayoutDefinition layout = getLayout(id);
         if (layout == null) {
+            return;
+        }
+
+        // The built-in layout is the one the app falls back to, so it stays even when the user
+        // asks for it to go. Its own arrangement can be reset instead.
+        if (DEFAULT_LAYOUT_ID.equals(layout.getId())) {
             return;
         }
 

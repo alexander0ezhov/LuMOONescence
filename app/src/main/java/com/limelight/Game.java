@@ -679,7 +679,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         passThroughLastY = y;
 
         switch (prefConfig.touchMode) {
-            case PreferenceConfiguration.TOUCH_MODE_TRACKPAD: {
+            case PreferenceConfiguration.TOUCH_MODE_TRACKPAD:
+            case PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS: {
                 // The same scaling the trackpad itself uses, so the movement feels the same
                 double xFactor = REFERENCE_HORIZ_RES / (double) streamView.getWidth();
                 double yFactor = REFERENCE_VERT_RES / (double) streamView.getHeight();
@@ -1846,6 +1847,12 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
                 case PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN:
                     touchContextMap[i] = new AbsoluteTouchContext(conn, i, streamView);
+                    break;
+
+                case PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS:
+                    touchContextMap[i] = new RelativeTouchContext(conn, i,
+                            REFERENCE_HORIZ_RES, REFERENCE_VERT_RES,
+                            streamView, prefConfig, false);
                     break;
 
                 default:

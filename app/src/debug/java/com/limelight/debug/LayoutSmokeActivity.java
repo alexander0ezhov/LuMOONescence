@@ -21,6 +21,7 @@ import android.graphics.Canvas;
 import com.limelight.R;
 import com.limelight.preferences.PreferenceConfiguration;
 import com.limelight.binding.input.ControllerHandler;
+import com.limelight.binding.input.touch.TouchGestureRules;
 import com.limelight.binding.input.virtual_controller.universal.UniversalAnalogStick;
 import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalButton;
 import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalPad;
@@ -143,6 +144,11 @@ public class LayoutSmokeActivity extends Activity {
     private void checkStore(UniversalLayoutStore store) {
         UniversalLayoutDefinition defaultLayout = store.getLayout("default");
         check("the built-in layout exists", defaultLayout != null);
+
+        // It is the arrangement the app falls back to, so it is put back when it is missing and
+        // cannot be deleted
+        store.deleteLayout("default");
+        check("the built-in layout cannot be deleted", store.getLayout("default") != null);
 
         UniversalLayoutDefinition created = store.addLayout(store.makeUniqueName("smoke layout"));
         check("a layout can be created", created != null && store.getLayout(created.getId()) != null);
@@ -646,6 +652,7 @@ public class LayoutSmokeActivity extends Activity {
         checkDeletingClosesTheDrawer();
         checkChoosingALayoutShowsItAgain();
         checkPassThrough();
+        checkTrackpadGestures();
     }
 
     /**
@@ -2867,21 +2874,60 @@ public class LayoutSmokeActivity extends Activity {
         java.util.List<String> wantedOrder = new java.util.ArrayList<>();
         wantedOrder.add(getString(R.string.stream_menu_touch_off));
         wantedOrder.add(getString(R.string.stream_menu_touch_trackpad));
-        wantedOrder.add(getString(R.string.stream_menu_touch_screen));
         wantedOrder.add(getString(R.string.stream_menu_touch_events));
         wantedOrder.add(getString(R.string.stream_menu_touch_right_stick));
 
         check("the touch modes are offered in the order the user asked for",
                 touchChoices.equals(wantedOrder));
 
-        check("the menu names the mouse touch mode as the user asked",
-                touchChoices.contains(getString(R.string.stream_menu_touch_screen)));
+        // What the touchpad does is a row of its own, offered only with the touchpad
+        check("the touchpad's own row appears with the touchpad",
+                containsLabel(rows, getString(R.string.stream_menu_touchpad_mode)));
+
+        java.util.List<String> touchpadChoices =
+                drawer.getChoiceLabelsForTesting(getString(R.string.stream_menu_touchpad_mode));
+
+        android.util.Log.i("LayoutSmoke", "touchpad choices: " + touchpadChoices);
+
+        java.util.List<String> wantedTouchpad = new java.util.ArrayList<>();
+        wantedTouchpad.add(getString(R.string.stream_menu_touchpad_standard));
+        wantedTouchpad.add(getString(R.string.stream_menu_touchpad_direct));
+        wantedTouchpad.add(getString(R.string.stream_menu_touchpad_no_clicks));
+
+        check("the touchpad offers its three kinds in order",
+                touchpadChoices.equals(wantedTouchpad));
+
+        // Choosing the kind of touchpad keeps the menu open and folds only its own list away
+        drawer.show();
+        drawer.clickRowForTesting(getString(R.string.stream_menu_touchpad_mode));
+
+        check("choosing the kind of touchpad keeps the menu open",
+                drawer.clickChoiceForTesting(getString(R.string.stream_menu_touchpad_no_clicks))
+                        && drawer.isOpen());
+        check("the kind of touchpad is reported",
+                chosenTouchMode[0]
+                        == com.limelight.preferences.PreferenceConfiguration
+                        .TOUCH_MODE_TRACKPAD_NO_CLICKS);
+
+        // Choosing a layout keeps the menu open as well
+        drawer.show();
+        drawer.clickRowForTesting(getString(R.string.stream_menu_layout));
+        drawer.clickChoiceForTesting("Second layout");
+
+        check("choosing a layout keeps the menu open", drawer.isOpen());
+
+        // With a touchpad kind chosen, the row still says touchpad in the main list
+        check("the main list reports the touchpad",
+                containsLabel(drawer.getRowTitlesForTesting(),
+                        getString(R.string.stream_menu_touch) + "   \u00b7   "
+                                + getString(R.string.stream_menu_touch_trackpad)));
+
         check("the menu names the native touch mode as the user asked",
                 touchChoices.contains(getString(R.string.stream_menu_touch_events)));
-        check("the mouse touch mode is called what the user asked for",
-                "Touch (mouse)".equals(getString(R.string.stream_menu_touch_screen)));
         check("the native touch mode is called what the user asked for",
                 "Touch native (experimental)".equals(getString(R.string.stream_menu_touch_events)));
+        check("the cursor-following touchpad is called what it is",
+                "Direct cursor".equals(getString(R.string.stream_menu_touchpad_direct)));
 
         check("the stream menu has a button to leave the stream",
                 exit != null && getString(R.string.stream_menu_exit).contentEquals(exit.getText()));
@@ -2909,7 +2955,9 @@ public class LayoutSmokeActivity extends Activity {
 
         check("choosing a touch mode reports it",
                 chosenTouchMode[0] == com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_OFF);
-        check("choosing a touch mode closes the menu", !drawer.isOpen());
+
+        // The menu stays open, so a second setting can be changed without opening it again
+        check("choosing a touch mode keeps the menu open", drawer.isOpen());
 
         drawer.show();
 
@@ -2929,7 +2977,7 @@ public class LayoutSmokeActivity extends Activity {
                 drawer.clickChoiceForTesting("Second layout"));
 
         check("choosing a layout reports it", "two".equals(chosenLayout[0]));
-        check("choosing a layout closes the menu", !drawer.isOpen());
+        check("choosing a layout keeps the menu open", drawer.isOpen());
 
         // The keyboard row closes the menu and asks for the keyboard, rather than toggling it
         drawer.show();
@@ -3275,6 +3323,66 @@ public class LayoutSmokeActivity extends Activity {
             universalController.setControllerMode(originalMode);
             universalController.setPassThroughListener(null);
         }
+    }
+
+
+    /**
+     * What a touch on the trackpad means: a tap is a click, two fingers are the right button,
+     * and a second tap that is held drags.
+     *
+     * The numbers here are the ones that used to fail: two fingers never stay as still or lift
+     * as quickly as one, and a check that asked the same of them is why the right click only
+     * sometimes happened.
+     */
+    private void checkTrackpadGestures() {
+        // One finger, quick and still: a click
+        check("a quick still tap with one finger is a click",
+                TouchGestureRules.isTap(1, 1, false, false, false, 5, 5, 200));
+
+        check("a tap that is held too long is not a click",
+                !TouchGestureRules.isTap(1, 1, false, false, false, 5, 5, 400));
+
+        check("a tap that moved too far is not a click",
+                !TouchGestureRules.isTap(1, 1, false, false, false, 30, 30, 200));
+
+        check("a finger that has already dragged does not also click",
+                !TouchGestureRules.isTap(1, 1, false, true, false, 5, 5, 200));
+
+        // Two fingers, the second one lifting last
+        check("two fingers lifting within the wider limits is a click",
+                TouchGestureRules.isTap(2, 1, false, false, false, 25, 25, 300));
+
+        check("two fingers are given more room than one",
+                TouchGestureRules.slackPx(2) > TouchGestureRules.slackPx(1));
+
+        check("two fingers are given longer than one",
+                TouchGestureRules.tapTimeLimitMs(2) > TouchGestureRules.tapTimeLimitMs(1));
+
+        // The finger that lifts last ends the gesture, so the first one to go does not click
+        check("a finger lifting while another is still down is not a click",
+                !TouchGestureRules.isTap(2, 2, false, false, false, 5, 5, 200));
+
+        // Which button a tap means
+        check("a tap with two fingers is the right button",
+                TouchGestureRules.isRightButton(2, 1));
+        check("the right button is kept when the first finger lifts last",
+                TouchGestureRules.isRightButton(2, 0));
+        check("a tap with one finger is the left button",
+                !TouchGestureRules.isRightButton(1, 0));
+
+        // Tap, then tap again and hold: the second touch drags at once
+        check("a touch right behind a tap starts dragging",
+                TouchGestureRules.startsDragWithSecondTap(150));
+        check("a tap long after the first one does not start dragging",
+                !TouchGestureRules.startsDragWithSecondTap(1500));
+        check("a touch with no tap before it does not start dragging",
+                !TouchGestureRules.startsDragWithSecondTap(Long.MAX_VALUE));
+
+        android.util.Log.i("LayoutSmoke", "trackpad: two-finger tap limit "
+                + TouchGestureRules.tapTimeLimitMs(2) + "ms within "
+                + (TouchGestureRules.TAP_MOVEMENT_THRESHOLD_PX + TouchGestureRules.slackPx(2))
+                + "px, drag after a tap within "
+                + TouchGestureRules.SECOND_TAP_DRAG_WINDOW_MS + "ms");
     }
 
     private static boolean contains(String[] labels, String needle) {

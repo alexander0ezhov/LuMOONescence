@@ -173,6 +173,13 @@ public class UniversalStreamDrawer {
 
         content.addView(buildKeyboardRow(), matchWidth());
         content.addView(buildTouchModeRow(), matchWidth());
+
+        // How the touchpad behaves only matters while the touchpad is what the touchscreen
+        // does, so the row appears with it
+        if (PreferenceConfiguration.isTouchpadMode(host.getTouchMode())) {
+            content.addView(buildTouchpadModeRow(), matchWidth());
+        }
+
         content.addView(buildControlsRow(), matchWidth());
         content.addView(buildLayoutRow(), matchWidth());
         content.addView(buildOpacityRow(), matchWidth());
@@ -220,27 +227,56 @@ public class UniversalStreamDrawer {
         ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_touch), touchModeName());
         RadioGroup choices = makeChoiceGroup();
 
-        addChoice(choices, getString(R.string.stream_menu_touch_off),
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touch_off),
                 host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_OFF,
                 PreferenceConfiguration.TOUCH_MODE_OFF);
 
-        addChoice(choices, getString(R.string.stream_menu_touch_trackpad),
-                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TRACKPAD,
-                PreferenceConfiguration.TOUCH_MODE_TRACKPAD);
+        // Picking the touchpad keeps the way it behaves, so a choice made below is not thrown
+        // away by touching this row again
+        addChoice(value -> host.onTouchModeChanged(
+                        PreferenceConfiguration.isTouchpadMode(host.getTouchMode())
+                                ? host.getTouchMode() : PreferenceConfiguration.TOUCH_MODE_TRACKPAD),
+                choices, getString(R.string.stream_menu_touch_trackpad),
+                PreferenceConfiguration.isTouchpadMode(host.getTouchMode()),
+                -1);
 
-        addChoice(choices, getString(R.string.stream_menu_touch_screen),
-                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN,
-                PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN);
-
-        // Real touch events, the way a Windows tablet sends them. Marked as an experiment
-        // because it only does anything on a host that takes touch input.
-        addChoice(choices, getString(R.string.stream_menu_touch_events),
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touch_events),
                 host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS,
                 PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS);
 
-        addChoice(choices, getString(R.string.stream_menu_touch_right_stick),
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touch_right_stick),
                 host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK,
                 PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK);
+
+        return row.withChoices(choices);
+    }
+
+    /**
+     * A row for what the touchpad does, which is offered only while the touchpad is what the
+     * touchscreen does.
+     */
+    private View buildTouchpadModeRow() {
+        ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_touchpad_mode),
+                touchpadModeName());
+        RadioGroup choices = makeChoiceGroup();
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touchpad_standard),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TRACKPAD,
+                PreferenceConfiguration.TOUCH_MODE_TRACKPAD);
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touchpad_direct),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN,
+                PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN);
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touchpad_no_clicks),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS,
+                PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS);
 
         return row.withChoices(choices);
     }
@@ -363,14 +399,17 @@ public class UniversalStreamDrawer {
 
         if (layouts != null) {
             for (final UniversalLayoutDefinition layout : layouts) {
-                RadioButton choice = addChoice(choices, layout.getName(),
-                        layout.getId().equals(selectedId), -1);
+                RadioButton choice = addPlainChoice(choices, layout.getName(),
+                        layout.getId().equals(selectedId));
 
                 choice.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         host.onLayoutChosen(layout.getId());
-                        close();
+
+                        // The list folds away and the row shows the new layout, while the menu
+                        // stays open
+                        buildRows();
                     }
                 });
             }
@@ -516,33 +555,52 @@ public class UniversalStreamDrawer {
         return group;
     }
 
-    private RadioButton addChoice(RadioGroup group, String label, boolean checked, int touchMode) {
+    /**
+     * Adds one choice.
+     *
+     * Choosing reports what was chosen and then rebuilds the rows, which folds the list away and
+     * puts the new value on its row. The menu itself stays open: a setting changed here is
+     * usually followed by another.
+     */
+    private RadioButton addChoice(final java.util.function.IntConsumer settle,
+                                  RadioGroup group, String label, boolean checked, int tagValue) {
         RadioButton choice = new RadioButton(activity);
 
         choice.setText(label);
         choice.setTextColor(0xFFD8DBE2);
         choice.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
         choice.setPadding(dp(24), dp(4), dp(12), dp(4));
-        choice.setTag(touchMode);
+        choice.setTag(tagValue);
 
-        // The mark is set after the listener would fire, so setting it does not report a choice
-        // the user did not make
+        // The mark is set before the listener is attached, so building the row does not report a
+        // choice nobody made
         choice.setChecked(checked);
 
-        if (touchMode >= 0) {
-            choice.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Object tag = view.getTag();
+        choice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Object tag = view.getTag();
 
-                    if (tag instanceof Integer) {
-                        host.onTouchModeChanged((Integer) tag);
-                    }
+                settle.accept(tag instanceof Integer ? (Integer) tag : 0);
+                buildRows();
+            }
+        });
 
-                    close();
-                }
-            });
-        }
+        group.addView(choice, matchWidth());
+        return choice;
+    }
+
+    /**
+     * Adds a choice that does its own work, such as picking a layout.
+     */
+    private RadioButton addPlainChoice(RadioGroup group, String label, boolean checked) {
+        RadioButton choice = new RadioButton(activity);
+
+        choice.setText(label);
+        choice.setTextColor(0xFFD8DBE2);
+        choice.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        choice.setPadding(dp(24), dp(4), dp(12), dp(4));
+        choice.setChecked(checked);
 
         group.addView(choice, matchWidth());
         return choice;
@@ -577,12 +635,9 @@ public class UniversalStreamDrawer {
             return getString(R.string.stream_menu_touch_off);
         }
 
-        if (mode == PreferenceConfiguration.TOUCH_MODE_TRACKPAD) {
+        // Every kind of touchpad is one entry of this row; what it does is the row below it
+        if (PreferenceConfiguration.isTouchpadMode(mode)) {
             return getString(R.string.stream_menu_touch_trackpad);
-        }
-
-        if (mode == PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN) {
-            return getString(R.string.stream_menu_touch_screen);
         }
 
         if (mode == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS) {
@@ -590,6 +645,23 @@ public class UniversalStreamDrawer {
         }
 
         return getString(R.string.stream_menu_touch_right_stick);
+    }
+
+    /**
+     * What the touchpad is set to do.
+     */
+    private String touchpadModeName() {
+        int mode = host.getTouchMode();
+
+        if (mode == PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN) {
+            return getString(R.string.stream_menu_touchpad_direct);
+        }
+
+        if (mode == PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS) {
+            return getString(R.string.stream_menu_touchpad_no_clicks);
+        }
+
+        return getString(R.string.stream_menu_touchpad_standard);
     }
 
     private String selectedLayoutName() {

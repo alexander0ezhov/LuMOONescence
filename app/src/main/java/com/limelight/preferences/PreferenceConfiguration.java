@@ -94,6 +94,24 @@ public class PreferenceConfiguration {
      * touch input.
      */
     public static final int TOUCH_MODE_TOUCH_EVENTS = 4;
+
+    /**
+     * The touchscreen moves the mouse but never clicks.
+     *
+     * It is the setting for aiming with a finger on a control that is already pressed: the view
+     * turns without the tap that would fire a second time.
+     */
+    public static final int TOUCH_MODE_TRACKPAD_NO_CLICKS = 5;
+
+    /**
+     * Whether the touchscreen behaves as some kind of trackpad, which is what decides if the
+     * choice of how it behaves is worth offering.
+     */
+    public static boolean isTouchpadMode(int mode) {
+        return mode == TOUCH_MODE_TRACKPAD
+                || mode == TOUCH_MODE_TRACKPAD_NO_CLICKS
+                || mode == TOUCH_MODE_TOUCHSCREEN;
+    }
     private static final String LATENCY_TOAST_PREF_STRING = "checkbox_enable_post_stream_toast";
     private static final String FRAME_PACING_PREF_STRING = "frame_pacing";
     private static final String ABSOLUTE_MOUSE_MODE_PREF_STRING = "checkbox_absolute_mouse_mode";

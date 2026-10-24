@@ -46,7 +46,10 @@ public class RelativeTouchContext implements TouchContext {
 
             // We haven't been cancelled before the timer expired so begin dragging
             confirmedDrag = true;
+            cancelPendingReleases();
             conn.sendMouseButtonDown(getMouseButtonIndex());
+
+            android.util.Log.i("Trackpad", "held still starts a drag");
         }
     };
 
@@ -84,16 +87,35 @@ public class RelativeTouchContext implements TouchContext {
             }
     };
 
-    private static final int TAP_MOVEMENT_THRESHOLD = 20;
-    private static final int TAP_DISTANCE_THRESHOLD = 25;
-    private static final int TAP_TIME_THRESHOLD = 250;
-    private static final int DRAG_TIME_THRESHOLD = 650;
+    /**
+     * How long a finger has to stay still before holding becomes a drag, from the shared rules.
+     */
+    private static final int DRAG_TIME_THRESHOLD = TouchGestureRules.HOLD_TO_DRAG_MS;
 
     private static final int SCROLL_SPEED_FACTOR = 5;
+
+    /**
+     * Whether a touch may press a mouse button. Aiming with a finger that is already holding a
+     * control must not fire, so that case turns this off.
+     */
+    private final boolean clicksEnabled;
+
+    /**
+     * When the last tap of this finger finished, so a touch right behind it can drag.
+     */
+    private long lastTapTime = -1;
 
     public RelativeTouchContext(NvConnection conn, int actionIndex,
                                 int referenceWidth, int referenceHeight,
                                 View view, PreferenceConfiguration prefConfig)
+    {
+        this(conn, actionIndex, referenceWidth, referenceHeight, view, prefConfig, true);
+    }
+
+    public RelativeTouchContext(NvConnection conn, int actionIndex,
+                                int referenceWidth, int referenceHeight,
+                                View view, PreferenceConfiguration prefConfig,
+                                boolean clicksEnabled)
     {
         this.conn = conn;
         this.actionIndex = actionIndex;
@@ -101,6 +123,7 @@ public class RelativeTouchContext implements TouchContext {
         this.referenceHeight = referenceHeight;
         this.targetView = view;
         this.prefConfig = prefConfig;
+        this.clicksEnabled = clicksEnabled;
         this.handler = new Handler(Looper.getMainLooper());
     }
 
@@ -112,32 +135,30 @@ public class RelativeTouchContext implements TouchContext {
 
     private boolean isWithinTapBounds(int touchX, int touchY)
     {
+        int slack = TouchGestureRules.slackPx(maxPointerCountInGesture);
         int xDelta = Math.abs(touchX - originalTouchX);
         int yDelta = Math.abs(touchY - originalTouchY);
-        return xDelta <= TAP_MOVEMENT_THRESHOLD &&
-                yDelta <= TAP_MOVEMENT_THRESHOLD;
+
+        return xDelta <= TouchGestureRules.TAP_MOVEMENT_THRESHOLD_PX + slack &&
+                yDelta <= TouchGestureRules.TAP_MOVEMENT_THRESHOLD_PX + slack;
     }
 
     private boolean isTap(long eventTime)
     {
-        if (confirmedDrag || confirmedMove || confirmedScroll) {
-            return false;
-        }
-
-        // If this input wasn't the last finger down, do not report
-        // a tap. This ensures we don't report duplicate taps for each
-        // finger on a multi-finger tap gesture
-        if (actionIndex + 1 != maxPointerCountInGesture) {
-            return false;
-        }
-
-        long timeDelta = eventTime - originalTouchTime;
-        return isWithinTapBounds(lastTouchX, lastTouchY) && timeDelta <= TAP_TIME_THRESHOLD;
+        // The finger that lifts last is the one that ends the gesture. Deciding the tap that
+        // way, rather than by which finger went down last, is what makes a two-finger tap one
+        // right click however the fingers are lifted.
+        return TouchGestureRules.isTap(maxPointerCountInGesture, pointerCount,
+                confirmedMove, confirmedDrag, confirmedScroll,
+                Math.max(Math.abs(lastTouchX - originalTouchX),
+                        Math.abs(lastTouchY - originalTouchY)),
+                (int) Math.round(distanceMoved),
+                eventTime - originalTouchTime);
     }
 
     private byte getMouseButtonIndex()
     {
-        if (actionIndex == 1) {
+        if (TouchGestureRules.isRightButton(maxPointerCountInGesture, actionIndex)) {
             return MouseButtonPacket.BUTTON_RIGHT;
         }
         else {
@@ -162,8 +183,24 @@ public class RelativeTouchContext implements TouchContext {
             distanceMoved = 0;
 
             if (actionIndex == 0) {
-                // Start the timer for engaging a drag
-                startDragTimer();
+                if (clicksEnabled && TouchGestureRules.startsDragWithSecondTap(
+                        eventTime - lastTapTime)) {
+                    // A second tap close behind the first starts dragging at once: the button
+                    // goes down and the finger carries it, so tap-then-drag selects and drags
+                    // rather than needing a long hold first
+                    confirmedDrag = true;
+
+                    // Nothing may let go of the button that is being pressed now
+                    cancelPendingReleases();
+                    conn.sendMouseButtonDown(getMouseButtonIndex());
+
+                    android.util.Log.i("Trackpad", "second tap after " + (eventTime - lastTapTime)
+                            + "ms starts a drag");
+                }
+                else {
+                    // Start the timer for engaging a drag
+                    startDragTimer();
+                }
             }
         }
 
@@ -184,10 +221,16 @@ public class RelativeTouchContext implements TouchContext {
 
         if (confirmedDrag) {
             // Raise the button after a drag
-            conn.sendMouseButtonUp(buttonIndex);
+            if (clicksEnabled) {
+                conn.sendMouseButtonUp(buttonIndex);
+            }
         }
-        else if (isTap(eventTime))
+        else if (clicksEnabled && isTap(eventTime))
         {
+            lastTapTime = eventTime;
+
+            android.util.Log.i("Trackpad", "tap becomes a click");
+
             // Lower the mouse button
             conn.sendMouseButtonDown(buttonIndex);
 
@@ -199,8 +242,26 @@ public class RelativeTouchContext implements TouchContext {
         }
     }
 
+    /**
+     * Drops the release that follows a tap.
+     *
+     * A tap lets go of the button a moment later, so that a host which polls for presses still
+     * sees one. If the next touch begins inside that moment, the release would otherwise arrive
+     * in the middle of it and end the drag as soon as it started.
+     */
+    private void cancelPendingReleases() {
+        for (Runnable buttonUp : buttonUpRunnables) {
+            handler.removeCallbacks(buttonUp);
+        }
+    }
+
     private void startDragTimer() {
         cancelDragTimer();
+
+        if (!clicksEnabled) {
+            return;
+        }
+
         handler.postDelayed(dragTimerRunnable, DRAG_TIME_THRESHOLD);
     }
 
@@ -223,7 +284,8 @@ public class RelativeTouchContext implements TouchContext {
 
         // Check if we've exceeded the maximum distance moved
         distanceMoved += Math.sqrt(Math.pow(eventX - lastTouchX, 2) + Math.pow(eventY - lastTouchY, 2));
-        if (distanceMoved >= TAP_DISTANCE_THRESHOLD) {
+        if (distanceMoved >= TouchGestureRules.TAP_DISTANCE_THRESHOLD_PX
+                + TouchGestureRules.slackPx(maxPointerCountInGesture)) {
             confirmedMove = true;
             cancelDragTimer();
             return;
@@ -310,7 +372,7 @@ public class RelativeTouchContext implements TouchContext {
         cancelDragTimer();
 
         // If it was a confirmed drag, we'll need to raise the button now
-        if (confirmedDrag) {
+        if (confirmedDrag && clicksEnabled) {
             conn.sendMouseButtonUp(getMouseButtonIndex());
         }
     }
