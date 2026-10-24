@@ -654,6 +654,8 @@ public class LayoutSmokeActivity extends Activity {
         checkPassThrough();
         checkTrackpadGestures();
         checkTypingAppliesWhenFinished();
+        checkANewLayoutStartsEmpty();
+        checkTheShippedArrangementIsPreinstalled();
     }
 
     /**
@@ -1394,59 +1396,76 @@ public class LayoutSmokeActivity extends Activity {
      * configured for it, exactly as the built-in on-screen trigger does.
      */
     private void checkTriggersWorkOnTheirOwn() {
-        // A layout of its own with nothing saved under it, so the check sees the arrangement the
-        // app starts with rather than whatever this device happens to have stored. Earlier runs
-        // of this suite change the stored layout, and a check that reads it then measures its
-        // own leftovers.
-        UniversalLayoutDefinition scratch = UniversalLayoutStore.getInstance(this)
-                .addLayout(UniversalLayoutStore.getInstance(this).makeUniqueName("smoke trigger"));
+        // The arrangement the app ships with belongs to the built-in layout and shows only while
+        // nothing is stored for it. The check borrows that state and puts back whatever was there,
+        // so it measures the built-in arrangement without disturbing the user's own.
+        String savedElements = readStoredElements(UniversalLayoutStore.DEFAULT_LAYOUT_ID);
+
+        SharedPreferences prefs = getSharedPreferences(
+                "OSC_UNIVERSAL_" + UniversalLayoutStore.DEFAULT_LAYOUT_ID, MODE_PRIVATE);
+
+        int savedWidth = prefs.getInt("savedWidth", 0);
+        int savedHeight = prefs.getInt("savedHeight", 0);
+
+        prefs.edit().clear().apply();
+
         UniversalVirtualController controller = new UniversalVirtualController(
-                universalController.getControllerHandler(), (FrameLayout) universalController
-                .getLayoutArea(), this, scratch.getId());
+                universalController.getControllerHandler(),
+                (FrameLayout) universalController.getLayoutArea(), this,
+                UniversalLayoutStore.DEFAULT_LAYOUT_ID);
 
         controller.refreshLayout();
 
-        UniversalVirtualControllerElement lt = null;
-        for (UniversalVirtualControllerElement element : controller.getElements()) {
-            if (element instanceof UniversalLeftTrigger) {
-                lt = element;
-                break;
-            }
-        }
-
-        check("the built-in layout has a left trigger", lt != null);
-
-        if (lt == null) {
-            controller.destroy();
-            UniversalLayoutStore.getInstance(this).deleteLayout(scratch.getId());
-            return;
-        }
-
-        UniversalVirtualController.ControllerMode originalMode = controller.getControllerMode();
-        controller.setControllerMode(UniversalVirtualController.ControllerMode.Active);
-
         try {
-            // Nothing is configured for it, which is how the built-in layout makes one
-            ((UniversalLeftTrigger) lt).getButtonConfig().setActionSequence(ActionSequence.empty());
+            UniversalVirtualControllerElement lt = null;
 
-            controller.getControllerInputContext().leftTrigger = 0;
+            for (UniversalVirtualControllerElement element : controller.getElements()) {
+                if (element instanceof UniversalLeftTrigger) {
+                    lt = element;
+                    break;
+                }
+            }
 
-            lt.onElementTouchEvent(motionEventFor(lt, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
-            check("a trigger pulls its axis without anything configured for it",
-                    controller.getControllerInputContext().leftTrigger == (byte) 0xFF);
+            check("the built-in layout has a left trigger", lt != null);
 
-            lt.onElementTouchEvent(motionEventFor(lt, MotionEvent.ACTION_UP, 0.5f, 0.5f));
-            check("a trigger lets its axis out again",
-                    controller.getControllerInputContext().leftTrigger == 0);
+            if (lt == null) {
+                return;
+            }
+
+            UniversalVirtualController.ControllerMode originalMode = controller.getControllerMode();
+            controller.setControllerMode(UniversalVirtualController.ControllerMode.Active);
+
+            try {
+                // Nothing is configured for it, which is how the built-in layout makes one
+                ((UniversalLeftTrigger) lt).getButtonConfig().setActionSequence(ActionSequence.empty());
+
+                controller.getControllerInputContext().leftTrigger = 0;
+
+                lt.onElementTouchEvent(motionEventFor(lt, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+                check("a trigger pulls its axis without anything configured for it",
+                        controller.getControllerInputContext().leftTrigger == (byte) 0xFF);
+
+                lt.onElementTouchEvent(motionEventFor(lt, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+                check("a trigger lets its axis out again",
+                        controller.getControllerInputContext().leftTrigger == 0);
+            } finally {
+                lt.releaseConfiguredActions();
+                controller.getControllerInputContext().leftTrigger = 0;
+                controller.setControllerMode(originalMode);
+            }
         } finally {
-            lt.releaseConfiguredActions();
-            controller.getControllerInputContext().leftTrigger = 0;
-            controller.setControllerMode(originalMode);
-
-            // The scratch layout is taken down again, so its controls do not sit on top of the
-            // real ones
+            // The borrowed controller takes its controls with it
             controller.destroy();
-            UniversalLayoutStore.getInstance(this).deleteLayout(scratch.getId());
+
+            // And the layout is exactly as it was before the check looked at it
+            if (savedElements == null || savedElements.isEmpty()) {
+                prefs.edit().clear().apply();
+            }
+            else {
+                UniversalLayoutConfigurationLoader.writeStoredElements(this,
+                        UniversalLayoutStore.DEFAULT_LAYOUT_ID, savedElements, savedWidth,
+                        savedHeight);
+            }
         }
     }
 
@@ -3450,6 +3469,116 @@ public class LayoutSmokeActivity extends Activity {
         panel.applyPendingInputs();
         editor.applyGeometryForTesting(100, 100, element.getWidth() > 0 ? element.getWidth() : 160,
                 element.getHeight() > 0 ? element.getHeight() : 160);
+    }
+
+
+    /**
+     * A layout that is made now starts from a clean screen, and the built-in one keeps its
+     * built-in arrangement.
+     */
+    private void checkANewLayoutStartsEmpty() {
+        UniversalLayoutStore store = UniversalLayoutStore.getInstance(this);
+        UniversalLayoutDefinition created = store.addLayout(store.makeUniqueName("smoke empty"));
+
+        UniversalVirtualController controller = new UniversalVirtualController(
+                universalController.getControllerHandler(),
+                (FrameLayout) universalController.getLayoutArea(), this, created.getId());
+
+        try {
+            controller.refreshLayout();
+
+            android.util.Log.i("LayoutSmoke", "a new layout has " + controller.getElements().size()
+                    + " controls");
+
+            check("a new layout has no controls at all", controller.getElements().isEmpty());
+        } finally {
+            controller.destroy();
+            store.deleteLayout(created.getId());
+        }
+
+        // The built-in layout still comes with the arrangement the app starts with
+        UniversalVirtualController builtIn = new UniversalVirtualController(
+                universalController.getControllerHandler(),
+                (FrameLayout) universalController.getLayoutArea(), this,
+                UniversalLayoutStore.DEFAULT_LAYOUT_ID);
+
+        try {
+            builtIn.refreshLayout();
+
+            android.util.Log.i("LayoutSmoke", "the built-in layout has "
+                    + builtIn.getElements().size() + " controls");
+
+            check("the built-in layout still has its controls",
+                    builtIn.getElements().size() > 10);
+        } finally {
+            builtIn.destroy();
+        }
+    }
+
+    /**
+     * A fresh install starts from the arrangement the app ships with, and the built-in layout
+     * cannot be removed or lost.
+     */
+    private void checkTheShippedArrangementIsPreinstalled() {
+        SharedPreferences prefs = getSharedPreferences(
+                "OSC_UNIVERSAL_" + UniversalLayoutStore.DEFAULT_LAYOUT_ID, MODE_PRIVATE);
+
+        // Whatever this device has stored is put back afterwards, so the check leaves no trace
+        String savedElements = prefs.getString("elements", null);
+        int savedWidth = prefs.getInt("savedWidth", 0);
+        int savedHeight = prefs.getInt("savedHeight", 0);
+
+        // A fresh install: nothing stored for the built-in layout
+        prefs.edit().clear().apply();
+
+        try {
+            check("a fresh install has the shipped arrangement put in",
+                    UniversalLayoutConfigurationLoader.seedShippedLayout(this));
+
+            String seeded = readStoredElements(UniversalLayoutStore.DEFAULT_LAYOUT_ID);
+
+            check("the shipped arrangement is written into the built-in layout",
+                    seeded != null && !seeded.isEmpty());
+
+            UniversalVirtualController controller = new UniversalVirtualController(
+                    universalController.getControllerHandler(),
+                    (FrameLayout) universalController.getLayoutArea(), this,
+                    UniversalLayoutStore.DEFAULT_LAYOUT_ID);
+
+            try {
+                controller.refreshLayout();
+
+                int shipped = countOccurrences(seeded, "\"type\"");
+
+                android.util.Log.i("LayoutSmoke", "the shipped arrangement has " + shipped
+                        + " controls, the built-in layout shows " + controller.getElements().size());
+
+                check("the built-in layout shows the shipped arrangement",
+                        controller.getElements().size() == shipped && shipped > 10);
+
+                // The screen it was arranged on is recorded, so it is fitted to this one
+                check("the shipped arrangement says which screen it was arranged on",
+                        prefs.getInt("savedWidth", 0) > 0 && prefs.getInt("savedHeight", 0) > 0);
+            } finally {
+                controller.destroy();
+            }
+        } finally {
+            if (savedElements == null || savedElements.isEmpty()) {
+                prefs.edit().clear().apply();
+            }
+            else {
+                UniversalLayoutConfigurationLoader.writeStoredElements(this,
+                        UniversalLayoutStore.DEFAULT_LAYOUT_ID, savedElements, savedWidth,
+                        savedHeight);
+            }
+        }
+
+        // And it still cannot be deleted, whatever is in it
+        UniversalLayoutStore.getInstance(this).deleteLayout(UniversalLayoutStore.DEFAULT_LAYOUT_ID);
+
+        check("the built-in layout is still there after asking to delete it",
+                UniversalLayoutStore.getInstance(this).getLayout(
+                        UniversalLayoutStore.DEFAULT_LAYOUT_ID) != null);
     }
 
     private static boolean contains(String[] labels, String needle) {

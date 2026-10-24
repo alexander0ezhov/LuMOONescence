@@ -582,7 +582,18 @@ public class UniversalVirtualController {
 
         removeElements();
 
-        UniversalLayoutConfigurationLoader.createDefaultLayout(this, context);
+        // The built-in arrangement belongs to the built-in layout. Any other layout holds
+        // exactly what the user put in it, which for a layout that was just made is nothing at
+        // all: a new layout starts from a clean screen rather than from a copy of the built-in
+        // one.
+        if (UniversalLayoutStore.DEFAULT_LAYOUT_ID.equals(layoutId)) {
+            // The built-in layout starts as the arrangement the app ships with. The one built in
+            // code is only there for the case of a build without the shipped file.
+            if (!UniversalLayoutConfigurationLoader.seedShippedLayout(context)) {
+                UniversalLayoutConfigurationLoader.createDefaultLayout(this, context);
+            }
+        }
+
         UniversalLayoutConfigurationLoader.loadFromPreferences(this, context, layoutId);
 
         applyElementOpacity();

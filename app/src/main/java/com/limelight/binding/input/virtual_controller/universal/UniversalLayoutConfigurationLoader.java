@@ -761,6 +761,62 @@ public class UniversalLayoutConfigurationLoader {
     }
 
     /**
+     * The arrangement the app ships with, as a file in the app itself.
+     */
+    private static final String SHIPPED_LAYOUT_ASSET = "universal_default_layout.json";
+
+    /**
+     * Puts the arrangement the app ships with into the built-in layout.
+     *
+     * A fresh install has nothing stored for the built-in layout, so the shipped arrangement is
+     * written in as its own, together with the screen it was arranged on. From there it is
+     * treated like any other layout: fitted to whatever screen the app is first run on, by the
+     * same rule an imported layout is fitted by.
+     *
+     * @return whether the built-in layout has an arrangement to show
+     */
+    public static boolean seedShippedLayout(Context context) {
+        SharedPreferences preferences = getLayoutPreferences(context, UniversalLayoutStore.DEFAULT_LAYOUT_ID);
+
+        if (preferences.getString(KEY_ELEMENTS, null) != null) {
+            // It already has an arrangement, which may be the user's own
+            return true;
+        }
+
+        try {
+            UniversalLayoutExchange.Imported shipped = UniversalLayoutExchange.fromJson(
+                    readAsset(context, SHIPPED_LAYOUT_ASSET));
+
+            writeStoredElements(context, UniversalLayoutStore.DEFAULT_LAYOUT_ID,
+                    shipped.getElementsJson(), shipped.getSourceWidth(), shipped.getSourceHeight());
+
+            return !shipped.getElementsJson().isEmpty();
+        } catch (java.io.IOException e) {
+            return false;
+        } catch (JSONException e) {
+            return false;
+        }
+    }
+
+    private static String readAsset(Context context, String name) throws java.io.IOException {
+        java.io.InputStream in = context.getAssets().open(name);
+
+        try {
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            int read;
+
+            while ((read = in.read(buffer)) > 0) {
+                out.write(buffer, 0, read);
+            }
+
+            return out.toString("UTF-8");
+        } finally {
+            in.close();
+        }
+    }
+
+    /**
      * The id a set of stored controls needs next, which is one past the highest it holds.
      */
     public static int nextElementIdIn(String elementsJson) {
