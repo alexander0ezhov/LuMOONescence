@@ -354,6 +354,11 @@ public class UniversalLayoutEditorActivity extends Activity
      * Shows or hides the drawer. It is only on screen while a control is being edited.
      */
     private void setPanelVisible(boolean visible) {
+        if (!visible && panel != null) {
+            // The rows are about to be hidden, so anything typed into them is finished first
+            panel.applyPendingInputs();
+        }
+
         panelContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
@@ -677,6 +682,12 @@ public class UniversalLayoutEditorActivity extends Activity
     private void selectElement(UniversalVirtualControllerElement element) {
         if (selectedElement == element) {
             return;
+        }
+
+        // A number that was typed but not yet acted on belongs to the control being left, so it
+        // is applied before the rows are replaced
+        if (panel != null && selectedElement != null) {
+            panel.applyPendingInputs();
         }
 
         if (selectedElement != null) {

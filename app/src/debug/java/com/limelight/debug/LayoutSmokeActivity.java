@@ -653,6 +653,7 @@ public class LayoutSmokeActivity extends Activity {
         checkChoosingALayoutShowsItAgain();
         checkPassThrough();
         checkTrackpadGestures();
+        checkTypingAppliesWhenFinished();
     }
 
     /**
@@ -3383,6 +3384,72 @@ public class LayoutSmokeActivity extends Activity {
                 + (TouchGestureRules.TAP_MOVEMENT_THRESHOLD_PX + TouchGestureRules.slackPx(2))
                 + "px, drag after a tap within "
                 + TouchGestureRules.SECOND_TAP_DRAG_WINDOW_MS + "ms");
+    }
+
+
+    /**
+     * A number typed into a field must not be acted on letter by letter.
+     *
+     * It used to be: typing 1024 moved the control to 1, then 10, then 102, each of them held
+     * inside the layout, so the field fought the person using it.
+     */
+    private void checkTypingAppliesWhenFinished() {
+        UniversalVirtualControllerElement element = firstElementInLayout();
+
+        check("a control is in the layout for the typing check", element != null);
+
+        if (element == null) {
+            return;
+        }
+
+        editor.onElementTapped(element);
+
+        UniversalEditorPanel panel = editor.getPanelForTesting();
+        UniversalEditorPanel.SliderRow xRow = panel.getSliderRow(getString(R.string.editor_label_x));
+
+        check("the drawer has a field for the position", xRow != null);
+
+        if (xRow == null) {
+            return;
+        }
+
+        int before = element.getConfig().getGeometry().getLeft();
+
+        // Typed one character at a time, as a person does
+        xRow.typeForTesting(1);
+        check("a half typed number is not acted on",
+                element.getConfig().getGeometry().getLeft() == before);
+
+        xRow.typeForTesting(10);
+        check("a number typed so far is not acted on",
+                element.getConfig().getGeometry().getLeft() == before);
+
+        xRow.typeForTesting(102);
+        xRow.typeForTesting(1024);
+
+        check("nothing was acted on while typing",
+                element.getConfig().getGeometry().getLeft() == before);
+        check("the field remembers what was typed", xRow.getValue() == 1024);
+        check("the field knows the entry is unfinished", panel.hasPendingInputs());
+
+        // Finishing the entry applies it
+        panel.applyPendingInputs();
+
+        int after = element.getConfig().getGeometry().getLeft();
+
+        android.util.Log.i("LayoutSmoke", "typed 1024: left was " + before
+                + ", came out " + after);
+
+        check("finishing the entry applies the number", after == 1024);
+        check("the entry is no longer waiting", !panel.hasPendingInputs());
+
+        // An empty or half typed field is not a value
+        xRow.typeForTesting(7);
+        check("a newly typed number waits again", panel.hasPendingInputs());
+
+        panel.applyPendingInputs();
+        editor.applyGeometryForTesting(100, 100, element.getWidth() > 0 ? element.getWidth() : 160,
+                element.getHeight() > 0 ? element.getHeight() : 160);
     }
 
     private static boolean contains(String[] labels, String needle) {

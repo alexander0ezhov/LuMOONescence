@@ -7,6 +7,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -558,6 +559,31 @@ public class UniversalEditorPanel {
         return Math.round(value * density);
     }
 
+    /**
+     * Applies every number that was typed and not yet acted on.
+     *
+     * It is called before the drawer is closed or another control is picked, so a number that
+     * was typed is not quietly thrown away with the rows that held it.
+     */
+    public void applyPendingInputs() {
+        for (SliderRow row : sliderRows.values()) {
+            row.applyTypedValueIfPending();
+        }
+    }
+
+    /**
+     * Whether any row holds a typed number that has not been acted on yet.
+     */
+    public boolean hasPendingInputs() {
+        for (SliderRow row : sliderRows.values()) {
+            if (row.hasPendingInput()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public interface OnTextChangedListener {
         void onTextChanged(String text);
     }
@@ -601,8 +627,11 @@ public class UniversalEditorPanel {
 
         private boolean updating;
 
+        private final OnValueChangedListener listener;
+
         SliderRow(String label, int initialValue, int max, final OnValueChangedListener listener) {
             this.value = initialValue;
+            this.listener = listener;
 
             LinearLayout row = new LinearLayout(context);
             row.setOrientation(LinearLayout.HORIZONTAL);
@@ -645,6 +674,10 @@ public class UniversalEditorPanel {
                     updating = false;
 
                     SliderRow.this.value = progress;
+
+                    // The handle is the newer word on the value, so nothing is left waiting
+                    typedNotApplied = false;
+
                     listener.onValueChanged(progress);
                 }
 
@@ -687,13 +720,94 @@ public class UniversalEditorPanel {
                     updating = false;
 
                     // The number that was typed is the value, even when the slider cannot
-                    // show it, so a large typed size is not quietly cut down
+                    // show it, so a large typed size is not quietly cut down. It is only
+                    // recorded here, though: applying it on every character would fight the
+                    // user, because the values are held inside the layout and a half typed
+                    // number is not one that should be acted on.
                     value = parsed;
-                    listener.onValueChanged(parsed);
+                    typedNotApplied = true;
+                }
+            });
+
+            // Leaving the field finishes the entry
+            input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean hasFocus) {
+                    if (!hasFocus) {
+                        applyTypedValue();
+                    }
+                }
+            });
+
+            // So does the key that says the entry is done, and the keyboard goes away with it
+            input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+                    boolean finished = actionId == EditorInfo.IME_ACTION_DONE
+                            || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER);
+
+                    if (!finished) {
+                        return false;
+                    }
+
+                    applyTypedValue();
+                    input.clearFocus();
+
+                    // The keyboard covers the layout being edited, so it is put away
+                    android.view.inputmethod.InputMethodManager keyboard =
+                            (android.view.inputmethod.InputMethodManager) context.getSystemService(
+                                    Context.INPUT_METHOD_SERVICE);
+
+                    if (keyboard != null) {
+                        keyboard.hideSoftInputFromWindow(input.getWindowToken(), 0);
+                    }
+
+                    return true;
                 }
             });
 
             content.addView(row, matchWidth());
+        }
+
+        /**
+         * Whether the field holds a number that has been typed but not yet acted on.
+         */
+        private boolean typedNotApplied;
+
+        /**
+         * Acts on a number that was typed and not yet applied.
+         *
+         * Nothing happens when there is nothing waiting, so a field that was left alone does not
+         * report a value nobody changed.
+         */
+        private void applyTypedValue() {
+            if (!typedNotApplied) {
+                return;
+            }
+
+            typedNotApplied = false;
+            listener.onValueChanged(value);
+        }
+
+        /**
+         * Applies a number that was typed and not yet acted on, if there is one.
+         */
+        public void applyTypedValueIfPending() {
+            applyTypedValue();
+        }
+
+        /**
+         * Whether this row holds a typed number that has not been acted on yet.
+         */
+        public boolean hasPendingInput() {
+            return typedNotApplied;
+        }
+
+        /**
+         * Types a number into the field, as a finger would, for the debug smoke test.
+         */
+        public void typeForTesting(int typed) {
+            input.setText(String.valueOf(typed));
         }
 
         private int clamp(int value, int max) {
@@ -710,6 +824,9 @@ public class UniversalEditorPanel {
          */
         public void setValue(int value) {
             this.value = value;
+
+            // The value that just arrived is the one that counts, so anything typed is spent
+            typedNotApplied = false;
 
             updating = true;
             seekBar.setProgress(clamp(value, seekBar.getMax()));
