@@ -1,0 +1,803 @@
+{
+  "format": "moonlight-universal-layout",
+  "version": 1,
+  "name": "Default",
+  "screen": {
+    "width": 2510,
+    "height": 1156
+  },
+  "elements": [
+    {
+      "name": "D-pad",
+      "geometry": {
+        "left": 321,
+        "top": 162,
+        "width": 400,
+        "height": 400
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "directions": [
+          {
+            "steps": [
+              {
+                "delayMs": 0,
+                "events": [
+                  {
+                    "kind": 2,
+                    "code": 5
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "steps": [
+              {
+                "delayMs": 0,
+                "events": [
+                  {
+                    "kind": 2,
+                    "code": 6
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "steps": [
+              {
+                "delayMs": 0,
+                "events": [
+                  {
+                    "kind": 2,
+                    "code": 7
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "steps": [
+              {
+                "delayMs": 0,
+                "events": [
+                  {
+                    "kind": 2,
+                    "code": 8
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "type": "dpad",
+      "elementId": 1
+    },
+    {
+      "name": "A",
+      "geometry": {
+        "left": 2136,
+        "top": 657,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 1
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 6
+    },
+    {
+      "name": "B",
+      "geometry": {
+        "left": 2287,
+        "top": 510,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 2
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 7
+    },
+    {
+      "name": "X",
+      "geometry": {
+        "left": 1981,
+        "top": 506,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 3
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 8
+    },
+    {
+      "name": "Y",
+      "geometry": {
+        "left": 2134,
+        "top": 356,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 4
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 9
+    },
+    {
+      "name": "LT",
+      "geometry": {
+        "left": 1773,
+        "top": 349,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 3,
+                  "code": 0
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "trigger",
+      "elementId": 2
+    },
+    {
+      "name": "RT",
+      "geometry": {
+        "left": 1666,
+        "top": 507,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 3,
+                  "code": 1
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "trigger",
+      "elementId": 3
+    },
+    {
+      "name": "LB",
+      "geometry": {
+        "left": 2133,
+        "top": 507,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 9
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 4
+    },
+    {
+      "name": "Left stick",
+      "geometry": {
+        "left": 356,
+        "top": 690,
+        "width": 340,
+        "height": 340
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "mode": 0,
+        "axisX": 1,
+        "axisY": 2,
+        "buttons": [
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          },
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          },
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          },
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          }
+        ],
+        "centerButton": {
+          "enabled": false,
+          "binding": {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          }
+        }
+      },
+      "type": "stick",
+      "elementId": 12
+    },
+    {
+      "name": "Right stick",
+      "geometry": {
+        "left": 1713,
+        "top": 738,
+        "width": 340,
+        "height": 340
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "mode": 0,
+        "axisX": 3,
+        "axisY": 4,
+        "buttons": [
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          },
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          },
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          },
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          }
+        ],
+        "centerButton": {
+          "enabled": false,
+          "binding": {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          }
+        }
+      },
+      "type": "stick",
+      "elementId": 13
+    },
+    {
+      "name": "BACK",
+      "geometry": {
+        "left": 960,
+        "top": 13,
+        "width": 192,
+        "height": 112
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 14
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 10
+    },
+    {
+      "name": "START",
+      "geometry": {
+        "left": 1408,
+        "top": 14,
+        "width": 192,
+        "height": 112
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 13
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 11
+    },
+    {
+      "name": "GUIDE",
+      "geometry": {
+        "left": 1189,
+        "top": 15,
+        "width": 192,
+        "height": 112
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 15
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 16
+    },
+    {
+      "name": "alt+f4",
+      "geometry": {
+        "left": 1970,
+        "top": 17,
+        "width": 202,
+        "height": 106
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32932
+                },
+                {
+                  "kind": 0,
+                  "code": 32883
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1000
+    },
+    {
+      "name": "#",
+      "geometry": {
+        "left": 1853,
+        "top": 506,
+        "width": 108,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 3,
+                  "code": 1
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": true
+      },
+      "type": "button",
+      "elementId": 1001
+    },
+    {
+      "name": "RS",
+      "geometry": {
+        "left": 2300,
+        "top": 789,
+        "width": 146,
+        "height": 144
+      },
+      "borderRadius": 38,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 12
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1002
+    },
+    {
+      "name": "LS",
+      "geometry": {
+        "left": 2154,
+        "top": 878,
+        "width": 146,
+        "height": 144
+      },
+      "borderRadius": 38,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 11
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1003
+    },
+    {
+      "name": "RT",
+      "geometry": {
+        "left": 765,
+        "top": 642,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 3,
+                  "code": 1
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "trigger",
+      "elementId": 1005
+    },
+    {
+      "name": "alt+tab",
+      "geometry": {
+        "left": 2217,
+        "top": 16,
+        "width": 202,
+        "height": 106
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32932
+                },
+                {
+                  "kind": 0,
+                  "code": 32777
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1006
+    },
+    {
+      "name": "#",
+      "geometry": {
+        "left": 1960,
+        "top": 348,
+        "width": 108,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 3,
+                  "code": 0
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": true
+      },
+      "type": "button",
+      "elementId": 1007
+    },
+    {
+      "name": "RB",
+      "geometry": {
+        "left": 2287,
+        "top": 357,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 10
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1008
+    },
+    {
+      "name": "LT",
+      "geometry": {
+        "left": 640,
+        "top": 479,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 3,
+                  "code": 0
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1011
+    },
+    {
+      "name": "LB",
+      "geometry": {
+        "left": 65,
+        "top": 648,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 9
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "trigger",
+      "elementId": 1013
+    },
+    {
+      "name": "RB",
+      "geometry": {
+        "left": 196,
+        "top": 471,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 2,
+                  "code": 10
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "trigger",
+      "elementId": 1014
+    }
+  ]
+}
