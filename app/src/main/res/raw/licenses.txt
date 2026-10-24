@@ -1,4 +1,4 @@
-StreamPad - open source licenses
+LunarStreamLight - open source licenses
 ================================
 
 This app is a modified fork of Moonlight for Android (https://moonlight-stream.org), which is
@@ -12,13 +12,13 @@ Moonlight build.
 
 Third-party components
 ----------------------
-  moonlight-common-c  GNU GPL v3        (streaming protocol core)
-  okhttp              Apache 2.0        (HTTP)
-  jmdns               Apache 2.0        (host discovery)
-  Bouncy Castle       Bouncy Castle Licence (MIT-style) (certificates)
-  JCodec              BSD 2-Clause      (H.264 utilities)
-  OpenSSL             Apache 2.0        (TLS, native)
-  Opus                BSD 3-Clause      (audio codec)
+  moonlight-common-c - GNU GPL v3 - streaming protocol core
+  okhttp - Apache 2.0 - HTTP
+  jmdns - Apache 2.0 - host discovery
+  Bouncy Castle - Bouncy Castle Licence (MIT-style) - certificates
+  JCodec - BSD 2-Clause - H.264 utilities
+  OpenSSL - Apache 2.0 - TLS, in the native core
+  Opus - BSD 3-Clause - audio codec
 
 Notice for Apache License 2.0 components:
   Copyright 2019 Square, Inc. (okhttp)

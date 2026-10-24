@@ -37,7 +37,7 @@ android {
                 }
             }
 
-            applicationId "io.github.alexander0ezhov.streampad.root"
+            applicationId "io.github.alexander0ezhov.lunarstreamlight.root"
             dimension "root"
             buildConfigField "boolean", "ROOT_BUILD", "true"
         }
@@ -49,7 +49,7 @@ android {
                 }
             }
 
-            applicationId "io.github.alexander0ezhov.streampad"
+            applicationId "io.github.alexander0ezhov.lunarstreamlight"
             dimension "root"
             buildConfigField "boolean", "ROOT_BUILD", "false"
         }
@@ -84,8 +84,8 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
-            resValue "string", "app_label", "StreamPad (Debug)"
-            resValue "string", "app_label_root", "StreamPad (Root Debug)"
+            resValue "string", "app_label", "LunarStreamLight (Debug)"
+            resValue "string", "app_label_root", "LunarStreamLight (Root Debug)"
         }
         release {
             // To whomever is releasing/using an APK in release mode with
@@ -118,8 +118,8 @@ android {
             // is to please change the applicationId before you publish.
             //
             // TL;DR: Leave the following line alone!
-            resValue "string", "app_label", "StreamPad"
-            resValue "string", "app_label_root", "StreamPad (Root)"
+            resValue "string", "app_label", "LunarStreamLight"
+            resValue "string", "app_label_root", "LunarStreamLight (Root)"
 
             // This fork already publishes under its own application id, so the suffix
             // the upstream project used for unofficial builds is not needed.

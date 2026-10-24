@@ -6,6 +6,8 @@ import android.util.TypedValue;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.limelight.utils.UiHelper;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,12 +31,17 @@ public class OpenSourceLicensesActivity extends Activity {
         text.setText(readLicenses());
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
         text.setTextIsSelectable(true);
+        text.setTypeface(android.graphics.Typeface.MONOSPACE);
         text.setPadding(dp(16), dp(16), dp(16), dp(16));
 
         ScrollView scroll = new ScrollView(this);
 
         scroll.addView(text);
         setContentView(scroll);
+
+        // The same padding every other screen of the app gets, so the text starts below the
+        // status bar rather than under it
+        UiHelper.notifyNewRootView(this);
     }
 
     private String readLicenses() {
