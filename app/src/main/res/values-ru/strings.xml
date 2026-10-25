@@ -113,13 +113,6 @@
     <string name="category_advanced_settings">Расширенные настройки</string>
     <string name="title_video_format">Изменить настройки кодека</string>
     <string name="summary_video_format">Новые кодеки могут снизить требования к пропускной способности видео, если ваше устройство их поддерживает. Выбор кодека можно игнорировать, если он не поддерживается ПО хоста или графическим процессором.</string>
-    <string name="category_on_screen_controls_settings">Настройки экранных кнопок</string>
-    <string name="title_checkbox_show_onscreen_controls">Показывать экранные кнопки</string>
-    <string name="summary_checkbox_show_onscreen_controls">Отображать оверлей виртуального контроллера на сенсорном экране</string>
-    <string name="title_only_l3r3">Показывать только L3 и R3</string>
-    <string name="summary_only_l3r3">Скрывать все экранные кнопки кроме L3 и R3</string>
-    <string name="summary_osc_opacity">Сделать экранные кнопки более/менее прозрачными</string>
-    <string name="dialog_title_osc_opacity">Изменить прозрачность</string>
     <string name="scut_deleted_pc">ПК удалён</string>
     <string name="scut_not_paired">ПК не сопряжён</string>
     <string name="help_loading_title">Просмотр помощи</string>
@@ -139,10 +132,6 @@
     <string name="summary_checkbox_usb_bind_all">Заставляет USB драйвер LunarStreamLight взять на себя работу со всеми поддерживаемыми Xbox геймпадами</string>
     <string name="title_checkbox_mouse_emulation">Эмуляция мыши на геймпаде</string>
     <string name="summary_checkbox_mouse_emulation">Долгое нажатие кнопки Start переключит геймпад в режим мыши</string>
-    <string name="title_reset_osc">Сбросить схему расположения экранных кнопок</string>
-    <string name="summary_reset_osc">Возвращает все экранные элементы управления к их расположениям по умолчанию</string>
-    <string name="dialog_title_reset_osc">Сбросить схему</string>
-    <string name="dialog_text_reset_osc">Вы уверены что хотите удалить сохраненную схему расположения кнопок?</string>
     <string name="toast_reset_osc_success">Экранные элементы управления возвращены к положениям по умолчанию</string>
     <string name="title_disable_frame_drop">Никогда не пропускать кадры</string>
     <string name="summary_disable_frame_drop">Может уменьшить микрозависания на некоторых устройствах, но также увеличить задержку</string>
@@ -150,13 +139,10 @@
     <string name="summary_enable_hdr">Потоковая передача с HDR, когда игра и графический процессор ПК поддерживают эту функцию. Для HDR требуется графический процессор с поддержкой кодирования HEVC Main 10.</string>
     <string name="title_enable_post_stream_toast">Показывать отчёт о задержке после трансляции</string>
     <string name="summary_enable_post_stream_toast">Отобразить сообщение с информацией о задержке после окончания трансляции</string>
-    <string name="title_checkbox_vibrate_osc">Включить вибрацию</string>
     <string name="title_fps_list">Частота кадров</string>
     <string name="applist_menu_details">Посмотреть детали</string>
     <string name="applist_menu_scut">Создать ярлык</string>
     <string name="category_input_settings">Настройки ввода</string>
-    <string name="title_checkbox_touchscreen_trackpad">Использовать сенсор как тачпад</string>
-    <string name="summary_checkbox_touchscreen_trackpad">Если включено, сенсор выступает в роли тачпада. Если отключено, сенсор напрямую контролирует курсор мыши.</string>
     <string name="delete_pc_msg">Вы уверены что хотите удалить этот ПК?</string>
     <string name="pcview_menu_details">Посмотреть детали</string>
     <string name="poor_connection_msg">Слабое соединение с ПК</string>
@@ -165,7 +151,6 @@
     <string name="title_unlock_fps">Показать неподдерживаемые настройки частоты кадров</string>
     <string name="applist_details_id">ID приложения:</string>
     <string name="title_checkbox_vibrate_fallback">Эмуляция виброотдачи</string>
-    <string name="summary_checkbox_vibrate_osc">Вибрировать устройство для эмуляции виброотдачи при экранном управлении</string>
     <string name="summary_checkbox_vibrate_fallback">Вибрировать устройство для эмуляции виброотдачи для геймпадов без поддержки вибрации</string>
     <string name="summary_checkbox_mouse_nav_buttons">Включение этой опции может привести к неправильной работе правой кнопки мыши на некоторых устройствах</string>
     <string name="scut_pc_not_found">ПК не найден</string>
@@ -183,7 +168,6 @@
     <string name="summary_fps_list">Увеличение для более плавного видео потока. Уменьшите для лучшей производительности на более слабых устройствах.</string>
     <string name="scut_invalid_uuid">Указанный ПК недействителен</string>
     <string name="scut_invalid_app_id">Указанное приложение недействительно</string>
-    <string name="suffix_osc_opacity">%</string>
     <string name="suffix_seekbar_bitrate_mbps">Мбит/с</string>
     <string name="applist_menu_hide_app">Скрыть приложение</string>
     <string name="pcview_menu_test_network">Тестовое подключение к сети</string>

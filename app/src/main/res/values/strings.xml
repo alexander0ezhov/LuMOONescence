@@ -195,37 +195,13 @@
     <string name="summary_checkbox_gamepad_motion_fallback">Uses your device\'s built-in motion sensors if gamepad sensors are not supported by your connected gamepad or your Android version.\nNote: Enabling this option may cause your gamepad to appear as a PlayStation controller on the host.</string>
 
     <string name="category_input_settings">Input Settings</string>
-    <string name="title_checkbox_touchscreen_trackpad">Use the touchscreen as a trackpad</string>
-    <string name="summary_checkbox_touchscreen_trackpad">If enabled, the touchscreen acts like a trackpad. If disabled, the touchscreen directly controls the mouse cursor.</string>
     <string name="title_checkbox_absolute_mouse_mode">Remote desktop mouse mode</string>
     <string name="summary_checkbox_absolute_mouse_mode">This can make mouse acceleration behave more naturally for remote desktop usage, but it is incompatible with many games.</string>
     <string name="title_checkbox_mouse_nav_buttons">Enable back and forward mouse buttons</string>
     <string name="summary_checkbox_mouse_nav_buttons">Enabling this option may break right clicking on some buggy devices</string>
 
-    <string name="category_on_screen_controls_settings">On-screen Controls Settings</string>
-    <string name="title_checkbox_show_onscreen_controls">Show on-screen controls</string>
-    <string name="summary_checkbox_show_onscreen_controls">Show virtual controller overlay on touchscreen</string>
-    <string name="title_checkbox_vibrate_osc">Enable vibration</string>
-    <string name="summary_checkbox_vibrate_osc">Vibrates your device to emulate rumble for the on-screen controls</string>
-    <string name="title_only_l3r3">Only show L3 and R3</string>
-    <string name="summary_only_l3r3">Hide all virtual buttons except L3 and R3</string>
-    <string name="title_show_guide_button">Show Guide Button</string>
-    <string name="summary_show_guide_button">Show the guide button on screen</string>
-    <string name="title_reset_osc">Clear saved on-screen controls layout</string>
-    <string name="summary_reset_osc">Resets all on-screen controls to their default size and position</string>
-    <string name="dialog_title_reset_osc">Reset Layout</string>
-    <string name="dialog_text_reset_osc">Are you sure you want to delete your saved on-screen controls layout?</string>
     <string name="toast_reset_osc_success">On-screen controls reset to default</string>
     <string name="title_osc_opacity">Change opacity of on-screen controls</string>
-    <string name="summary_osc_opacity">Make the on-screen controls more/less transparent</string>
-    <string name="dialog_title_osc_opacity">Change opacity</string>
-    <string name="suffix_osc_opacity">%</string>
-    <string name="title_checkbox_show_universal_layout">Show universal layout</string>
-    <string name="summary_checkbox_show_universal_layout">Show the customizable layout that can mix gamepad and keyboard controls</string>
-    <string name="title_reset_universal_layout">Reset universal layout controls</string>
-    <string name="summary_reset_universal_layout">Puts the controls of every universal layout back to their default size and position</string>
-    <string name="dialog_title_reset_universal_layout">Reset Universal Layouts</string>
-    <string name="dialog_text_reset_universal_layout">Reset the controls of all universal layouts to their default size and position? The layouts and their images are kept.</string>
     <string name="toast_reset_universal_layout_success">Universal layout controls reset to default</string>
 
     <string name="back">Back</string>
@@ -297,6 +273,8 @@
     <string name="stream_menu_touchpad_standard">Trackpad</string>
     <string name="stream_menu_touchpad_direct">Direct cursor</string>
     <string name="stream_menu_touchpad_no_clicks">No clicks</string>
+    <string name="stream_menu_extras">Extras</string>
+    <string name="stream_menu_vibration">Vibration</string>
     <string name="stream_menu_controls">On-screen controls</string>
     <string name="editor_label_pass_through">Pass through to touch</string>
     <string name="stream_menu_layout">Layout</string>

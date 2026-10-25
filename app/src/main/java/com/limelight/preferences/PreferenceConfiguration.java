@@ -407,6 +407,21 @@ public class PreferenceConfiguration {
     }
 
     /**
+     * Whether the phone should buzz when the game rumbles and an on-screen layout is what is
+     * receiving it.
+     */
+    public static boolean isVibrationEnabled(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(VIBRATE_OSC_PREF_STRING, DEFAULT_VIBRATE_OSC);
+    }
+
+    public static void setVibrationEnabled(Context context, boolean enabled) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putBoolean(VIBRATE_OSC_PREF_STRING, enabled)
+                .apply();
+    }
+
+    /**
      * Whether the on-screen layout is used at all. It is the switch on the layouts screen and
      * the switch in the stream menu, which is why both write it here.
      */

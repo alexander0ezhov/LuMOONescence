@@ -43,7 +43,6 @@
     <string name="applist_refresh_error_msg">Απέτυχε η λήψη λίστας εφαρμογών</string>
     <string name="applist_quit_fail">Αποτυχία διακοπής</string>
     <string name="applist_quit_confirmation">Είστε σίγουροι ότι θέλετε να τερματίσετε την τρέχουσα εφαρμογή; Όλα τα μη αποθηκευμένα δεδομένα θα χαθούν.</string>
-    <string name="dialog_text_reset_osc">Είστε βέβαιοι ότι θέλετε να διαγράψετε την αποθηκευμένη διάταξη στοιχείων ελέγχου στην οθόνη;</string>
     <string name="title_enable_perf_overlay">Εμφάνιση στατιστικών στοιχείων απόδοσης κατά τη ροή</string>
     <string name="unpair_error">Η συσκευή δεν είχε συζευξηθεί</string>
     <string name="error_pc_offline">Ο υπολογιστής είναι εκτός σύνδεσης</string>
@@ -94,15 +93,8 @@
     <string name="summary_checkbox_mouse_nav_buttons">Η ενεργοποίηση αυτής της επιλογής μπορεί να διακόψει το δεξί κλικ σε ορισμένες συσκευές με σφάλματα</string>
     <string name="title_checkbox_flip_face_buttons">Αναστροφή κουμπιών πρόσωψης</string>
     <string name="summary_checkbox_flip_face_buttons">Αλλάζει τα κουμπιά πρόσοψης A/B και X/Y για τα gamepad και τα χειριστήρια στην οθόνη</string>
-    <string name="summary_checkbox_show_onscreen_controls">Εμφάνιση επικάλυψης εικονικού ελεγκτή στην οθόνη αφής</string>
-    <string name="title_checkbox_vibrate_osc">Ενεργοποίηση δόνησης</string>
-    <string name="title_only_l3r3">Εμφάνιση μόνο των L3 και R3</string>
-    <string name="summary_only_l3r3">Απόκρυψη όλων των εικονικών κουμπιών εκτός των L3 και R3</string>
-    <string name="dialog_title_reset_osc">Επαναφορά διάταξης</string>
     <string name="toast_reset_osc_success">Επαναφορά των στοιχείων ελέγχου στην οθόνη στις προεπιλογές</string>
     <string name="title_osc_opacity">Αλλαγή της αδιαφάνειας των στοιχείων ελέγχου στην οθόνη</string>
-    <string name="summary_osc_opacity">Κάντε τα στοιχεία ελέγχου στην οθόνη περισσότερο/λιγότερο διαφανή</string>
-    <string name="suffix_osc_opacity">%</string>
     <string name="category_ui_settings">Ρυθμίσεις διεπαφής χρήστη</string>
     <string name="title_checkbox_enable_pip">Ενεργοποίηση της λειτουργίας παρατηρητή εικόνας μέσα σε εικόνα</string>
     <string name="summary_checkbox_enable_pip">Επιτρέπει την προβολή της ροής (αλλά όχι τον έλεγχο) κατά την εκτέλεση πολλαπλών εργασιών</string>
@@ -166,7 +158,6 @@
     <string name="poor_connection_msg">Κακή σύνδεση με τον υπολογιστή</string>
     <string name="applist_connect_msg">Σύνδεση σε υπολογιστή…</string>
     <string name="applist_menu_quit_and_start">Τερματισμός τρέχοντος παιχνιδιού και έναρξη</string>
-    <string name="summary_checkbox_touchscreen_trackpad">Εάν είναι ενεργοποιημένη, η οθόνη αφής λειτουργεί σαν trackpad. Εάν είναι απενεργοποιημένη, η οθόνη αφής ελέγχει απευθείας τον κέρσορα του ποντικιού.</string>
     <string name="title_checkbox_multi_controller">Αυτόματη ανίχνευση παρουσίας gamepad</string>
     <string name="applist_menu_details">Προβολή λεπτομερειών</string>
     <string name="applist_quit_success">Επιτυχής έξοδος</string>
@@ -177,7 +168,6 @@
     <string name="title_resolution_list">Ανάλυση βίντεο</string>
     <string name="summary_audio_config_list">Ενεργοποίηση ήχου surround 5.1 ή 7.1 για συστήματα οικιακού κινηματογράφου</string>
     <string name="category_input_settings">Ρυθμίσεις εισόδου</string>
-    <string name="title_checkbox_touchscreen_trackpad">Χρήση της οθόνης αφής ως trackpad</string>
     <string name="summary_checkbox_multi_controller">Η απενεργοποίηση αυτής της επιλογής αναγκάζει ένα gamepad να είναι πάντα παρόν</string>
     <string name="category_basic_settings">Βασικές ρυθμίσεις</string>
     <string name="summary_resolution_list">Αυξήστε για να βελτιώσετε την ευκρίνεια της εικόνας. Μειώστε για καλύτερη απόδοση σε συσκευές χαμηλότερων επιδόσεων και σε πιο αργά δίκτυα.</string>
@@ -192,13 +182,7 @@
     <string name="title_checkbox_vibrate_fallback">Μιμηθείτε την υποστήριξη rumble με δόνηση</string>
     <string name="title_seekbar_deadzone">Ρύθμιση της νεκρής ζώνης του αναλογικού μοχλού</string>
     <string name="summary_checkbox_mouse_emulation">Με παρατεταμένο πάτημα του κουμπιού Έναρξη θα αλλάξει το gamepad σε λειτουργία ποντικιού</string>
-    <string name="category_on_screen_controls_settings">Ρυθμίσεις στοιχείων ελέγχου στην οθόνη</string>
-    <string name="summary_reset_osc">Επαναφέρει όλα τα στοιχεία ελέγχου στην οθόνη στο προεπιλεγμένο μέγεθος και τη θέση τους</string>
     <string name="title_unlock_fps">Ξεκλειδώστε όλους τους πιθανούς ρυθμούς καρέ</string>
-    <string name="title_checkbox_show_onscreen_controls">Εμφάνιση στοιχείων ελέγχου στην οθόνη</string>
-    <string name="summary_checkbox_vibrate_osc">Δονεί τη συσκευή σας για να μιμηθεί το rumble για τα χειριστήρια στην οθόνη</string>
-    <string name="title_reset_osc">Εκκαθάριση αποθηκευμένης διάταξης στοιχείων ελέγχου στην οθόνη</string>
-    <string name="dialog_title_osc_opacity">Αλλαγή αδιαφάνειας</string>
     <string name="title_checkbox_enable_sops">Βελτιστοποίηση ρυθμίσεων παιχνιδιού</string>
     <string name="summary_checkbox_enable_sops">Επιτρέψτε στη GFE να τροποποιήσει τις ρυθμίσεις του παιχνιδιού για βέλτιστη ροή</string>
     <string name="category_advanced_settings">Προηγμένες ρυθμίσεις</string>

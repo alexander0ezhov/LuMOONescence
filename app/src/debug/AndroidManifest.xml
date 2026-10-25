@@ -35,6 +35,13 @@
             android:label="Control style preview" />
         <!-- Exported in debug builds so the licenses screen can be opened on its own and
              looked at, since touch cannot be injected on every device. -->
+        <!-- Exported in debug builds so the settings screen can be opened on its own and looked
+             at, since touch cannot be injected on every device. -->
+        <activity
+            android:name="com.limelight.preferences.StreamSettings"
+            tools:replace="android:exported"
+            android:exported="true" />
+
         <activity
             android:name="com.limelight.OpenSourceLicensesActivity"
             tools:replace="android:exported"

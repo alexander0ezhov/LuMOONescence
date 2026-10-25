@@ -633,6 +633,19 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             }
 
             @Override
+            public boolean isVibrationEnabled() {
+                return PreferenceConfiguration.isVibrationEnabled(Game.this);
+            }
+
+            @Override
+            public void onVibrationChanged(boolean enabled) {
+                PreferenceConfiguration.setVibrationEnabled(Game.this, enabled);
+
+                // The handler keeps the configuration it was made with, so it is told too
+                prefConfig.vibrateOsc = enabled;
+            }
+
+            @Override
             public void onLayoutOpacityChanged(int percent) {
                 PreferenceConfiguration.setUniversalLayoutOpacity(Game.this, percent);
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="title_checkbox_multi_controller">Automatisk oppdaging av spillkontroller</string>
-    <string name="title_checkbox_touchscreen_trackpad">Bruk denne pekeskjermen som pekeflate</string>
     <string name="title_checkbox_stretch_video">Strekk video til hele skjermen</string>
     <string name="title_seekbar_bitrate">Video-bitrate</string>
     <string name="title_fps_list">Videobilderammetakt</string>
@@ -58,12 +57,6 @@
     <string name="summary_language_list">Språk brukt i LunarStreamLight</string>
     <string name="title_language_list">Språk</string>
     <string name="category_ui_settings">Grensesnittsinnstillinger</string>
-    <string name="suffix_osc_opacity">%</string>
-    <string name="dialog_title_osc_opacity">Endre dekkevne</string>
-    <string name="dialog_title_reset_osc">Tilbakestill oppsett</string>
-    <string name="summary_only_l3r3">Skjul alle virtuelle knapper unntatt L3 og R3</string>
-    <string name="title_only_l3r3">Kun vis L3 og R3</string>
-    <string name="title_checkbox_vibrate_osc">Skru på vibrering</string>
     <string name="title_checkbox_mouse_emulation">Museemulering via spillkontroller</string>
     <string name="suffix_seekbar_deadzone">%</string>
     <string name="category_input_settings">Inndatainnstillinger</string>
@@ -132,7 +125,6 @@
     <string name="summary_checkbox_xb1_driver">Skrur på en innebygd USB-driver for enheter uten systemspesifikk Xbox-kontrollerstøtte</string>
     <string name="summary_checkbox_vibrate_fallback">Vibrerer din kontroller for å emulere vibrasjon, hvis din kontroller støtter det</string>
     <string name="title_checkbox_vibrate_fallback">Vibrasjonsemulering</string>
-    <string name="summary_checkbox_touchscreen_trackpad">Får pekeskjermen til å oppføre seg som en pekeflate. Ellers kontrolleres pekeskjermen musen direkte.</string>
     <string name="title_decoding_reset">Tilbakestilling av videoinnstillinger</string>
     <string name="message_decoding_error">LunarStreamLight har krasjet som følge av inkompatibilitet med denne enhetens videodekoder. Prøv å justere strømmingsinnstillingene hvis problemet vedvarer.</string>
     <string name="error_404">GFE returnerte en HTTP-404-feil. Forsikre deg om at PC-en kjører et støttet skjermkort. Bruk av fjernskrivebordsprogramvare kan også forårsake denne feilen. Prøv å starte maskinen på ny, eller å reinstallere GFE.</string>
@@ -148,11 +140,6 @@
     <string name="summary_enable_hdr">Strøm HDR når spillet og PC-ens skjermkort støtter det. HDR krever GTX 1000-eller nyere.</string>
     <string name="summary_checkbox_enable_pip">Tillater strømmen å vises (men ikke kontrolleres) under fleroppgaveløsning</string>
     <string name="title_checkbox_enable_pip">Skru på bilde-i-bilde-observatørmodus</string>
-    <string name="title_reset_osc">Tøm lagret oppsett for innstillingskontroller som vises på skjermen</string>
-    <string name="summary_checkbox_vibrate_osc">Vibrerer din enhet for innstillingskontroller som vises på skjermen</string>
-    <string name="summary_checkbox_show_onscreen_controls">Vis virtuelle innstillingskontroller for innstillinger i overleggslag på pekeskjermen</string>
-    <string name="title_checkbox_show_onscreen_controls">Vis innstillingskontroller på skjermen</string>
-    <string name="category_on_screen_controls_settings">Innstillinger for innstillingskontroller som vises på skjermen</string>
     <string name="summary_checkbox_usb_bind_all">Bruk LunarStreamLight sin USB-driver for alle støttede spillkontrollere, selv når systemspesifikk kontrollerstøtte er tilgjengelig</string>
     <string name="summary_audio_config_list">Skru på for 5,1- eller 7,1-kringlyd for hjemmekinosystemer</string>
     <string name="summary_seekbar_bitrate">Øk for bedret bildekvalitet. Senk for bedre ytelse på trege tilkoblinger.</string>
@@ -175,11 +162,8 @@
     <string name="summary_checkbox_enable_sops">Tillat GFE å endre spill-innstillinger for optimal strømming</string>
     <string name="summary_checkbox_small_icon_mode">Mindre bilder for omslagskunst i programrutenettet lar deg se flere programmer på skjermen</string>
     <string name="title_checkbox_small_icon_mode">Bruk liten omslagskunst</string>
-    <string name="summary_osc_opacity">Gjør innstillingskontroller som vises på skjermen mer/mindre gjennomsiktige</string>
     <string name="title_osc_opacity">Endre dekkevne for innstillingskontroller som vises på skjermen</string>
     <string name="toast_reset_osc_success">Innstillingskontroller som vises på skjermen tilbakestilt til forvalg</string>
-    <string name="dialog_text_reset_osc">Er du sikker på at du vil slette oppsettet ditt for innstillingskontroller som vises på skjermen\?</string>
-    <string name="summary_reset_osc">Tilbakestiller alle innstillingskontroller som vises på skjermen til forvalgt størrelse og posisjon</string>
     <string name="summary_checkbox_mouse_nav_buttons">Å skru på dette ødelegger for høyreklikking på noen enheter</string>
     <string name="title_checkbox_mouse_nav_buttons">Skru på museknapper for forover og tilbake</string>
     <string name="suffix_seekbar_bitrate_mbps">Mbps</string>

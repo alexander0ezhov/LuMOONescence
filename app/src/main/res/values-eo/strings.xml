@@ -12,7 +12,6 @@
     <string name="applist_menu_tv_channel">Aldoni al kanalo</string>
     <string name="resolution_prefix_native_landscape">(horizontala)</string>
     <string name="resolution_prefix_native_portrait">(vertikala)</string>
-    <string name="suffix_osc_opacity">%</string>
     <string name="category_help">Helpo</string>
     <string name="resolution_360p">360p</string>
     <string name="resolution_480p">480p</string>

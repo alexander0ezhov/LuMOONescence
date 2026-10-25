@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="summary_reset_osc">Tüm ekran kontrollerini varsayılan boyutu ve pozisyonuna sıfırlar</string>
-    <string name="title_checkbox_touchscreen_trackpad">Dokunmatik ekranı trackpad olarak kullan</string>
     <string name="category_input_settings">Girdi Ayarları</string>
     <string name="summary_language_list">LunarStreamLight için kullanılacak olan dil</string>
     <string name="ip_hint">Ana bilgisayarın IP adresi</string>
     <string name="title_details">Detaylar</string>
-    <string name="dialog_title_osc_opacity">Saydamlığı değiştir</string>
     <string name="conn_error_title">Bağlantı Hatası</string>
     <string name="conn_starting">Başlatılıyor</string>
     <string name="conn_error_msg">Başlatma başarısız</string>
@@ -68,8 +65,6 @@
     <string name="summary_checkbox_xb1_driver">Yerel Xbox oyun kumandası desteği olmayan cihazlar için yerleşik USB sürücüsünü etkinleştirir</string>
     <string name="title_checkbox_mouse_emulation">Oyun kumandası üstünden fare taklidi</string>
     <string name="title_checkbox_mouse_nav_buttons">Geri ve ileri fare düğmelerini etkinleştir</string>
-    <string name="category_on_screen_controls_settings">Ekran Kontrolleri Ayarları</string>
-    <string name="title_checkbox_show_onscreen_controls">Ekran kontrollerini göster</string>
     <string name="error_manager_not_running">ComputerManager hizmeti çalışmıyor. Lütfen birkaç saniye bekleyin veya uygulamayı yeniden başlatın.</string>
     <string name="error_unknown_host">Ana bilgisayar çözümlenemedi</string>
     <string name="title_decoding_error">Video Kod Çözücü Çöktü</string>
@@ -124,7 +119,6 @@
     <string name="title_native_res_dialog">Yerel çözünürlük uyarısı</string>
     <string name="title_fps_list">Video kare hızı</string>
     <string name="title_seekbar_bitrate">Video bit hızı</string>
-    <string name="summary_checkbox_touchscreen_trackpad">Etkinleştirilirse, dokunmatik ekran bir dokunmatik fare gibi davranır. Devre dışı bırakılırsa, dokunmatik ekran doğrudan fare imlecini kontrol eder.</string>
     <string name="conn_establishing_msg">Bağlantı başlatılıyor</string>
     <string name="conn_metered">Uyarı: Aktif ağ bağlantınız ölçülüdür!</string>
     <string name="conn_client_latency">Ortalama kare kod çözme gecikmesi:</string>
@@ -171,8 +165,6 @@
     <string name="summary_checkbox_usb_bind_all">Yerel Xbox oyun kumandası desteği mevcut olsa bile desteklenen tüm oyun kumandaları için LunarStreamLight\'ın USB sürücüsünü kullan</string>
     <string name="summary_checkbox_flip_face_buttons">Oyun kumandaları ve ekran kontrolleri için A/B ve X/Y yüzey düğmelerini değiştirir</string>
     <string name="summary_checkbox_absolute_mouse_mode">Bu fare hızlandırmanın uzak masaüstü kullanımı için daha doğal davranmasını sağlayabilir, ancak birçok oyunla uyumsuzdur.</string>
-    <string name="summary_checkbox_show_onscreen_controls">Dokunmatik ekranda sanal denetleyici katmanını göster</string>
-    <string name="dialog_title_reset_osc">Düzeni Sıfırla</string>
     <string name="title_language_list">Dil</string>
     <string name="category_host_settings">Ana Bilgisayar Ayarları</string>
     <string name="pair_pairing_help">Ana bilgisayarınız Sunshine çalıştırıyorsa PIN girmek için Sunshine web kullanıcı arayüzüne gidin.</string>
@@ -193,19 +185,11 @@
     <string name="summary_checkbox_gamepad_touchpad_as_mouse">Dokunmatik yüzeyli bir oyun kumandasını taklit ederken bile, oyun kumandası dokunmatik yüzey girişini ana fareyi kontrol etmeye zorlar.</string>
     <string name="title_checkbox_gamepad_motion_sensors">Oyun kumandası hareket sensörü kullanımına izin ver</string>
     <string name="title_checkbox_gamepad_motion_fallback">Oyun kumandası hareket sensörü desteğini taklit et</string>
-    <string name="title_checkbox_vibrate_osc">Titreşimi etkinleştir</string>
-    <string name="summary_checkbox_vibrate_osc">Ekrandaki kontrollerde gürültüyü taklit etmek için cihazınızı titretir</string>
-    <string name="title_only_l3r3">Yalnızca L3 ve R3 göster</string>
-    <string name="summary_only_l3r3">L3 ve R3 dışındaki tüm sanal düğmeleri gizle</string>
-    <string name="title_reset_osc">Kaydedilen ekran kontrolleri düzenini temizle</string>
-    <string name="dialog_text_reset_osc">Kaydedilmiş ekran kontrolleri düzeninizi silmek istediğinizden emin misiniz?</string>
     <string name="toast_reset_osc_success">Ekrandaki kontroller varsayılana sıfırlandı</string>
     <string name="title_osc_opacity">Ekrandaki kontrollerin saydamlığını değiştir</string>
-    <string name="suffix_osc_opacity">%</string>
     <string name="category_ui_settings">Arayüz Ayarları</string>
     <string name="title_checkbox_enable_pip">Resim İçinde Resim gözlemci modunu etkinleştir</string>
     <string name="summary_checkbox_enable_pip">Çoklu görev sırasında akışın görüntülenmesine (ancak kontrol edilmemesine) olanak tanır</string>
-    <string name="summary_osc_opacity">Ekrandaki kontrolleri daha fazla/daha az saydam hale getirin</string>
     <string name="summary_checkbox_enable_sops">En iyi akış için GFE oyun ayarlarını değiştirmesine izin ver</string>
     <string name="category_advanced_settings">Gelişmiş Ayarlar</string>
     <string name="title_unlock_fps">Mümkün olan tüm kare hızlarının kilidini aç</string>

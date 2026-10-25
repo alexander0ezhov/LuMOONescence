@@ -654,6 +654,8 @@ public class LayoutSmokeActivity extends Activity {
         checkPassThrough();
         checkTrackpadGestures();
         checkTypingAppliesWhenFinished();
+        checkTheSettingsScreenIsTidy();
+        checkStreamMenuExtras();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -2789,6 +2791,7 @@ public class LayoutSmokeActivity extends Activity {
         final boolean[] exited = new boolean[]{false};
         final boolean[] controlsShown = new boolean[]{true};
         final int[] opacity = new int[]{100};
+        final boolean[] vibration = new boolean[]{true};
 
         final java.util.List<UniversalLayoutDefinition> layouts = new java.util.ArrayList<>();
         layouts.add(new UniversalLayoutDefinition("one", "First layout", "", 0));
@@ -2852,6 +2855,16 @@ public class LayoutSmokeActivity extends Activity {
                     @Override
                     public void onLayoutOpacityChanged(int percent) {
                         opacity[0] = percent;
+                    }
+
+                    @Override
+                    public boolean isVibrationEnabled() {
+                        return vibration[0];
+                    }
+
+                    @Override
+                    public void onVibrationChanged(boolean enabled) {
+                        vibration[0] = enabled;
                     }
                 });
 
@@ -3581,6 +3594,158 @@ public class LayoutSmokeActivity extends Activity {
                         UniversalLayoutStore.DEFAULT_LAYOUT_ID) != null);
     }
 
+
+    /**
+     * The settings screen holds only what is still a setting.
+     */
+    private void checkTheSettingsScreenIsTidy() {
+        java.util.List<String> keys = new java.util.ArrayList<>();
+
+        try {
+            org.xmlpull.v1.XmlPullParser parser = getResources().getXml(R.xml.preferences);
+            int event;
+
+            while ((event = parser.next()) != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
+                if (event != org.xmlpull.v1.XmlPullParser.START_TAG) {
+                    continue;
+                }
+
+                for (int i = 0; i < parser.getAttributeCount(); i++) {
+                    if ("key".equals(parser.getAttributeName(i))) {
+                        keys.add(parser.getAttributeValue(i));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("LayoutSmoke", "could not read the settings", e);
+        }
+
+        android.util.Log.i("LayoutSmoke", "settings keys: " + keys.size() + " " + keys);
+
+        // Everything that moved to the stream menu or the layouts screen
+        String[] gone = new String[]{
+                "checkbox_touchscreen_trackpad",
+                "checkbox_show_onscreen_controls",
+                "checkbox_vibrate_osc",
+                "checkbox_only_show_L3R3",
+                "checkbox_show_guide_button",
+                "seekbar_osc_opacity",
+                "checkbox_show_universal_layout",
+        };
+
+        for (String key : gone) {
+            check("the settings no longer offer " + key, !keys.contains(key));
+        }
+
+        // The settings that are still worth having stay
+        check("the settings still offer the video options", keys.contains("list_resolution"));
+        check("the settings still offer the mouse options",
+                keys.contains("checkbox_mouse_nav_buttons"));
+        check("the settings still offer the advanced options",
+                keys.contains("checkbox_unlock_fps"));
+    }
+
+    /**
+     * The stream menu has a place for options that are not about a control or a layout.
+     */
+    private void checkStreamMenuExtras() {
+        final boolean[] vibration = new boolean[]{true};
+        final java.util.List<UniversalLayoutDefinition> layouts = new java.util.ArrayList<>();
+
+        FrameLayout area = new FrameLayout(this);
+        UniversalStreamDrawer drawer = new UniversalStreamDrawer(this, area,
+                new UniversalStreamDrawer.Host() {
+                    @Override
+                    public void onExitStream() {
+                    }
+
+                    @Override
+                    public void onShowKeyboard() {
+                    }
+
+                    @Override
+                    public int getTouchMode() {
+                        return com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TRACKPAD;
+                    }
+
+                    @Override
+                    public void onTouchModeChanged(int mode) {
+                    }
+
+                    @Override
+                    public java.util.List<UniversalLayoutDefinition> getLayouts() {
+                        return layouts;
+                    }
+
+                    @Override
+                    public String getSelectedLayoutId() {
+                        return "";
+                    }
+
+                    @Override
+                    public void onLayoutChosen(String layoutId) {
+                    }
+
+                    @Override
+                    public boolean isOnScreenControlsEnabled() {
+                        return true;
+                    }
+
+                    @Override
+                    public void onOnScreenControlsToggled(boolean enabled) {
+                    }
+
+                    @Override
+                    public int getLayoutOpacity() {
+                        return 100;
+                    }
+
+                    @Override
+                    public void onLayoutOpacityChanged(int percent) {
+                    }
+
+                    @Override
+                    public boolean isVibrationEnabled() {
+                        return vibration[0];
+                    }
+
+                    @Override
+                    public void onVibrationChanged(boolean enabled) {
+                        vibration[0] = enabled;
+                    }
+                });
+
+        drawer.show();
+
+        java.util.List<String> rows = drawer.getRowTitlesForTesting();
+
+        android.util.Log.i("LayoutSmoke", "menu rows: " + rows);
+
+        check("the stream menu has a row for the extra options",
+                containsLabel(rows, getString(R.string.stream_menu_extras)));
+
+        // It sits under everything else, above the way out
+        check("the extra options come last",
+                indexOfRow(rows, getString(R.string.stream_menu_extras))
+                        > indexOfRow(rows, getString(R.string.stream_menu_opacity)));
+
+        check("the extra options unfold",
+                drawer.clickRowForTesting(getString(R.string.stream_menu_extras)));
+
+        check("the extra options hold the vibration switch",
+                drawer.getRowTitlesForTesting().contains(getString(R.string.stream_menu_vibration)));
+
+        check("the vibration switch can be pressed",
+                drawer.clickSwitchInRowForTesting(getString(R.string.stream_menu_vibration)));
+        check("the vibration switch turns vibration off", !vibration[0]);
+
+        check("the vibration switch can be pressed again",
+                drawer.clickSwitchInRowForTesting(getString(R.string.stream_menu_vibration)));
+        check("the vibration switch turns vibration back on", vibration[0]);
+
+        drawer.hide();
+    }
+
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
             if (label.contains(needle)) {
@@ -3748,12 +3913,24 @@ public class LayoutSmokeActivity extends Activity {
                     @Override
                     public void onLayoutOpacityChanged(int percent) {
                     }
+
+                    @Override
+                    public boolean isVibrationEnabled() {
+                        return true;
+                    }
+
+                    @Override
+                    public void onVibrationChanged(boolean enabled) {
+                    }
                 });
 
         drawer.settleForTesting();
 
         // The touch row is left open, so the choices are in the picture as well
         drawer.clickRowForTesting(getString(R.string.stream_menu_touch));
+
+        // ... and the last row as well, so the switch inside it is visible
+        drawer.clickRowForTesting(getString(R.string.stream_menu_extras));
 
         // Drawn into a picture rather than left on the screen: what is on the screen belongs to
         // whichever activity is in front, and this one may already have stepped back

@@ -2140,7 +2140,11 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
             // If we didn't find a matching device, it must be the on-screen
             // controls that triggered the rumble. Vibrate the device if
             // the user has requested that behavior.
-            if (!foundMatchingDevice && prefConfig.onscreenController && !prefConfig.onlyL3R3 && prefConfig.vibrateOsc) {
+            // Either on-screen layout counts: the built-in one and the universal one. If a
+            // control of either is what asked for the rumble, the phone buzzes.
+            boolean onScreenControls = prefConfig.onscreenController || prefConfig.universalLayout;
+
+            if (!foundMatchingDevice && onScreenControls && prefConfig.vibrateOsc) {
                 rumbleSingleVibrator(deviceVibrator, lowFreqMotor, highFreqMotor);
             }
             else if (foundMatchingDevice && !vibrated && prefConfig.vibrateFallbackToDevice) {

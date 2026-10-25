@@ -74,6 +74,13 @@ public class UniversalStreamDrawer {
         int getLayoutOpacity();
 
         void onLayoutOpacityChanged(int percent);
+
+        /**
+         * Whether the phone buzzes when the game rumbles.
+         */
+        boolean isVibrationEnabled();
+
+        void onVibrationChanged(boolean enabled);
     }
 
     private final Activity activity;
@@ -88,7 +95,7 @@ public class UniversalStreamDrawer {
     /**
      * The row that is unfolded, or null when only the rows themselves are showing.
      */
-    private LinearLayout expandedBody;
+    private View expandedBody;
 
     private ImageView expandedArrow;
 
@@ -183,6 +190,7 @@ public class UniversalStreamDrawer {
         content.addView(buildControlsRow(), matchWidth());
         content.addView(buildLayoutRow(), matchWidth());
         content.addView(buildOpacityRow(), matchWidth());
+        content.addView(buildExtrasRow(), matchWidth());
     }
 
     private int panelWidth() {
@@ -451,6 +459,55 @@ public class UniversalStreamDrawer {
     }
 
     /**
+     * The last accordion of the menu, for options that do not belong to a control or a layout.
+     */
+    private View buildExtrasRow() {
+        ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_extras), null);
+        LinearLayout body = new LinearLayout(activity);
+
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.setVisibility(View.GONE);
+
+        LinearLayout vibration = new LinearLayout(activity);
+        vibration.setOrientation(LinearLayout.HORIZONTAL);
+        vibration.setGravity(Gravity.CENTER_VERTICAL);
+        vibration.setPadding(dp(24), dp(10), dp(14), dp(10));
+        vibration.setBackground(rowBackground());
+
+        TextView title = new TextView(activity);
+        title.setText(R.string.stream_menu_vibration);
+        title.setTextColor(0xFFD8DBE2);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+        final android.widget.Switch toggle = new android.widget.Switch(activity);
+
+        // The mark is set before the listener is attached, so building the row does not report a
+        // change nobody made
+        toggle.setChecked(host.isVibrationEnabled());
+        toggle.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(android.widget.CompoundButton button, boolean checked) {
+                host.onVibrationChanged(checked);
+            }
+        });
+
+        // The whole line works as the switch
+        vibration.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggle.setChecked(!toggle.isChecked());
+            }
+        });
+
+        vibration.addView(title, new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        vibration.addView(toggle);
+
+        body.addView(vibration, matchWidth());
+        return row.withBody(body);
+    }
+
+    /**
      * A row with nothing to unfold.
      */
     private TextView makePlainRow(String title) {
@@ -508,17 +565,24 @@ public class UniversalStreamDrawer {
          * Returns the row together with its list, and arranges for the arrow to unfold it.
          */
         View withChoices(final RadioGroup choices) {
+            return withBody(choices);
+        }
+
+        /**
+         * The same, for an accordion whose body is not a list of choices.
+         */
+        View withBody(final View body) {
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    unfold(choices, arrow);
+                    unfold(body, arrow);
                 }
             });
 
             LinearLayout holder = new LinearLayout(activity);
             holder.setOrientation(LinearLayout.VERTICAL);
             holder.addView(row, matchWidth());
-            holder.addView(choices, matchWidth());
+            holder.addView(body, matchWidth());
 
             return holder;
         }
@@ -610,7 +674,7 @@ public class UniversalStreamDrawer {
      * Opens one of the rows and closes whichever other row was open, so only one list is out at
      * a time. The arrow turns over while its list is showing.
      */
-    private void unfold(RadioGroup body, ImageView arrow) {
+    private void unfold(View body, ImageView arrow) {
         boolean wasOpen = body.getVisibility() == View.VISIBLE;
 
         if (expandedBody != null && expandedBody != body) {
@@ -850,6 +914,49 @@ public class UniversalStreamDrawer {
 
         row.performClick();
         return true;
+    }
+
+    /**
+     * Presses the switch that sits in the row with this label, for the debug smoke test.
+     */
+    public boolean clickSwitchInRowForTesting(String label) {
+        View title = findText(content, label);
+
+        if (!(title instanceof TextView) || !(((TextView) title).getParent() instanceof ViewGroup)) {
+            return false;
+        }
+
+        ViewGroup row = (ViewGroup) ((TextView) title).getParent();
+
+        for (int i = 0; i < row.getChildCount(); i++) {
+            if (row.getChildAt(i) instanceof android.widget.Switch) {
+                row.getChildAt(i).performClick();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private View findText(ViewGroup group, String label) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof TextView && !(child instanceof RadioButton)
+                    && ((TextView) child).getText().toString().equals(label)) {
+                return child;
+            }
+
+            if (child instanceof ViewGroup) {
+                View found = findText((ViewGroup) child, label);
+
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
