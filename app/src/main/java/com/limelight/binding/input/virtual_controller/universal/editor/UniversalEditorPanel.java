@@ -282,11 +282,21 @@ public class UniversalEditorPanel {
      * Adds a checkbox with a label.
      */
     public CheckBox addCheckBox(String label, boolean checked, final OnCheckedListener listener) {
+        return addCheckBox(label, checked, true, listener);
+    }
+
+    /**
+     * Adds a checkbox that can also be shown as out of reach.
+     */
+    public CheckBox addCheckBox(String label, boolean checked, boolean enabled,
+                                final OnCheckedListener listener) {
         final CheckBox checkBox = new CheckBox(context);
         checkBox.setText(label);
         checkBox.setTextColor(0xFFE0E0E6);
         checkBox.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         checkBox.setChecked(checked);
+        checkBox.setEnabled(enabled);
+        checkBox.setAlpha(enabled ? 1f : 0.45f);
         checkBox.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(android.widget.CompoundButton buttonView, boolean isChecked) {
@@ -486,6 +496,104 @@ public class UniversalEditorPanel {
      * The text of every button in the panel, in the order they appear, and whether it can be
      * pressed. Used by the debug smoke test to check what the drawer offers.
      */
+    /**
+     * The labels of the checkboxes, in the order they are shown. Used by the debug smoke test.
+     */
+    public java.util.List<String> getCheckBoxLabelsForTesting() {
+        java.util.List<String> labels = new java.util.ArrayList<>();
+
+        collectCheckBoxLabels(content, labels);
+        return labels;
+    }
+
+    private void collectCheckBoxLabels(ViewGroup group, java.util.List<String> labels) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof CheckBox) {
+                labels.add(((CheckBox) child).getText().toString());
+            }
+            else if (child instanceof ViewGroup) {
+                collectCheckBoxLabels((ViewGroup) child, labels);
+            }
+        }
+    }
+
+    /**
+     * Whether the checkbox with this label can be used, or is shown as out of reach.
+     */
+    public boolean isCheckBoxEnabledForTesting(String label) {
+        CheckBox box = findCheckBox(label);
+        return box != null && box.isEnabled();
+    }
+
+    public boolean isCheckBoxCheckedForTesting(String label) {
+        CheckBox box = findCheckBox(label);
+        return box != null && box.isChecked();
+    }
+
+    /**
+     * Presses the checkbox with this label, exactly as a finger would.
+     */
+    public boolean clickCheckBoxForTesting(String label) {
+        CheckBox box = findCheckBox(label);
+
+        if (box == null || !box.isEnabled()) {
+            return false;
+        }
+
+        box.performClick();
+        return true;
+    }
+
+    private CheckBox findCheckBox(String label) {
+        return findCheckBox(content, label);
+    }
+
+    private CheckBox findCheckBox(ViewGroup group, String label) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof CheckBox && ((CheckBox) child).getText().toString().equals(label)) {
+                return (CheckBox) child;
+            }
+
+            if (child instanceof ViewGroup) {
+                CheckBox found = findCheckBox((ViewGroup) child, label);
+
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether any text in the panel says this. Used by the debug smoke test for the notes.
+     */
+    public boolean hasTextForTesting(String text) {
+        return hasText(content, text);
+    }
+
+    private boolean hasText(ViewGroup group, String text) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof TextView && !(child instanceof CheckBox)
+                    && ((TextView) child).getText().toString().equals(text)) {
+                return true;
+            }
+
+            if (child instanceof ViewGroup && hasText((ViewGroup) child, text)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public java.util.List<String> getButtonLabelsForTesting() {
         java.util.List<String> labels = new java.util.ArrayList<>();
 

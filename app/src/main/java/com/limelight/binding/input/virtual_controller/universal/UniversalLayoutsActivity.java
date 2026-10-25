@@ -35,15 +35,8 @@ public class UniversalLayoutsActivity extends Activity {
     private UniversalLayoutStore layoutStore;
 
     private GridView layoutsGrid;
-    private Switch enabledSwitch;
     private TextView emptyText;
     private LayoutGridAdapter adapter;
-
-    private boolean updatingSwitch;
-
-    private SeekBar opacitySlider;
-    private TextView opacityLabel;
-    private boolean updatingOpacity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +58,7 @@ public class UniversalLayoutsActivity extends Activity {
         });
 
         layoutsGrid = findViewById(R.id.layoutsGrid);
-        enabledSwitch = findViewById(R.id.layoutsEnabledSwitch);
         emptyText = findViewById(R.id.layoutsEmptyText);
-        opacitySlider = findViewById(R.id.layoutsOpacitySlider);
-        opacityLabel = findViewById(R.id.layoutsOpacityLabel);
 
         adapter = new LayoutGridAdapter();
         layoutsGrid.setAdapter(adapter);
@@ -95,62 +85,6 @@ public class UniversalLayoutsActivity extends Activity {
                 showAddLayoutDialog();
             }
         });
-
-        enabledSwitch.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(android.widget.CompoundButton buttonView, boolean isChecked) {
-                if (updatingSwitch) {
-                    return;
-                }
-
-                setUniversalLayoutEnabled(isChecked);
-            }
-        });
-
-        setUpOpacitySlider();
-    }
-
-    /**
-     * The transparency of the layout, as one slider for all of it.
-     */
-    private void setUpOpacitySlider() {
-        opacitySlider.setMax(100 - PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_MIN);
-
-        opacitySlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int percent = PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_MIN + progress;
-                showOpacity(percent);
-
-                if (fromUser && !updatingOpacity) {
-                    setLayoutOpacity(percent);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-    }
-
-    private void showOpacity(int percent) {
-        opacityLabel.setText(getString(R.string.title_layout_opacity, percent));
-    }
-
-    private int getLayoutOpacity() {
-        return getPreferences().getInt(
-                PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING,
-                PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_DEFAULT);
-    }
-
-    private void setLayoutOpacity(int percent) {
-        getPreferences().edit()
-                .putInt(PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_PREF_STRING, percent)
-                .apply();
     }
 
     @Override
@@ -165,29 +99,9 @@ public class UniversalLayoutsActivity extends Activity {
         return PreferenceManager.getDefaultSharedPreferences(this);
     }
 
-    /**
-     * The one switch for the whole feature, in the same place the stream menu writes it.
-     */
-    private boolean isUniversalLayoutEnabled() {
-        return PreferenceConfiguration.isUniversalLayoutEnabled(this);
-    }
-
-    private void setUniversalLayoutEnabled(boolean enabled) {
-        PreferenceConfiguration.setUniversalLayoutEnabled(this, enabled);
-    }
-
     private void refresh() {
-        updatingSwitch = true;
-        enabledSwitch.setChecked(isUniversalLayoutEnabled());
-        updatingSwitch = false;
-
-        int percent = getLayoutOpacity();
-
-        updatingOpacity = true;
-        opacitySlider.setProgress(percent - PreferenceConfiguration.UNIVERSAL_LAYOUT_OPACITY_MIN);
-        updatingOpacity = false;
-        showOpacity(percent);
-
+        // The switch for the whole feature and the transparency of the layout are in the stream
+        // menu, so this screen only lists what there is to choose from
         List<UniversalLayoutDefinition> layouts = layoutStore.getLayouts();
         adapter.setLayouts(layouts);
 

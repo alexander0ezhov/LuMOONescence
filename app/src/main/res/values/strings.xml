@@ -207,7 +207,6 @@
     <string name="back">Back</string>
     <string name="title_universal_layouts">On-screen layouts</string>
     <string name="title_add_layout">Add layout</string>
-    <string name="title_use_universal_layout">Use universal layout</string>
     <string name="title_layout_image">Layout image</string>
     <string name="title_edit_controls">Edit controls</string>
     <string name="title_finish_editing">Done</string>
@@ -236,7 +235,6 @@
     <string name="msg_editor_hint_editing">Drag a control to move it, or drag its edge to resize it. Tap &quot;Done&quot; when finished.</string>
 
     <string name="title_layout_settings">Layout settings</string>
-    <string name="title_layout_opacity">Layout opacity: %1$d%%</string>
     <string name="control_type_button">Button</string>
     <string name="control_type_stick">Stick</string>
     <string name="control_type_dpad">D-pad</string>
@@ -276,7 +274,7 @@
     <string name="stream_menu_extras">Extras</string>
     <string name="stream_menu_vibration">Vibration</string>
     <string name="stream_menu_controls">On-screen controls</string>
-    <string name="editor_label_pass_through">Pass through to touch</string>
+    <string name="editor_label_pass_through">Pass through to touch (hold and move to look around)</string>
     <string name="stream_menu_layout">Layout</string>
     <string name="stream_menu_no_layouts">No layouts</string>
     <string name="stream_menu_exit">Exit stream</string>
@@ -306,6 +304,7 @@
     <string name="editor_label_width">Width</string>
     <string name="editor_label_height">Height</string>
     <string name="editor_label_toggle">Toggle (tap to press, tap again to release)</string>
+    <string name="editor_toggle_off_while_pass_through">Toggle is off while pass through is on</string>
     <string name="editor_label_sequence">Sequence of events</string>
     <string name="editor_label_sequence_empty">No events yet. Add a step below.</string>
     <string name="editor_label_step_delay">Delay after step (ms)</string>

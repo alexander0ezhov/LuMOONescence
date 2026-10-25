@@ -189,18 +189,6 @@ public class UniversalElementEditorBuilder {
                     }
                 });
 
-        // Whether holding this control keeps it pressed while the same finger looks around.
-        // It is what makes a control usable in a shooter: fire and aim with one finger.
-        panel.addCheckBox(context.getString(R.string.editor_label_pass_through),
-                element.getConfig().isPassThrough(),
-                new UniversalEditorPanel.OnCheckedListener() {
-                    @Override
-                    public void onCheckedChanged(boolean checked) {
-                        element.getConfig().setPassThrough(checked);
-                        callbacks.onElementChanged();
-                    }
-                });
-
         // How round the control is drawn. It is a share of the shorter side, so the shape
         // stays the same whatever the control is resized to.
         panel.addSliderRow(context.getString(R.string.editor_label_corner_radius),
@@ -293,8 +281,17 @@ public class UniversalElementEditorBuilder {
 
         final UniversalButtonConfig config = element.getButtonConfigIfAny();
 
+        // Holding the control keeps it pressed while the same finger looks around, so it cannot
+        // also be a latch: the two would fight over one touch. Pass through has the stronger
+        // claim on the finger, and choosing it drops the latch.
+        if (config.isPassThrough() && config.isToggle()) {
+            config.setToggle(false);
+        }
+
+        final boolean canToggle = !config.isPassThrough();
+
         panel.addCheckBox(context.getString(R.string.editor_label_toggle), config.isToggle(),
-                new UniversalEditorPanel.OnCheckedListener() {
+                canToggle, new UniversalEditorPanel.OnCheckedListener() {
                     @Override
                     public void onCheckedChanged(boolean checked) {
                         // Rebuilding the panel re-creates this row, so only a real change is
@@ -304,6 +301,26 @@ public class UniversalElementEditorBuilder {
                         }
 
                         config.setToggle(checked);
+                        callbacks.onElementChanged();
+                    }
+                });
+
+        if (!canToggle) {
+            panel.addStatus(context.getString(R.string.editor_toggle_off_while_pass_through));
+        }
+
+        // Whether holding this control keeps it pressed while the same finger looks around.
+        // It is what makes a control usable in a shooter: fire and aim with one finger.
+        panel.addCheckBox(context.getString(R.string.editor_label_pass_through),
+                config.isPassThrough(),
+                new UniversalEditorPanel.OnCheckedListener() {
+                    @Override
+                    public void onCheckedChanged(boolean checked) {
+                        config.setPassThrough(checked);
+
+                        // The row above becomes unavailable (or available again) with this
+                        // choice, so the panel is built again
+                        onRebuildRequested.run();
                         callbacks.onElementChanged();
                     }
                 });

@@ -656,6 +656,8 @@ public class LayoutSmokeActivity extends Activity {
         checkTypingAppliesWhenFinished();
         checkTheSettingsScreenIsTidy();
         checkStreamMenuExtras();
+        checkEditorPassThroughOrder();
+        checkLayoutsScreenIsTidy();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -3746,6 +3748,134 @@ public class LayoutSmokeActivity extends Activity {
         drawer.hide();
     }
 
+
+    /**
+     * The editor offers pass through under the toggle, and the two cannot both be on.
+     */
+    private void checkEditorPassThroughOrder() {
+        final UniversalVirtualController controller = universalController;
+        UniversalDigitalButton button = new UniversalDigitalButton(controller, 4343, 0, this);
+        com.limelight.binding.input.virtual_controller.universal.config.UniversalButtonConfig config =
+                button.getButtonConfigIfAny();
+
+        config.setName("Pass through");
+        config.setToggle(false);
+        config.setPassThrough(false);
+
+        com.limelight.binding.input.virtual_controller.universal.editor.UniversalEditorPanel panel =
+                newPanelForTesting();
+        com.limelight.binding.input.virtual_controller.universal.editor.UniversalElementEditorBuilder builder =
+                new com.limelight.binding.input.virtual_controller.universal.editor
+                        .UniversalElementEditorBuilder(this, panel);
+
+        String toggleLabel = getString(com.limelight.R.string.editor_label_toggle);
+        String passThroughLabel = getString(com.limelight.R.string.editor_label_pass_through);
+
+        buildPanelForTesting(builder, panel, button);
+
+        java.util.List<String> boxes = panel.getCheckBoxLabelsForTesting();
+
+        android.util.Log.i("LayoutSmoke", "editor checkboxes: " + boxes);
+
+        int toggleAt = boxes.indexOf(toggleLabel);
+        int passThroughAt = boxes.indexOf(passThroughLabel);
+
+        check("the editor offers the toggle", toggleAt >= 0);
+        check("the editor offers pass through", passThroughAt >= 0);
+        check("pass through sits under the toggle", passThroughAt > toggleAt);
+
+        // Nothing else is in the way: the two are neighbours
+        check("pass through follows the toggle directly", passThroughAt == toggleAt + 1);
+
+        check("the toggle is available while pass through is off",
+                panel.isCheckBoxEnabledForTesting(toggleLabel));
+
+        // Turning pass through on drops the toggle and puts it out of reach
+        check("pass through can be turned on",
+                panel.clickCheckBoxForTesting(passThroughLabel));
+        check("the control now passes movement on", config.isPassThrough());
+        check("pass through is marked as on",
+                panel.isCheckBoxCheckedForTesting(passThroughLabel));
+
+        buildPanelForTesting(builder, panel, button);
+
+        check("the toggle is out of reach while pass through is on",
+                !panel.isCheckBoxEnabledForTesting(toggleLabel));
+        check("the toggle is off while pass through is on",
+                !panel.isCheckBoxCheckedForTesting(toggleLabel));
+
+        // ... and a control that had both is left with pass through only
+        config.setToggle(true);
+        config.setPassThrough(true);
+        buildPanelForTesting(builder, panel, button);
+
+        check("pass through wins over a toggle set beforehand", !config.isToggle());
+
+        // Turning pass through off gives the toggle back
+        config.setPassThrough(false);
+        buildPanelForTesting(builder, panel, button);
+
+        check("the toggle comes back once pass through is off",
+                panel.isCheckBoxEnabledForTesting(toggleLabel));
+    }
+
+    private com.limelight.binding.input.virtual_controller.universal.editor.UniversalEditorPanel
+            newPanelForTesting() {
+        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        android.widget.LinearLayout content = new android.widget.LinearLayout(this);
+        content.setOrientation(android.widget.LinearLayout.VERTICAL);
+        scroll.addView(content);
+
+        return new com.limelight.binding.input.virtual_controller.universal.editor
+                .UniversalEditorPanel(this, scroll, content, null);
+    }
+
+    private void buildPanelForTesting(
+            com.limelight.binding.input.virtual_controller.universal.editor.UniversalElementEditorBuilder builder,
+            com.limelight.binding.input.virtual_controller.universal.editor.UniversalEditorPanel panel,
+            final UniversalVirtualControllerElement element) {
+        panel.clear();
+
+        builder.build(element, new com.limelight.binding.input.virtual_controller.universal.editor
+                .UniversalElementEditorBuilder.Callbacks() {
+            @Override
+            public void onElementChanged() {
+            }
+
+            @Override
+            public void onGeometryChanged(int left, int top, int newWidth, int newHeight) {
+            }
+
+            @Override
+            public void onNameChanged(String name) {
+            }
+
+            @Override
+            public void onBorderRadiusChanged(int percent) {
+            }
+        });
+    }
+
+    /**
+     * The layouts screen lists layouts and nothing else: the switch and the transparency are in
+     * the stream menu now.
+     */
+    private void checkLayoutsScreenIsTidy() {
+        check("the layouts screen no longer offers the master switch",
+                getResources().getIdentifier("layoutsEnabledSwitch", "id", getPackageName()) == 0);
+        check("the layouts screen no longer offers the transparency slider",
+                getResources().getIdentifier("layoutsOpacitySlider", "id", getPackageName()) == 0);
+        check("the layouts screen no longer labels the transparency",
+                getResources().getIdentifier("layoutsOpacityLabel", "id", getPackageName()) == 0);
+
+        // The screen itself still builds and still has its grid
+        View screen = getLayoutInflater().inflate(R.layout.activity_universal_layouts, null);
+
+        check("the layouts screen still builds", screen != null);
+        check("the layouts screen still has its grid",
+                screen != null && screen.findViewById(R.id.layoutsGrid) != null);
+    }
+
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
             if (label.contains(needle)) {
@@ -3825,6 +3955,41 @@ public class LayoutSmokeActivity extends Activity {
             }, 1500);
         }
 
+        // Opens the editor on a control with pass through turned on, in memory only, so the
+        // rows can be looked at on a real screen
+        if (getIntent().getBooleanExtra("showPassThroughOnScreen", false)) {
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    UniversalVirtualControllerElement element = firstElementInLayout();
+
+                    // A button is what these rows belong to, so the first one is picked
+                    for (UniversalVirtualControllerElement candidate : universalController.getElements()) {
+                        if (candidate.getButtonConfigIfAny() != null) {
+                            element = candidate;
+                            break;
+                        }
+                    }
+
+                    if (element == null) {
+                        return;
+                    }
+
+                    element.getConfig().setPassThrough(true);
+
+                    if (element.getButtonConfigIfAny() != null) {
+                        element.getButtonConfigIfAny().setToggle(true);
+                    }
+
+                    editor.onElementTapped(element);
+                }
+            }, 2500);
+        }
+
+        if (getIntent().getBooleanExtra("showPassThroughPanel", false)) {
+            showPassThroughPanelForInspection();
+        }
+
         if (getIntent().getBooleanExtra("showDrawer", false)) {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
@@ -3846,6 +4011,77 @@ public class LayoutSmokeActivity extends Activity {
                     }, 1500);
                 }
             }, 2000);
+        }
+    }
+
+    /**
+     * Draws the part of the editor that holds the toggle and pass through, with pass through
+     * turned on, so the state of the toggle can be looked at without a stream.
+     */
+    private void showPassThroughPanelForInspection() {
+        UniversalDigitalButton button = new UniversalDigitalButton(universalController, 4545, 0, this);
+        com.limelight.binding.input.virtual_controller.universal.config.UniversalButtonConfig config =
+                button.getButtonConfigIfAny();
+
+        config.setName("Fire");
+        config.setToggle(true);
+        config.setPassThrough(true);
+
+        com.limelight.binding.input.virtual_controller.universal.editor.UniversalEditorPanel panel =
+                newPanelForTesting();
+        com.limelight.binding.input.virtual_controller.universal.editor.UniversalElementEditorBuilder builder =
+                new com.limelight.binding.input.virtual_controller.universal.editor
+                        .UniversalElementEditorBuilder(this, panel);
+
+        buildPanelForTesting(builder, panel, button);
+
+        String passThroughLabel = getString(com.limelight.R.string.editor_label_pass_through);
+        String toggleLabel = getString(com.limelight.R.string.editor_label_toggle);
+
+        android.util.Log.i("LayoutSmoke", "picture: passThrough=" + config.isPassThrough()
+                + " toggle=" + config.isToggle()
+                + " boxOn=" + panel.isCheckBoxCheckedForTesting(passThroughLabel)
+                + " boxOff=" + panel.isCheckBoxCheckedForTesting(toggleLabel));
+
+        View view = panel.getView();
+
+        // A platform checkbox reveals its mark with an animation, and an unattached view never
+        // runs one, so the drawables are jumped to their finished state before drawing
+        settleDrawables(view);
+
+        int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.86f);
+
+        view.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0, 0, width, Math.max(1, view.getMeasuredHeight()));
+
+        int height = Math.min(view.getMeasuredHeight(),
+                getResources().getDisplayMetrics().heightPixels);
+
+        android.graphics.Bitmap picture = android.graphics.Bitmap.createBitmap(width, height,
+                android.graphics.Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(picture);
+        canvas.drawColor(0xFF101418);
+        view.draw(canvas);
+
+        saveBitmapForInspection(picture, "editor-pass-through.png");
+        picture.recycle();
+    }
+
+    /**
+     * Moves every drawable in the tree to the state it would come to rest in, which is what
+     * makes a picture of an unattached view match what a screen shows.
+     */
+    private void settleDrawables(View view) {
+        view.jumpDrawablesToCurrentState();
+
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+
+            for (int i = 0; i < group.getChildCount(); i++) {
+                settleDrawables(group.getChildAt(i));
+            }
         }
     }
 
