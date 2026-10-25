@@ -217,8 +217,6 @@
     <string name="title_checkbox_usb_bind_all">Sobrescribir el soporte nativo del control de Xbox</string>
     <string name="summary_checkbox_flip_face_buttons">Invertir botones frontales A/B y X/Y para los mandos y los botones sobre la pantalla</string>
     <string name="title_checkbox_absolute_mouse_mode">Modo de ratón para escritorio remoto</string>
-    <string name="toast_reset_osc_success">Establecer Controles en Pantalla en modo Predeterminado</string>
-    <string name="title_osc_opacity">Cambiar la transparencia de los controles en pantalla</string>
     <string name="summary_checkbox_enable_pip">Permite que la transmisión sea vista (pero no controlable) mientras se usa la multitarea</string>
     <string name="title_disable_frame_drop">Nunca disminuir cuadros</string>
     <string name="summary_disable_frame_drop">Puede reducir micro-tartamudeos (Stuttering) en algunos dispositivos , pero puede incrementar latencia</string>

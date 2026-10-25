@@ -16,7 +16,6 @@ public final class UniversalElementTypes {
     public static final String ELEMENT_BUTTON = "button";
     public static final String ELEMENT_STICK = "stick";
     public static final String ELEMENT_DPAD = "dpad";
-    public static final String ELEMENT_TRIGGER = "trigger";
 
     private UniversalElementTypes() {
     }

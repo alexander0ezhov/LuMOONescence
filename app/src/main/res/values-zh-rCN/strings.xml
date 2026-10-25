@@ -138,7 +138,6 @@
     <string name="summary_checkbox_mouse_nav_buttons"> 在一些支持不佳的设备上启用此项可能会使其右键失效 </string>
     <string name="title_checkbox_flip_face_buttons"> 反转技能键 </string>
     <string name="summary_checkbox_flip_face_buttons"> 为手柄和虚拟手柄调转A/B和X/Y技能键 </string>
-    <string name="toast_reset_osc_success"> 屏幕按钮布局已经重置 </string>
     <string name="category_ui_settings"> 界面设置 </string>
     <string name="title_language_list"> 语言 </string>
     <string name="summary_language_list"> 选择LunarStreamLight显示的语言 </string>
@@ -160,7 +159,6 @@
     <string name="summary_enable_perf_overlay"> 在串流中显示实时性能信息 </string>
     <string name="title_enable_post_stream_toast">串流完毕显示延迟信息</string>
     <string name="summary_enable_post_stream_toast">串流结束后显示延迟信息</string>
-    <string name="title_osc_opacity">更改屏幕按钮透明度</string>
     <string name="nettest_text_failure">您设备的当前网络似乎正在阻止LunarStreamLight。连接到该网络时，可能无法通过互联网串流。
 \n
 \n以下网络端口被阻止：

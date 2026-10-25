@@ -27,8 +27,6 @@
     <string name="summary_checkbox_enable_pip">Lehetővé teszi a stream megtekintését (de nem vezérlését) miközben mást csinálsz</string>
     <string name="title_checkbox_enable_pip">Kép a képben megfigyelő mód engedélyezése</string>
     <string name="category_ui_settings">UI beállítások</string>
-    <string name="title_osc_opacity">A képernyőn megjelenő vezérlők átlátszatlanságának módosítása</string>
-    <string name="toast_reset_osc_success">A képernyőn megjelenő vezérlők visszaálltak az alapértelmezettre</string>
     <string name="summary_checkbox_flip_face_buttons">Átkapcsolja az A/B és X/Y arcgombokat a gamepadekhez és a képernyőn megjelenő vezérlőkhöz</string>
     <string name="title_checkbox_flip_face_buttons">Arcgombok felcserélése</string>
     <string name="summary_checkbox_mouse_nav_buttons">Ha ezt bekapcsolod, lehet, hogy a jobb egérgombbal való kattintás nem fog működni néhány hibás eszközön</string>

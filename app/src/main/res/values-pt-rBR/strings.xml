@@ -194,8 +194,6 @@
     <string name="category_ui_settings">Configurações de Interface</string>
     <string name="category_host_settings">Configurações de Host</string>
     <string name="title_checkbox_small_icon_mode">Mostrar ícones menores</string>
-    <string name="toast_reset_osc_success">Controles de tela redefinidos para o padrão</string>
-    <string name="title_osc_opacity">Mudar a opacidade dos controles de tela</string>
     <string name="title_video_format">Mudar configurações do HEVC</string>
     <string name="summary_video_format">HEVC reduz os requisitos de largura de banda de vídeo, mas requer um dispositivo mais atual</string>
     <string name="summary_checkbox_disable_warnings">Desativa as mensagens de aviso de conexão na tela durante a transmissão</string>

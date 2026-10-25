@@ -132,6 +132,11 @@ public class UniversalLayoutConfigurationLoader {
          */
         char character;
 
+        /**
+         * Analog trigger this element drives, or -1.
+         */
+        int trigger = -1;
+
         int axisXCode = UniversalHostAxis.codeOf(UniversalHostAxis.KIND_NONE, 0);
         int axisYCode = UniversalHostAxis.codeOf(UniversalHostAxis.KIND_NONE, 0);
 
@@ -148,6 +153,11 @@ public class UniversalLayoutConfigurationLoader {
 
         ElementDefinition button(int gamepadButton) {
             this.gamepadButton = gamepadButton;
+            return this;
+        }
+
+        ElementDefinition trigger(int trigger) {
+            this.trigger = trigger;
             return this;
         }
 
@@ -220,100 +230,97 @@ public class UniversalLayoutConfigurationLoader {
 
         List<ElementDefinition> definitions = new ArrayList<>();
 
-        if (!config.onlyL3R3) {
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_DPAD,
-                    UniversalVirtualControllerElement.EID_DPAD, "D-pad",
-                    DPAD_BASE_X, DPAD_BASE_Y, DPAD_SIZE, DPAD_SIZE));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_DPAD,
+                UniversalVirtualControllerElement.EID_DPAD, "D-pad",
+                DPAD_BASE_X, DPAD_BASE_Y, DPAD_SIZE, DPAD_SIZE));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_A,
-                    !config.flipFaceButtons ? "A" : "B",
-                    BUTTON_BASE_X, BUTTON_BASE_Y + 2 * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE)
-                    .button(GamepadButtons.codeOfFlag(!config.flipFaceButtons
-                            ? ControllerPacket.A_FLAG : ControllerPacket.B_FLAG)));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_A,
+                !config.flipFaceButtons ? "A" : "B",
+                BUTTON_BASE_X, BUTTON_BASE_Y + 2 * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE)
+                .button(GamepadButtons.codeOfFlag(!config.flipFaceButtons
+                        ? ControllerPacket.A_FLAG : ControllerPacket.B_FLAG)));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_B,
-                    config.flipFaceButtons ? "A" : "B",
-                    BUTTON_BASE_X + BUTTON_SIZE, BUTTON_BASE_Y + BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE)
-                    .button(GamepadButtons.codeOfFlag(config.flipFaceButtons
-                            ? ControllerPacket.A_FLAG : ControllerPacket.B_FLAG)));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_B,
+                config.flipFaceButtons ? "A" : "B",
+                BUTTON_BASE_X + BUTTON_SIZE, BUTTON_BASE_Y + BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE)
+                .button(GamepadButtons.codeOfFlag(config.flipFaceButtons
+                        ? ControllerPacket.A_FLAG : ControllerPacket.B_FLAG)));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_X,
-                    !config.flipFaceButtons ? "X" : "Y",
-                    BUTTON_BASE_X - BUTTON_SIZE, BUTTON_BASE_Y + BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE)
-                    .button(GamepadButtons.codeOfFlag(!config.flipFaceButtons
-                            ? ControllerPacket.X_FLAG : ControllerPacket.Y_FLAG)));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_X,
+                !config.flipFaceButtons ? "X" : "Y",
+                BUTTON_BASE_X - BUTTON_SIZE, BUTTON_BASE_Y + BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE)
+                .button(GamepadButtons.codeOfFlag(!config.flipFaceButtons
+                        ? ControllerPacket.X_FLAG : ControllerPacket.Y_FLAG)));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_Y,
-                    config.flipFaceButtons ? "X" : "Y",
-                    BUTTON_BASE_X, BUTTON_BASE_Y, BUTTON_SIZE, BUTTON_SIZE)
-                    .button(GamepadButtons.codeOfFlag(config.flipFaceButtons
-                            ? ControllerPacket.X_FLAG : ControllerPacket.Y_FLAG)));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_Y,
+                config.flipFaceButtons ? "X" : "Y",
+                BUTTON_BASE_X, BUTTON_BASE_Y, BUTTON_SIZE, BUTTON_SIZE)
+                .button(GamepadButtons.codeOfFlag(config.flipFaceButtons
+                        ? ControllerPacket.X_FLAG : ControllerPacket.Y_FLAG)));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_TRIGGER,
-                    UniversalVirtualControllerElement.EID_LT, "LT",
-                    TRIGGER_L_BASE_X, TRIGGER_BASE_Y, TRIGGER_WIDTH, TRIGGER_HEIGHT));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_LT, "LT",
+                TRIGGER_L_BASE_X, TRIGGER_BASE_Y, TRIGGER_WIDTH, TRIGGER_HEIGHT)
+                .trigger(InputEvent.TRIGGER_LEFT));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_TRIGGER,
-                    UniversalVirtualControllerElement.EID_RT, "RT",
-                    TRIGGER_R_BASE_X + TRIGGER_DISTANCE, TRIGGER_BASE_Y,
-                    TRIGGER_WIDTH, TRIGGER_HEIGHT));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_RT, "RT",
+                TRIGGER_R_BASE_X + TRIGGER_DISTANCE, TRIGGER_BASE_Y,
+                TRIGGER_WIDTH, TRIGGER_HEIGHT)
+                .trigger(InputEvent.TRIGGER_RIGHT));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_LB, "LB",
-                    TRIGGER_L_BASE_X + TRIGGER_DISTANCE, TRIGGER_BASE_Y,
-                    TRIGGER_WIDTH, TRIGGER_HEIGHT)
-                    .button(GamepadButtons.codeOfFlag(ControllerPacket.LB_FLAG)));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_LB, "LB",
+                TRIGGER_L_BASE_X + TRIGGER_DISTANCE, TRIGGER_BASE_Y,
+                TRIGGER_WIDTH, TRIGGER_HEIGHT)
+                .button(GamepadButtons.codeOfFlag(ControllerPacket.LB_FLAG)));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_RB, "RB",
-                    TRIGGER_R_BASE_X, TRIGGER_BASE_Y, TRIGGER_WIDTH, TRIGGER_HEIGHT)
-                    .button(GamepadButtons.codeOfFlag(ControllerPacket.RB_FLAG)));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_RB, "RB",
+                TRIGGER_R_BASE_X, TRIGGER_BASE_Y, TRIGGER_WIDTH, TRIGGER_HEIGHT)
+                .button(GamepadButtons.codeOfFlag(ControllerPacket.RB_FLAG)));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_STICK,
-                    UniversalVirtualControllerElement.EID_LS, "Left stick",
-                    ANALOG_L_BASE_X, ANALOG_L_BASE_Y, ANALOG_SIZE, ANALOG_SIZE)
-                    .axes(UniversalHostAxis.KIND_GAMEPAD, UniversalHostAxis.TARGET_LEFT_X,
-                            UniversalHostAxis.KIND_GAMEPAD, UniversalHostAxis.TARGET_LEFT_Y));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_STICK,
+                UniversalVirtualControllerElement.EID_LS, "Left stick",
+                ANALOG_L_BASE_X, ANALOG_L_BASE_Y, ANALOG_SIZE, ANALOG_SIZE)
+                .axes(UniversalHostAxis.KIND_GAMEPAD, UniversalHostAxis.TARGET_LEFT_X,
+                        UniversalHostAxis.KIND_GAMEPAD, UniversalHostAxis.TARGET_LEFT_Y));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_STICK,
-                    UniversalVirtualControllerElement.EID_RS, "Right stick",
-                    ANALOG_R_BASE_X, ANALOG_R_BASE_Y, ANALOG_SIZE, ANALOG_SIZE)
-                    .axes(UniversalHostAxis.KIND_GAMEPAD, UniversalHostAxis.TARGET_RIGHT_X,
-                            UniversalHostAxis.KIND_GAMEPAD, UniversalHostAxis.TARGET_RIGHT_Y));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_STICK,
+                UniversalVirtualControllerElement.EID_RS, "Right stick",
+                ANALOG_R_BASE_X, ANALOG_R_BASE_Y, ANALOG_SIZE, ANALOG_SIZE)
+                .axes(UniversalHostAxis.KIND_GAMEPAD, UniversalHostAxis.TARGET_RIGHT_X,
+                        UniversalHostAxis.KIND_GAMEPAD, UniversalHostAxis.TARGET_RIGHT_Y));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_BACK, "BACK",
-                    BACK_X, START_BACK_Y, START_BACK_WIDTH, START_BACK_HEIGHT)
-                    .button(GamepadButtons.codeOfFlag(ControllerPacket.BACK_FLAG)));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_BACK, "BACK",
+                BACK_X, START_BACK_Y, START_BACK_WIDTH, START_BACK_HEIGHT)
+                .button(GamepadButtons.codeOfFlag(ControllerPacket.BACK_FLAG)));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_START, "START",
-                    START_X, START_BACK_Y, START_BACK_WIDTH, START_BACK_HEIGHT)
-                    .button(GamepadButtons.codeOfFlag(ControllerPacket.PLAY_FLAG)));
-        }
-        else {
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_LSB, "L3",
-                    TRIGGER_L_BASE_X, L3_R3_BASE_Y, TRIGGER_WIDTH, TRIGGER_HEIGHT)
-                    .button(GamepadButtons.codeOfFlag(ControllerPacket.LS_CLK_FLAG)));
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_START, "START",
+                START_X, START_BACK_Y, START_BACK_WIDTH, START_BACK_HEIGHT)
+                .button(GamepadButtons.codeOfFlag(ControllerPacket.PLAY_FLAG)));
 
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_RSB, "R3",
-                    TRIGGER_R_BASE_X + TRIGGER_DISTANCE, L3_R3_BASE_Y,
-                    TRIGGER_WIDTH, TRIGGER_HEIGHT)
-                    .button(GamepadButtons.codeOfFlag(ControllerPacket.RS_CLK_FLAG)));
-        }
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_LSB, "L3",
+                TRIGGER_L_BASE_X, L3_R3_BASE_Y, TRIGGER_WIDTH, TRIGGER_HEIGHT)
+                .button(GamepadButtons.codeOfFlag(ControllerPacket.LS_CLK_FLAG)));
 
-        if (config.showGuideButton) {
-            definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
-                    UniversalVirtualControllerElement.EID_GDB, "GUIDE",
-                    GUIDE_X, GUIDE_Y, START_BACK_WIDTH, START_BACK_HEIGHT)
-                    .button(GamepadButtons.codeOfFlag(ControllerPacket.SPECIAL_BUTTON_FLAG)));
-        }
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_RSB, "R3",
+                TRIGGER_R_BASE_X + TRIGGER_DISTANCE, L3_R3_BASE_Y,
+                TRIGGER_WIDTH, TRIGGER_HEIGHT)
+                .button(GamepadButtons.codeOfFlag(ControllerPacket.RS_CLK_FLAG)));
+
+        definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
+                UniversalVirtualControllerElement.EID_GDB, "GUIDE",
+                GUIDE_X, GUIDE_Y, START_BACK_WIDTH, START_BACK_HEIGHT)
+                .button(GamepadButtons.codeOfFlag(ControllerPacket.SPECIAL_BUTTON_FLAG)));
 
         for (int i = 0; i < DEFAULT_KEYBOARD_KEYS.length; i++) {
             definitions.add(new ElementDefinition(UniversalElementTypes.ELEMENT_BUTTON,
@@ -367,6 +374,10 @@ public class UniversalLayoutConfigurationLoader {
         if (definition.character != 0) {
             buttonConfig.setActionSequence(ActionSequence.single(new InputEvent(
                     InputEvent.KIND_KEYBOARD, keyboardKeyCode(definition.character))));
+        }
+        else if (definition.trigger >= 0) {
+            buttonConfig.setActionSequence(ActionSequence.single(new InputEvent(
+                    InputEvent.KIND_TRIGGER, definition.trigger)));
         }
         else if (definition.gamepadButton != GamepadButtons.CODE_NONE) {
             buttonConfig.setActionSequence(ActionSequence.single(new InputEvent(
@@ -438,15 +449,17 @@ public class UniversalLayoutConfigurationLoader {
             return pad;
         }
 
-        if (UniversalElementTypes.ELEMENT_TRIGGER.equals(type)) {
-            // Which trigger this is comes from the element ID, so a layout that has both
-            // triggers keeps them apart, and a trigger the user adds becomes the left one
-            // when it takes the left trigger's ID.
-            if (elementId == UniversalVirtualControllerElement.EID_LT) {
-                return new UniversalLeftTrigger(controller, elementId, 1, context);
-            }
+        // "trigger" is what an older layout calls a button that drove an analog trigger, so the
+        // name is still understood and the element it makes is an ordinary button
+        if ("trigger".equals(type)) {
+            UniversalDigitalButton button = new UniversalDigitalButton(controller, elementId, 1, context);
 
-            return new UniversalRightTrigger(controller, elementId, 1, context);
+            button.getButtonConfig().setActionSequence(ActionSequence.single(new InputEvent(
+                    InputEvent.KIND_TRIGGER,
+                    elementId == UniversalVirtualControllerElement.EID_LT
+                            ? InputEvent.TRIGGER_LEFT : InputEvent.TRIGGER_RIGHT)));
+
+            return button;
         }
 
         if (UniversalElementTypes.ELEMENT_BUTTON.equals(type) ||
@@ -789,6 +802,26 @@ public class UniversalLayoutConfigurationLoader {
 
             writeStoredElements(context, UniversalLayoutStore.DEFAULT_LAYOUT_ID,
                     shipped.getElementsJson(), shipped.getSourceWidth(), shipped.getSourceHeight());
+
+            return !shipped.getElementsJson().isEmpty();
+        } catch (java.io.IOException e) {
+            return false;
+        } catch (JSONException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Writes the shipped arrangement into a layout of the caller's choosing, so the debug smoke
+     * test can edit a copy of it instead of the layout the user made.
+     */
+    public static boolean seedShippedArrangementInto(Context context, String layoutId) {
+        try {
+            UniversalLayoutExchange.Imported shipped = UniversalLayoutExchange.fromJson(
+                    readAsset(context, SHIPPED_LAYOUT_ASSET));
+
+            writeStoredElements(context, layoutId, shipped.getElementsJson(),
+                    shipped.getSourceWidth(), shipped.getSourceHeight());
 
             return !shipped.getElementsJson().isEmpty();
         } catch (java.io.IOException e) {

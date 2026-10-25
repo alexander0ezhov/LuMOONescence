@@ -218,7 +218,7 @@
         },
         "toggle": false
       },
-      "type": "trigger",
+      "type": "button",
       "elementId": 2
     },
     {
@@ -247,7 +247,7 @@
         },
         "toggle": false
       },
-      "type": "trigger",
+      "type": "button",
       "elementId": 3
     },
     {
@@ -618,7 +618,7 @@
         },
         "toggle": false
       },
-      "type": "trigger",
+      "type": "button",
       "elementId": 1005
     },
     {
@@ -767,7 +767,7 @@
         },
         "toggle": false
       },
-      "type": "trigger",
+      "type": "button",
       "elementId": 1013
     },
     {
@@ -796,7 +796,7 @@
         },
         "toggle": false
       },
-      "type": "trigger",
+      "type": "button",
       "elementId": 1014
     }
   ]

@@ -92,8 +92,6 @@
     <string name="summary_checkbox_flip_face_buttons">Inverte os botões A/B e X/Y dos gamepads e controles de ecrã</string>
     <string name="title_checkbox_absolute_mouse_mode">Modo de rato para área de trabalho remota</string>
     <string name="summary_checkbox_absolute_mouse_mode">Isso pode alterar a aceleração do rato para se comportar mais naturalmente para uso em desktop remoto, mas é incompatível com muitos jogos.</string>
-    <string name="toast_reset_osc_success">Controles de ecrã redefinidos para o padrão</string>
-    <string name="title_osc_opacity">Mudar a opacidade dos controles de ecrã</string>
     <string name="category_ui_settings">Configurações de Interface</string>
     <string name="title_checkbox_enable_pip">Ativar modo Picture-in-Picture</string>
     <string name="summary_checkbox_enable_pip">Permite que a transmissão seja visualizada (mas não controlada) enquanto usa outros apps</string>

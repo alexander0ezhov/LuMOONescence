@@ -130,8 +130,6 @@
     <string name="title_checkbox_flip_face_buttons">Skifta ansiktsknappar</string>
     <string name="title_checkbox_absolute_mouse_mode">Musläget för fjärrskrivbord</string>
     <string name="summary_checkbox_absolute_mouse_mode">Detta kan göra musacceleration mer naturligt för fjärrskrivbordsanvändning, men det är oförenligt med många spel.</string>
-    <string name="toast_reset_osc_success">Kontroller på skärmen återställs till ursprungsinställningen</string>
-    <string name="title_osc_opacity">Jämka genomskinligheten av skärmkontrollerna</string>
     <string name="title_checkbox_enable_pip">Sätt på bild-i-bild-observatörsläge</string>
     <string name="title_language_list">Språk</string>
     <string name="summary_language_list">Språk att använda för LunarStreamLight</string>

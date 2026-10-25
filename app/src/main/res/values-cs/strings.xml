@@ -164,7 +164,6 @@
     <string name="title_resolution_list">Rozlišení videa</string>
     <string name="summary_resolution_list">Zvyšte přo zlepšení ostrosti obrazu. Snižte pro lepší výkon na levnějších zařízeních nebo pomalejších sítích.</string>
     <string name="summary_audio_config_list">Povolit 5.1 nebo 7.1 prostorový zvuk pro systémy domácího kina</string>
-    <string name="title_osc_opacity">Změnit průhlednost ovladače na obrazovce</string>
     <string name="category_advanced_settings">Pokročilá nastavení</string>
     <string name="title_unlock_fps">Odemknout všechny možné snímkové frekvence</string>
     <string name="title_checkbox_reduce_refresh_rate">Povolit snížení obnovovací frekvence</string>
@@ -172,7 +171,6 @@
     <string name="title_checkbox_mouse_nav_buttons">Povolit tlačítka myši zpět a vpřed</string>
     <string name="summary_checkbox_mouse_nav_buttons">Povolení této možnosti může na některých pochybných zařízeních rozbít klikání pravým tlačítkem</string>
     <string name="summary_checkbox_flip_face_buttons">Přehodí tlačítka A/B a X/Y na herním ovladači a instrukcích na obrazovce</string>
-    <string name="toast_reset_osc_success">Ovladač na obrazovce resetován</string>
     <string name="title_checkbox_enable_pip">Povolit sledovací rezim obraz-v-obraze</string>
     <string name="summary_checkbox_enable_sops">Povolit GFE měnit herní nastavení pro optimální streamování</string>
     <string name="title_checkbox_host_audio">Přehrávat zvuk na PC</string>

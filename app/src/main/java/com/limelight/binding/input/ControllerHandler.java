@@ -400,11 +400,6 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
             }
         }
 
-        if (PreferenceConfiguration.readPreferences(context).onscreenController) {
-            LimeLog.info("Counting OSC gamepad");
-            mask |= 1;
-        }
-
         LimeLog.info("Enumerated "+count+" gamepads");
         return mask;
     }
@@ -1102,7 +1097,7 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
     private short getActiveControllerMask() {
         if (prefConfig.multiController) {
             return (short)(currentControllers | initialControllers
-                    | onScreenPlayerMask(prefConfig.onscreenController, prefConfig.universalLayout));
+                    | onScreenPlayerMask(prefConfig.universalLayout));
         }
         else {
             // Only Player 1 is active with multi-controller disabled
@@ -1119,8 +1114,8 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
      * a separate setting and used to be left out, leaving the universal layout unable to
      * register its gamepad until the built-in one was enabled as well.
      */
-    public static int onScreenPlayerMask(boolean onscreenController, boolean universalLayout) {
-        return (onscreenController || universalLayout) ? 1 : 0;
+    public static int onScreenPlayerMask(boolean universalLayout) {
+        return universalLayout ? 1 : 0;
     }
 
     private static boolean areBatteryCapacitiesEqual(float first, float second) {
@@ -2142,7 +2137,7 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
             // the user has requested that behavior.
             // Either on-screen layout counts: the built-in one and the universal one. If a
             // control of either is what asked for the rumble, the phone buzzes.
-            boolean onScreenControls = prefConfig.onscreenController || prefConfig.universalLayout;
+            boolean onScreenControls = prefConfig.universalLayout;
 
             if (!foundMatchingDevice && onScreenControls && prefConfig.vibrateOsc) {
                 rumbleSingleVibrator(deviceVibrator, lowFreqMotor, highFreqMotor);

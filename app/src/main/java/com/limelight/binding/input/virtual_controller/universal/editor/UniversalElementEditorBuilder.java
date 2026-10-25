@@ -534,14 +534,7 @@ public class UniversalElementEditorBuilder {
      * Everything a press can send: the gamepad buttons and the analog triggers.
      */
     private static List<InputEvent> gamepadCatalog() {
-        List<InputEvent> events = new ArrayList<>(buttonCodeCatalog());
-
-        // The analog triggers are part of the same controller, so they are offered alongside
-        // its buttons. They cannot be a button flag, which is why they are their own event
-        // kind.
-        events.addAll(InputEventNames.triggerCatalog());
-
-        return events;
+        return InputEventNames.padCatalog();
     }
 
     /**

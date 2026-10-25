@@ -76,8 +76,6 @@
     <string name="title_checkbox_absolute_mouse_mode">Tryb myszy dla pulpitu zdalnego</string>
     <string name="title_checkbox_mouse_nav_buttons">Włączanie przycisków myszy wstecz i dalej</string>
     <string name="summary_checkbox_mouse_nav_buttons">Włączenie tej opcji może uniemożliwić kliknięcie prawym przyciskiem myszy na niektórych problematycznych urządzeniach</string>
-    <string name="toast_reset_osc_success">Przywrócenie domyślnych ustawień elementów sterujących na ekranie</string>
-    <string name="title_osc_opacity">Zmiana krycia elementów sterujących na ekranie</string>
     <string name="category_ui_settings">Ustawienia interfejsu użytkownika</string>
     <string name="title_checkbox_enable_pip">Włącz tryb obserwatora obrazu w obrazie</string>
     <string name="title_language_list">Język</string>

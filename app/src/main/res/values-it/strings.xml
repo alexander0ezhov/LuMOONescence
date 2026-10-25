@@ -111,7 +111,6 @@
     <string name="summary_checkbox_usb_bind_all">Forza i driver USB di LunarStreamLight di assumere il controllo su tutti i controller Xbox supportati</string>
     <string name="title_checkbox_mouse_emulation">Emulazione del mouse tramite controller</string>
     <string name="summary_checkbox_mouse_emulation">Tenendo premuto il pulsante Start, il controller passerà alla modalità mouse</string>
-    <string name="toast_reset_osc_success">I controlli a schermo sono stati ripristinati</string>
     <string name="category_ui_settings">Impostazioni dell\'interfaccia</string>
     <string name="title_language_list">Lingua</string>
     <string name="summary_language_list">Lingua da usare in LunarStreamLight</string>
@@ -165,7 +164,6 @@
     <string name="title_fps_list">Frame rate video</string>
     <string name="title_checkbox_vibrate_fallback">Emula il supporto per la vibrazione</string>
     <string name="title_checkbox_mouse_nav_buttons">Abilita i bottoni avanti e indietro del mouse</string>
-    <string name="title_osc_opacity">Cambia l\'opavità dei controlli a schermo</string>
     <string name="title_unlock_fps">Sblocca tutti i frame rate possibili</string>
     <string name="pacing_balanced">Bilanciato</string>
     <string name="pacing_latency">Preferisci ritardi minori</string>

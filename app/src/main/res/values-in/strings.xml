@@ -103,7 +103,6 @@
     <string name="summary_seekbar_bitrate">Tingkatkan untuk kualitas gambar yang lebih baik. Kurangi untuk meningkatkan kinerja pada koneksi yang lebih lambat.</string>
     <string name="title_checkbox_flip_face_buttons">Balikkan tombol wajah</string>
     <string name="summary_checkbox_flip_face_buttons">Mengalihkan tombol wajah A/B dan X/Y untuk gamepad dan kontrol di layar</string>
-    <string name="toast_reset_osc_success">Kontrol di layar diatur ulang ke default</string>
     <string name="resolution_prefix_native_landscape">(Lanskap)</string>
     <string name="resolution_prefix_native_portrait">(Potret)</string>
     <string name="summary_checkbox_enable_audiofx">Mengizinkan efek audio berfungsi saat streaming, tetapi dapat meningkatkan latensi audio</string>
@@ -153,7 +152,6 @@
     <string name="summary_checkbox_usb_bind_all">Gunakan driver USB LunarStreamLight untuk semua gamepad yang didukung, meskipun ada dukungan pengontrol Xbox asli</string>
     <string name="title_checkbox_mouse_nav_buttons">Aktifkan tombol mouse mundur dan maju</string>
     <string name="title_checkbox_absolute_mouse_mode">Mode mouse desktop jarak jauh</string>
-    <string name="title_osc_opacity">Ubah opasitas kontrol di layar</string>
     <string name="category_ui_settings">Pengaturan UI</string>
     <string name="summary_checkbox_enable_pip">Mengizinkan streaming untuk dilihat (tetapi tidak dikontrol) saat melakukan banyak tugas</string>
     <string name="title_language_list">Bahasa</string>

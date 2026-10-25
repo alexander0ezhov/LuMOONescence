@@ -102,10 +102,11 @@ public final class InputEventNames {
     }
 
     /**
-     * The name of one of the analog triggers.
+     * The name of one of the analog triggers. They are named like the shoulder buttons, because
+     * that is what they are: part of the same pad, one line further.
      */
     public static String triggerName(int trigger) {
-        return trigger == InputEvent.TRIGGER_RIGHT ? "Right trigger (RT)" : "Left trigger (LT)";
+        return trigger == InputEvent.TRIGGER_RIGHT ? "RT" : "LT";
     }
 
     public static String describe(InputEvent event) {
@@ -118,10 +119,33 @@ public final class InputEventNames {
         }
 
         if (event.isTrigger()) {
-            return triggerName(event.getCode());
+            return "Pad: " + triggerName(event.getCode());
         }
 
         return "Pad: " + GamepadButtons.nameForCode(event.getCode());
+    }
+
+    /**
+     * Everything a press can send: the gamepad buttons, with the analog triggers where they sit
+     * on a real pad, straight after the shoulder buttons.
+     */
+    public static List<InputEvent> padCatalog() {
+        List<InputEvent> events = new ArrayList<>();
+
+        for (GamepadButtons.Button button : GamepadButtons.all()) {
+            if (button.code == GamepadButtons.CODE_NONE) {
+                continue;
+            }
+
+            events.add(new InputEvent(InputEvent.KIND_GAMEPAD, button.code));
+
+            // The triggers follow the shoulder buttons, as they do on the controller
+            if (button.flag == com.limelight.nvstream.input.ControllerPacket.RB_FLAG) {
+                events.addAll(triggerCatalog());
+            }
+        }
+
+        return events;
     }
 
     /**

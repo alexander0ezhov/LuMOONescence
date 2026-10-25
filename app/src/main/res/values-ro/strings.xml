@@ -138,8 +138,6 @@
     <string name="summary_checkbox_mouse_emulation">Apăsarea lungă pe butonul Start schimba modul de operare a controllerului în modul mouse.</string>
     <string name="title_checkbox_mouse_nav_buttons">Activează butoanele de înainte și înapoi ale mousului</string>
     <string name="summary_checkbox_mouse_nav_buttons">Această opțiune poate afecta click dreapta pentru unele dispozitive problematice.</string>
-    <string name="toast_reset_osc_success">Controalele de pe ecran au fost resetate la setarile implicite</string>
-    <string name="title_osc_opacity">Modifică opacitatea controalelor de pe ecran</string>
     <string name="category_ui_settings">Setari UI</string>
     <string name="title_language_list">Limba (Language)</string>
     <string name="summary_language_list">Limba folosită de către LunarStreamLight</string>

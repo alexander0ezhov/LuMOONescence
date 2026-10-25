@@ -93,8 +93,6 @@
     <string name="summary_checkbox_mouse_nav_buttons">Η ενεργοποίηση αυτής της επιλογής μπορεί να διακόψει το δεξί κλικ σε ορισμένες συσκευές με σφάλματα</string>
     <string name="title_checkbox_flip_face_buttons">Αναστροφή κουμπιών πρόσωψης</string>
     <string name="summary_checkbox_flip_face_buttons">Αλλάζει τα κουμπιά πρόσοψης A/B και X/Y για τα gamepad και τα χειριστήρια στην οθόνη</string>
-    <string name="toast_reset_osc_success">Επαναφορά των στοιχείων ελέγχου στην οθόνη στις προεπιλογές</string>
-    <string name="title_osc_opacity">Αλλαγή της αδιαφάνειας των στοιχείων ελέγχου στην οθόνη</string>
     <string name="category_ui_settings">Ρυθμίσεις διεπαφής χρήστη</string>
     <string name="title_checkbox_enable_pip">Ενεργοποίηση της λειτουργίας παρατηρητή εικόνας μέσα σε εικόνα</string>
     <string name="summary_checkbox_enable_pip">Επιτρέπει την προβολή της ροής (αλλά όχι τον έλεγχο) κατά την εκτέλεση πολλαπλών εργασιών</string>

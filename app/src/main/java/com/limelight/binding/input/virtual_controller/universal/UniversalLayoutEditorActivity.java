@@ -668,10 +668,6 @@ public class UniversalLayoutEditorActivity extends Activity
             return getString(R.string.control_type_dpad);
         }
 
-        if (UniversalElementTypes.ELEMENT_TRIGGER.equals(type)) {
-            return getString(R.string.control_type_trigger);
-        }
-
         if (UniversalElementTypes.ELEMENT_BUTTON.equals(type)) {
             return getString(R.string.control_type_button);
         }

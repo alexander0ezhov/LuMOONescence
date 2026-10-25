@@ -27,7 +27,6 @@ import com.limelight.binding.input.virtual_controller.universal.UniversalDigital
 import com.limelight.binding.input.virtual_controller.universal.UniversalDigitalPad;
 import com.limelight.binding.input.virtual_controller.universal.UniversalElementTypes;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutConfigurationLoader;
-import com.limelight.binding.input.virtual_controller.universal.UniversalLeftTrigger;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutArea;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutEditorActivity;
@@ -101,8 +100,17 @@ public class LayoutSmokeActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // The editor is opened on a copy of the shipped arrangement, so the checks that delete,
+        // duplicate and drag controls never touch a layout the user made. The copy has to be a
+        // layout the store knows about, because the editor closes on one it cannot find.
+        UniversalLayoutDefinition copy =
+                UniversalLayoutStore.getInstance(this).addLayout("Smoke test copy");
+
+        editorLayoutId = copy.getId();
+        UniversalLayoutConfigurationLoader.seedShippedArrangementInto(this, editorLayoutId);
+
         Intent intent = new Intent(this, UniversalLayoutEditorActivity.class);
-        intent.putExtra(UniversalLayoutEditorActivity.EXTRA_LAYOUT_ID, EDITOR_LAYOUT_ID);
+        intent.putExtra(UniversalLayoutEditorActivity.EXTRA_LAYOUT_ID, editorLayoutId);
         startActivity(intent);
 
         postDelayed(new Runnable() {
@@ -658,6 +666,7 @@ public class LayoutSmokeActivity extends Activity {
         checkStreamMenuExtras();
         checkEditorPassThroughOrder();
         checkLayoutsScreenIsTidy();
+        checkTriggerEventNames();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -1376,23 +1385,20 @@ public class LayoutSmokeActivity extends Activity {
     private static final String SCRATCH_LAYOUT_ID = "smoke-test-scratch";
 
     /**
-     * The layout the editor under test is opened with.
+     * The layout the editor under test is opened with: a copy of the shipped arrangement, made
+     * for the run and removed afterwards.
      */
-    private static final String EDITOR_LAYOUT_ID = "default";
+    private String editorLayoutId;
 
     /**
      * The host only registers a gamepad for the players named in the mask of an input packet,
      * so a layout that is not in the mask has all of its input ignored.
      */
     private void checkOnScreenLayoutRegistersGamepad() {
-        check("the built-in on-screen layout names player one",
-                ControllerHandler.onScreenPlayerMask(true, false) == 1);
-        check("the universal layout names player one on its own",
-                ControllerHandler.onScreenPlayerMask(false, true) == 1);
-        check("both on-screen layouts together still name player one",
-                ControllerHandler.onScreenPlayerMask(true, true) == 1);
+        check("the on-screen layout names player one",
+                ControllerHandler.onScreenPlayerMask(true) == 1);
         check("no on-screen layout leaves player one out",
-                ControllerHandler.onScreenPlayerMask(false, false) == 0);
+                ControllerHandler.onScreenPlayerMask(false) == 0);
     }
 
     /**
@@ -1423,14 +1429,28 @@ public class LayoutSmokeActivity extends Activity {
         try {
             UniversalVirtualControllerElement lt = null;
 
+            // The trigger is an ordinary button whose action is the left trigger of the host
             for (UniversalVirtualControllerElement element : controller.getElements()) {
-                if (element instanceof UniversalLeftTrigger) {
+                if (element.getButtonConfigIfAny() != null
+                        && element.getElementId() == UniversalVirtualControllerElement.EID_LT) {
                     lt = element;
                     break;
                 }
             }
 
             check("the built-in layout has a left trigger", lt != null);
+            check("the left trigger is an ordinary button",
+                    lt != null && UniversalElementTypes.ELEMENT_BUTTON.equals(lt.getElementTypeName()));
+
+            boolean anyTriggerLeft = false;
+            for (UniversalVirtualControllerElement element : controller.getElements()) {
+                if ("trigger".equals(element.getElementTypeName())) {
+                    anyTriggerLeft = true;
+                    break;
+                }
+            }
+
+            check("no control is of a trigger kind any more", !anyTriggerLeft);
 
             if (lt == null) {
                 return;
@@ -1440,13 +1460,10 @@ public class LayoutSmokeActivity extends Activity {
             controller.setControllerMode(UniversalVirtualController.ControllerMode.Active);
 
             try {
-                // Nothing is configured for it, which is how the built-in layout makes one
-                ((UniversalLeftTrigger) lt).getButtonConfig().setActionSequence(ActionSequence.empty());
-
                 controller.getControllerInputContext().leftTrigger = 0;
 
                 lt.onElementTouchEvent(motionEventFor(lt, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
-                check("a trigger pulls its axis without anything configured for it",
+                check("a trigger pulls its axis with the action the layout gives it",
                         controller.getControllerInputContext().leftTrigger == (byte) 0xFF);
 
                 lt.onElementTouchEvent(motionEventFor(lt, MotionEvent.ACTION_UP, 0.5f, 0.5f));
@@ -1889,7 +1906,7 @@ public class LayoutSmokeActivity extends Activity {
      * way out really does throw the changes away.
      */
     private void checkDontSaveLeavesTheLayoutAlone() {
-        String before = readStoredElements(EDITOR_LAYOUT_ID);
+        String before = readStoredElements(editorLayoutId);
 
         // A control that is really in the layout, so dragging it is a real edit rather than a
         // gesture on something that was taken out of the layout by an earlier check
@@ -1915,7 +1932,7 @@ public class LayoutSmokeActivity extends Activity {
         check("editing marks the layout as having unsaved changes",
                 universalController.isLayoutDirty());
         check("editing does not write the stored layout",
-                readStoredElements(EDITOR_LAYOUT_ID).equals(before));
+                readStoredElements(editorLayoutId).equals(before));
 
         // The user answers "don't save" on the way out
         editor.discardChanges();
@@ -1923,7 +1940,7 @@ public class LayoutSmokeActivity extends Activity {
         check("answering don't save clears the unsaved marker",
                 !universalController.isLayoutDirty());
         check("answering don't save leaves the stored layout as it was",
-                readStoredElements(EDITOR_LAYOUT_ID).equals(before));
+                readStoredElements(editorLayoutId).equals(before));
     }
 
     /**
@@ -3520,8 +3537,14 @@ public class LayoutSmokeActivity extends Activity {
         try {
             builtIn.refreshLayout();
 
+            StringBuilder names = new StringBuilder();
+            for (UniversalVirtualControllerElement element : builtIn.getElements()) {
+                names.append(element.getElementName()).append("/")
+                        .append(element.getElementTypeName()).append(" ");
+            }
+
             android.util.Log.i("LayoutSmoke", "the built-in layout has "
-                    + builtIn.getElements().size() + " controls");
+                    + builtIn.getElements().size() + " controls: " + names);
 
             check("the built-in layout still has its controls",
                     builtIn.getElements().size() > 10);
@@ -3876,6 +3899,62 @@ public class LayoutSmokeActivity extends Activity {
                 screen != null && screen.findViewById(R.id.layoutsGrid) != null);
     }
 
+
+    /**
+     * The triggers are named and placed like the shoulder buttons, since they are part of the
+     * same pad.
+     */
+    private void checkTriggerEventNames() {
+        java.util.List<com.limelight.binding.input.virtual_controller.universal.action.InputEvent> catalog =
+                com.limelight.binding.input.virtual_controller.universal.action.InputEventNames
+                        .padCatalog();
+
+        java.util.List<String> names = new java.util.ArrayList<>();
+        for (com.limelight.binding.input.virtual_controller.universal.action.InputEvent event : catalog) {
+            names.add(com.limelight.binding.input.virtual_controller.universal.action.InputEventNames
+                    .describe(event));
+        }
+
+        android.util.Log.i("LayoutSmoke", "pad events: " + names);
+
+        String lb = "Pad: LB";
+        String rb = "Pad: RB";
+        String lt = "Pad: LT";
+        String rt = "Pad: RT";
+
+        check("the shoulder buttons are offered", names.contains(lb) && names.contains(rb));
+        check("the triggers are named like the other pad buttons", names.contains(lt) && names.contains(rt));
+
+        int lbAt = names.indexOf(lb);
+        int rbAt = names.indexOf(rb);
+        int ltAt = names.indexOf(lt);
+        int rtAt = names.indexOf(rt);
+
+        check("the triggers sit next to the shoulder buttons",
+                ltAt > rbAt && rtAt > rbAt && Math.abs(ltAt - rbAt) <= 2 && Math.abs(rtAt - ltAt) == 1);
+
+        // Nothing is named after a trigger in the old style any more
+        boolean anyOldName = false;
+        for (String name : names) {
+            if (name.contains("trigger (LT)") || name.contains("trigger (RT)")) {
+                anyOldName = true;
+                break;
+            }
+        }
+
+        check("no event is named the old way", !anyOldName);
+
+        // The left trigger of the built-in arrangement says what it sends
+        com.limelight.binding.input.virtual_controller.universal.action.InputEvent leftTrigger =
+                new com.limelight.binding.input.virtual_controller.universal.action.InputEvent(
+                        com.limelight.binding.input.virtual_controller.universal.action.InputEvent.KIND_TRIGGER,
+                        com.limelight.binding.input.virtual_controller.universal.action.InputEvent.TRIGGER_LEFT);
+
+        check("a trigger event says which trigger it is",
+                "Pad: LT".equals(com.limelight.binding.input.virtual_controller.universal.action
+                        .InputEventNames.describe(leftTrigger)));
+    }
+
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
             if (label.contains(needle)) {
@@ -3937,9 +4016,24 @@ public class LayoutSmokeActivity extends Activity {
 
     // ------------------------------------------------------------------ helpers
 
+    /**
+     * The copy the editor worked on is removed, so a run leaves nothing behind.
+     */
+    private void clearEditorCopy() {
+        if (editorLayoutId == null) {
+            return;
+        }
+
+        UniversalLayoutConfigurationLoader.resetLayout(this, editorLayoutId);
+        UniversalLayoutStore.getInstance(this).deleteLayout(editorLayoutId);
+        editorLayoutId = null;
+    }
+
     private void report() {
         Log.i(TAG, "RESULT " + (failures == 0 ? "PASSED" : "FAILED")
                 + " checks=" + checks + " failures=" + failures);
+
+        clearEditorCopy();
 
         // Starting this activity with --ez showDrawer true leaves the editor on screen with a
         // control's drawer open, so the drawer itself can be looked at. Touch cannot be

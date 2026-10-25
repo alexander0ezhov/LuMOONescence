@@ -99,8 +99,6 @@
     <string name="category_advanced_settings">高度な設定</string>
     <string name="title_video_format">HEVC</string>
     <string name="summary_video_format">HEVCは動画に必要な帯域幅を圧縮します。この機能にはなるべく新しいデバイスが必要です</string>
-    <string name="title_osc_opacity">透過率</string>
-    <string name="toast_reset_osc_success">オンスクリーンコントローラをデフォルトに戻しました</string>
     <!-- Array strings -->
     <string name="videoformat_hevcalways">HEVCを強制的に有効化(クラッシュする可能性があります)</string>
     <string name="scut_not_paired">コンピュータとペアリングされてません</string>

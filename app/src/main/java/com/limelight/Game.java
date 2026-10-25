@@ -14,7 +14,6 @@ import com.limelight.binding.input.touch.RelativeTouchContext;
 import com.limelight.binding.input.driver.UsbDriverService;
 import com.limelight.binding.input.evdev.EvdevListener;
 import com.limelight.binding.input.touch.TouchContext;
-import com.limelight.binding.input.virtual_controller.VirtualController;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
 import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutStore;
 import com.limelight.binding.input.virtual_controller.universal.UniversalStreamDrawer;
@@ -118,7 +117,6 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
     private ControllerHandler controllerHandler;
     private KeyboardTranslator keyboardTranslator;
-    private VirtualController virtualController;
     private UniversalVirtualController universalVirtualController;
 
     private PreferenceConfiguration prefConfig;
@@ -439,7 +437,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             // of gamepads removed and replugged at runtime.
             gamepadMask = 1;
         }
-        if (prefConfig.onscreenController || prefConfig.universalLayout) {
+        if (prefConfig.universalLayout) {
             // If we're using an on-screen layout, always set at least gamepad 1.
             gamepadMask |= 1;
         }
@@ -502,15 +500,6 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         // Initialize touch contexts
         setUpTouchContexts();
-
-        if (prefConfig.onscreenController) {
-            // create virtual onscreen controller
-            virtualController = new VirtualController(controllerHandler,
-                    (FrameLayout)streamView.getParent(),
-                    this);
-            virtualController.refreshLayout();
-            virtualController.show();
-        }
 
         UniversalLayoutDefinition universalLayoutDefinition =
                 prefConfig.universalLayout ? UniversalLayoutStore.getInstance(this).getSelectedLayout() : null;
@@ -875,7 +864,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             int desiredOrientation = Configuration.ORIENTATION_UNDEFINED;
 
             // On-screen layouts don't properly support portrait displays, so don't use them in portrait mode by default
-            if (prefConfig.onscreenController || prefConfig.universalLayout) {
+            if (prefConfig.universalLayout) {
                 desiredOrientation = Configuration.ORIENTATION_LANDSCAPE;
             }
 
@@ -913,11 +902,6 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         // Set requested orientation for possible new screen size
         setPreferredOrientationForCurrentDisplay();
 
-        if (virtualController != null) {
-            // Refresh layout of OSC for possible new screen size
-            virtualController.refreshLayout();
-        }
-
         if (universalVirtualController != null) {
             // Refresh the universal layout for the possible new screen size
             universalVirtualController.refreshLayout();
@@ -927,10 +911,6 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (isInPictureInPictureMode()) {
                 isHidingOverlays = true;
-
-                if (virtualController != null) {
-                    virtualController.hide();
-                }
 
                 if (universalVirtualController != null) {
                     universalVirtualController.hide();
@@ -949,10 +929,6 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                 isHidingOverlays = false;
 
                 // Restore overlays to previous state when leaving PiP
-
-                if (virtualController != null) {
-                    virtualController.show();
-                }
 
                 if (universalVirtualController != null) {
                     universalVirtualController.show();
@@ -1431,10 +1407,6 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         SpinnerDialog.closeDialogs(this);
         Dialog.closeDialogs();
-
-        if (virtualController != null) {
-            virtualController.hide();
-        }
 
         if (universalVirtualController != null) {
             universalVirtualController.hide();
@@ -2186,14 +2158,6 @@ public class Game extends Activity implements SurfaceHolder.Callback,
      * touches that manipulate the controls would also be sent to the host.
      */
     private boolean isOnScreenLayoutBeingConfigured() {
-        if (virtualController != null) {
-            VirtualController.ControllerMode mode = virtualController.getControllerMode();
-            if (mode == VirtualController.ControllerMode.MoveButtons ||
-                    mode == VirtualController.ControllerMode.ResizeButtons) {
-                return true;
-            }
-        }
-
         if (universalVirtualController != null) {
             UniversalVirtualController.ControllerMode mode = universalVirtualController.getControllerMode();
             if (mode == UniversalVirtualController.ControllerMode.MoveButtons ||
