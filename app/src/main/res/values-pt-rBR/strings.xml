@@ -62,7 +62,6 @@
     <string name="scut_invalid_app_id">O aplicativo informado não é válido</string>
     <string name="pcview_menu_header_online">Disponível</string>
     <string name="pcview_menu_app_list">Ver Todos os Jogos</string>
-    <string name="pcview_menu_unpair_pc">Desparear</string>
     <string name="pcview_menu_delete_pc">Deletar PC</string>
     <string name="pcview_menu_test_network">Testar Conexão com a Internet</string>
     <string name="pcview_menu_details">Ver Detalhes</string>
@@ -86,7 +85,6 @@
     <string name="pair_fail">Falha no pareamento</string>
     <string name="pair_already_in_progress">Pareamento já em andamento</string>
     <string name="wol_pc_online">Esse computador está disponível</string>
-    <string name="wol_waking_pc">Acordando o PC…</string>
     <string name="wol_fail">Falha ao enviar pacotes Wake-On-LAN</string>
     <string name="unpairing">Despareando…</string>
     <string name="unpair_success">Despareado com sucesso</string>
@@ -124,10 +122,8 @@
     <string name="applist_menu_resume">Retornar ao Jogo</string>
     <string name="applist_menu_quit">Sair do Jogo</string>
     <string name="applist_menu_quit_and_start">Sair do Jogo Atual e Iniciar</string>
-    <string name="applist_menu_cancel">Cancelar</string>
     <string name="applist_menu_details">Ver Detalhes</string>
     <string name="applist_menu_scut">Criar Atalho</string>
-    <string name="applist_menu_tv_channel">Adicionar ao Canal</string>
     <string name="applist_menu_hide_app">Esconder Jogo</string>
     <string name="applist_refresh_title">Lista de Aplicativos</string>
     <string name="perf_overlay_netdrops">Quadros dropados pela rede: %1$.2f%%</string>
@@ -135,10 +131,7 @@
     <string name="applist_quit_success">Saiu com sucesso</string>
     <string name="applist_quit_fail">Falha ao sair</string>
     <string name="applist_refresh_msg">Recarregando aplicativos…</string>
-    <string name="applist_refresh_error_title">Erro</string>
-    <string name="applist_refresh_error_msg">Falha ao obter a lista de aplicativos</string>
     <string name="applist_quit_confirmation">Tem certeza de que deseja sair do aplicativo em execução\? Todos os dados não salvos serão perdidos.</string>
-    <string name="applist_details_id">ID do App:</string>
     <string name="title_add_pc">Adicionar PC Manualmente</string>
     <string name="msg_add_pc">Conectando ao PC…</string>
     <string name="addpc_success">Computador adicionado com sucesso</string>
@@ -197,8 +190,6 @@
     <string name="title_video_format">Mudar configurações do HEVC</string>
     <string name="summary_video_format">HEVC reduz os requisitos de largura de banda de vídeo, mas requer um dispositivo mais atual</string>
     <string name="summary_checkbox_disable_warnings">Desativa as mensagens de aviso de conexão na tela durante a transmissão</string>
-    <string name="title_disable_frame_drop">Nunca dropar quadros</string>
-    <string name="summary_disable_frame_drop">Talvez reduza o micro-stuttering em alguns dispositivos, mas pode aumentar a latência</string>
     <string name="title_enable_hdr">Habilitar HDR (Experimental)</string>
     <string name="title_enable_post_stream_toast">Mostrar aviso de latência após terminar a transmissão</string>
     <string name="summary_enable_perf_overlay">Exibe informações de performance em tempo real durante a transmissão</string>

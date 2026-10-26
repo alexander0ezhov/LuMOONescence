@@ -84,10 +84,10 @@ public class RightStickTouchContext implements TouchContext {
         // The stick reaches all the way over once the finger is far enough away, and no further
         float reach = Math.min(1f, distance / fullTravel);
 
-        // Screen coordinates grow downwards and so do the stick's, so the vertical value is
-        // passed through as it is
+        // Screen coordinates grow downwards while the stick reports upwards as positive, so the
+        // vertical value is turned around
         short axisX = (short) Math.round(dx / distance * reach * AXIS_MAX);
-        short axisY = (short) Math.round(dy / distance * reach * AXIS_MAX);
+        short axisY = (short) Math.round(-dy / distance * reach * AXIS_MAX);
 
         reportStick(axisX, axisY);
         return true;
@@ -110,8 +110,8 @@ public class RightStickTouchContext implements TouchContext {
     }
 
     private void reportStick(short x, short y) {
-        // Only the right stick is claimed; everything else is left as the on-screen layout and
-        // any real controller have it
-        controllerHandler.reportOscState(0, (short) 0, (short) 0, x, y, (byte) 0, (byte) 0);
+        // Only the right stick is claimed; the buttons and triggers the on-screen layout is
+        // sending are left alone, so a held control keeps firing while the view turns
+        controllerHandler.reportOscRightStick(x, y);
     }
 }

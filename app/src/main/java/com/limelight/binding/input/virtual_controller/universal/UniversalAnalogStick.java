@@ -264,6 +264,11 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
      * @param y vertical position, -1..1 with the origin in the middle
      */
     protected void applyConfiguredMovement(float x, float y) {
+        // The touch inside the control grows downwards, while the host, the mouse and the
+        // directions of a stick all take upwards as positive. Turning the value around here is
+        // what keeps "push the finger up" from being sent as "pull down".
+        y = -y;
+
         UniversalStickConfig config = getStickConfig();
 
         if (config.isAxesMode()) {

@@ -12,7 +12,6 @@
     <string name="pcview_menu_header_unknown">Uppdaterar</string>
     <string name="pcview_menu_app_list">Visa alla appar</string>
     <string name="pcview_menu_pair_pc">Para ihop med PC</string>
-    <string name="pcview_menu_unpair_pc">Koppla bort</string>
     <string name="pcview_menu_send_wol">Skicka begäran om Wake-On-LAN</string>
     <string name="pcview_menu_delete_pc">Radera PC</string>
     <string name="pcview_menu_test_network">Testa nätverksanslutning</string>
@@ -32,7 +31,6 @@
     <string name="pair_already_in_progress">Fogning redan i utveckling</string>
     <string name="wol_pc_online">Datorn är online</string>
     <string name="wol_no_mac">Det går inte att väcka datorn eftersom det inte finns någon lagrad MAC-adress</string>
-    <string name="wol_waking_pc">Väcker dator…</string>
     <string name="wol_waking_msg">Det kan ta några sekunder innan datorn vaknar upp. Om den inte gör det, kontrollera att den är korrekt konfigurerad för Wake-On-LAN.</string>
     <string name="wol_fail">Misslyckades med att skicka Wake-On-LAN-paket</string>
     <string name="unpairing">Bortkopplar…</string>
@@ -79,15 +77,11 @@
     <string name="applist_menu_resume">Återuppta session</string>
     <string name="applist_menu_quit">Avsluta session</string>
     <string name="applist_menu_quit_and_start">Avsluta aktuellt spel och starta</string>
-    <string name="applist_menu_cancel">Avbryt</string>
     <string name="applist_menu_details">Visa detaljer</string>
     <string name="applist_menu_scut">Skapa genväg</string>
-    <string name="applist_menu_tv_channel">Lägg till i kanal</string>
     <string name="applist_menu_hide_app">Dölj appen</string>
     <string name="applist_refresh_title">Applista</string>
     <string name="applist_refresh_msg">Friskar upp appar…</string>
-    <string name="applist_refresh_error_title">Fel</string>
-    <string name="applist_refresh_error_msg">Misslyckades att få app lista</string>
     <string name="applist_quit_app">Avslutar</string>
     <string name="applist_quit_success">Framgångsrikt avslutad</string>
     <string name="applist_quit_confirmation">Är du säker på att du vill avsluta den pågående appen\? Alla osparade datamatrial kommer att gå förlorade.</string>
@@ -96,7 +90,6 @@
     <string name="addpc_fail">Det går inte att foga till den angivna datorn. Kontrollera att de nödvändiga portarna tillåts genom brandväggen.</string>
     <string name="addpc_success">Lyckades lägga till dator</string>
     <string name="addpc_unknown_host">Det går inte att lösa PC-adressen. Kontrollera att du inte har skrivit fel i adressen.</string>
-    <string name="applist_details_id">Applikations identitet:</string>
     <string name="addpc_enter_ip">Du måste ange en IP-adress</string>
     <string name="addpc_wrong_sitelocal">Den adressen ser inte rätt ut. Du måste använda routerns offentliga IP-adress för att streama via Internet.</string>
     <string name="category_basic_settings">Grundinställningar</string>
@@ -145,8 +138,6 @@
     <string name="title_checkbox_reduce_refresh_rate">Tillåt minskning av uppdateringsfrekvensen</string>
     <string name="title_checkbox_disable_warnings">Ta bort varningsmedelanden</string>
     <string name="summary_checkbox_disable_warnings">Ta bort varningsmeddelanden om inmatning på skärmen när du strömmar</string>
-    <string name="title_disable_frame_drop">Tappa aldrig bildramar</string>
-    <string name="summary_disable_frame_drop">Kan minska mikrohack på vissa enheter, men kan öka latensen</string>
     <string name="title_video_format">Ändra codec-inställningar</string>
     <string name="summary_video_format">Nyare codecs kan sänka videobandbreddskraven om din enhet stöder dem. Codec-val kan ignoreras om det inte stöds av värdprogramvaran eller GPU:n.</string>
     <string name="title_enable_hdr">Sätt på HDR (Prövning)</string>

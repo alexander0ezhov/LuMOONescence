@@ -12,7 +12,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Vezi lista de jocuri</string>
     <string name="pcview_menu_pair_pc">Împerechează PC-ul</string>
-    <string name="pcview_menu_unpair_pc">Desperechează</string>
     <string name="pcview_menu_send_wol">Trimite o cerere Wake-On-LAN</string>
     <string name="pcview_menu_delete_pc">Șterge PC</string>
     <string name="pcview_menu_details">Vezi detalii</string>
@@ -28,7 +27,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">PC-ul este accesibil</string>
     <string name="wol_no_mac">Nu s-a putut porni PC-ul deoarece GFE nu a comunicat o adresa MAC</string>
-    <string name="wol_waking_pc">Se pornește PC-ul…</string>
     <string name="wol_waking_msg">Poate dura puțin până PC-ul pornește. Dacă nu pornește, verifică dacă este configurat corect pentru Wake-On-LAN.</string>
     <string name="wol_fail">Nu s-au putut trimite pachetele Wake-On-LAN</string>
     <!-- Unpair messages -->
@@ -84,19 +82,14 @@
     <string name="applist_menu_resume">Continuă Sesiunea</string>
     <string name="applist_menu_quit">Închide Sesiunea</string>
     <string name="applist_menu_quit_and_start">Închide Jocul Curent si Pornește</string>
-    <string name="applist_menu_cancel">Anulează</string>
     <string name="applist_menu_details">Vezi detalii</string>
     <string name="applist_menu_scut">Creează o scurtătură</string>
-    <string name="applist_menu_tv_channel">Adaugă la canal</string>
     <string name="applist_refresh_title">Lista de aplicații</string>
     <string name="applist_refresh_msg">Reîmprospătare aplicații…</string>
-    <string name="applist_refresh_error_title">Eroare</string>
-    <string name="applist_refresh_error_msg">Nu s-a putut obține lista de aplicații</string>
     <string name="applist_quit_app">Închidere în curs</string>
     <string name="applist_quit_success">Închis cu succes</string>
     <string name="applist_quit_fail">Nu s-a putut închide lista</string>
     <string name="applist_quit_confirmation">Sigur dorești să închizi aplicația curentă? Toate datele nesalvate vor fi pierdute.</string>
-    <string name="applist_details_id">ID-ul aplicației:</string>
     <!-- Add computer manually activity -->
     <string name="title_add_pc">Adaugă PC manual</string>
     <string name="msg_add_pc">Conectare în curs…</string>
@@ -149,8 +142,6 @@
     <string name="title_checkbox_host_audio">Redă audio si pe PC</string>
     <string name="summary_checkbox_host_audio">Sunetul se va auzi atat pe acest dispozitiv cât și pe PC</string>
     <string name="category_advanced_settings">Setări avansate</string>
-    <string name="title_disable_frame_drop">Nu pierde cadre intenționat</string>
-    <string name="summary_disable_frame_drop">Poate să reducă micro-stuttering pe anumite device-uri, dar s-ar putea să crească latența</string>
     <string name="title_video_format">Modifica setările HEVC</string>
     <string name="summary_video_format">HEVC funcționează cu o conexiune mai slaba, dar necesită un dispozitiv recent, performant</string>
     <string name="title_enable_hdr">Activează HDR (Experimental)</string>

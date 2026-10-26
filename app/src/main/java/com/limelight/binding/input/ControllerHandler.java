@@ -2841,6 +2841,27 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
     }
 
     /**
+     * Reports one stick on its own.
+     *
+     * Everything else the on-screen layout is sending is left as it is, which is what makes a
+     * touch that drives a stick usable together with a control that is being held: reporting a
+     * whole packet would clear the buttons that control has pressed.
+     */
+    public void reportOscRightStick(short x, short y) {
+        defaultContext.rightStickX = x;
+        defaultContext.rightStickY = y;
+
+        sendControllerInputPacket(defaultContext);
+    }
+
+    public void reportOscLeftStick(short x, short y) {
+        defaultContext.leftStickX = x;
+        defaultContext.leftStickY = y;
+
+        sendControllerInputPacket(defaultContext);
+    }
+
+    /**
      * Sends a keyboard event originating from the on-screen controller (OSC).
      *
      * @param keyCode GFE keycode, as produced by KeyboardTranslator.translate(int, int)

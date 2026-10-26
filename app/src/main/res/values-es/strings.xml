@@ -3,7 +3,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Ver lista de juegos</string>
     <string name="pcview_menu_pair_pc">Emparejar con PC</string>
-    <string name="pcview_menu_unpair_pc">Desemparejar</string>
     <string name="pcview_menu_send_wol">Enviar petición Wake-On-LAN</string>
     <string name="pcview_menu_delete_pc">Eliminar PC</string>
     <!-- Pair messages -->
@@ -17,7 +16,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">Ordenador encendido</string>
     <string name="wol_no_mac">No se puede activar el PC porque no hay ninguna dirección MAC almacenada</string>
-    <string name="wol_waking_pc">Iniciando PC…</string>
     <string name="wol_waking_msg">Puede tomar algunos segundos iniciar tu PC.
 	    Si no se inicia asegúrate que está configurado correctamente para Wake-On-LAN.
     </string>
@@ -56,11 +54,8 @@
     <string name="applist_menu_resume">Reanudar sesión</string>
     <string name="applist_menu_quit">Cerrar sesión</string>
     <string name="applist_menu_quit_and_start">Cerrar juego actual e iniciar</string>
-    <string name="applist_menu_cancel">Cancelar</string>
     <string name="applist_refresh_title">Lista de aplicaciones</string>
     <string name="applist_refresh_msg">Actualizando lista de aplicaciones…</string>
-    <string name="applist_refresh_error_title">Error</string>
-    <string name="applist_refresh_error_msg">Error al cargar lista de aplicaciones</string>
     <string name="applist_quit_app">Cerrando</string>
     <string name="applist_quit_success">Cerrado satisfactoriamente</string>
     <string name="applist_quit_fail">Error al cerrar</string>
@@ -136,7 +131,6 @@
     <string name="title_audio_config_list">Configuración de Sonido Envolvente</string>
     <string name="title_decoding_reset">Reiniciar Opciones de Video</string>
     <string name="no_video_received_error">No se recibe video desde el equipo anfitrión.</string>
-    <string name="applist_details_id">ID de Aplicación:</string>
     <string name="title_checkbox_mouse_emulation">Emulación de ratón usando el mando</string>
     <string name="pacing_latency">Preferir la menor latencia posible</string>
     <string name="pacing_balanced">Equilibrado</string>
@@ -179,7 +173,6 @@
     <string name="poor_connection_msg">Conexión pobre al PC</string>
     <string name="applist_menu_details">Ver Detalles</string>
     <string name="applist_menu_scut">Crear Acceso Directo</string>
-    <string name="applist_menu_tv_channel">Agregar al Canal</string>
     <string name="applist_menu_hide_app">Esconder Aplicación</string>
     <string name="applist_connect_msg">Conectando al Equipo…</string>
     <string name="summary_checkbox_mouse_nav_buttons">Activar esta opción puede desconfigurar la función de clic derecho en algunos dispositivos inestables</string>
@@ -218,8 +211,6 @@
     <string name="summary_checkbox_flip_face_buttons">Invertir botones frontales A/B y X/Y para los mandos y los botones sobre la pantalla</string>
     <string name="title_checkbox_absolute_mouse_mode">Modo de ratón para escritorio remoto</string>
     <string name="summary_checkbox_enable_pip">Permite que la transmisión sea vista (pero no controlable) mientras se usa la multitarea</string>
-    <string name="title_disable_frame_drop">Nunca disminuir cuadros</string>
-    <string name="summary_disable_frame_drop">Puede reducir micro-tartamudeos (Stuttering) en algunos dispositivos , pero puede incrementar latencia</string>
     <string name="title_enable_hdr">Activar HDR (Alto Rango Dinámico / Experimental)</string>
     <string name="summary_enable_hdr">Transmite en HDR cuando el juego y la GPU del PC lo admitan. HDR requiere una GPU compatible con la codificación HEVC Main 10.</string>
     <string name="summary_enable_perf_overlay">Mostrar en tiempo real la información del desempeño de la transmisión mientras está activa la misma</string>

@@ -3,7 +3,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Подивитися перелік застосунків</string>
     <string name="pcview_menu_pair_pc">Створити пару з пристроєм</string>
-    <string name="pcview_menu_unpair_pc">Розірвати пару</string>
     <string name="pcview_menu_send_wol">Надіслати запит Wake-On-LAN</string>
     <string name="pcview_menu_delete_pc">Видалити пристрій</string>
     <!-- Pair messages -->
@@ -17,7 +16,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">Пристрій у мережі</string>
     <string name="wol_no_mac">Не вдається розбудити ПК, оскільки немає збереженої MAC-адреси</string>
-    <string name="wol_waking_pc">Пробудження пристрою…</string>
     <string name="wol_waking_msg">Пробудження пристрою може зайняти кілька секунд. Якщо цього не відбувається, упевніться що Wake-On-LAN налаштований правильно.</string>
     <string name="wol_fail">Помилка при відправці Wake-On-LAN пакетів</string>
     <!-- Unpair messages -->
@@ -54,12 +52,8 @@
     <string name="applist_menu_resume">Відновити сесію</string>
     <string name="applist_menu_quit">Вийти з сесії</string>
     <string name="applist_menu_quit_and_start">Вийти з поточної гри і запустити</string>
-    <string name="applist_menu_cancel">Скасувати</string>
-    <string name="applist_menu_tv_channel">Додати на канал</string>
     <string name="applist_refresh_title">Перелік застосунків</string>
     <string name="applist_refresh_msg">Оновлення застосунків…</string>
-    <string name="applist_refresh_error_title">Помилка</string>
-    <string name="applist_refresh_error_msg">Помилка отримання переліку застосунків</string>
     <string name="applist_quit_app">Виходимо з</string>
     <string name="applist_quit_success">Успішний вихід з</string>
     <string name="applist_quit_fail">Помилка при виході</string>
@@ -121,8 +115,6 @@
     <string name="summary_checkbox_usb_bind_all">Використовувати USB драйвер LunarStreamLight для усіх підтриманих контролерів, навіть якщо існує рідна підтримка</string>
     <string name="title_checkbox_mouse_emulation">Емуляція миші через контролер</string>
     <string name="summary_checkbox_mouse_emulation">Довге натиснення ґудзика Start, перемкне контролер в режим миші</string>
-    <string name="title_disable_frame_drop">Ніколи не пропускати кадри</string>
-    <string name="summary_disable_frame_drop">Може зменшити мікрозависання на деяких пристроях але, також збільшити затримку</string>
     <string name="title_enable_hdr">Увімкнути HDR (Експериментально)</string>
     <string name="summary_enable_hdr">Транслювати в HDR, якщо це підтримується грою та графічним процесором ПК. Для HDR потрібен графічний процесор із підтримкою кодування HEVC Main 10.</string>
     <string name="title_fps_list">Частота кадрів</string>
@@ -135,7 +127,6 @@
     <string name="title_details">Деталі</string>
     <string name="title_enable_perf_overlay">Увімкнути відображення статистики</string>
     <string name="title_unlock_fps">Розблокувати всі можливі частоти кадрів</string>
-    <string name="applist_details_id">ID застосунку:</string>
     <string name="title_checkbox_vibrate_fallback">Емуляція вібровіддачі</string>
     <string name="summary_checkbox_vibrate_fallback">Вібрує пристрій для емуляції вібровіддачі, якщо під\'єднаний контролер не підтримує її</string>
     <string name="summary_checkbox_mouse_nav_buttons">Вмикання цієї опції може привести до неправильної роботи правої клавіші миші на деяких пристроях</string>

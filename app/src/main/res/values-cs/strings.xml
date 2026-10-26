@@ -12,7 +12,6 @@
 \nUjistěte se, že na hostitelském počítači neběží žádný obsah chráněný DRM. Můžete také zkusit restartovat hostitelský PC.
 \n
 \nPokud problém přetrvává, zkuste přeinstalovat ovladače GPU a GeForce Experience.</string>
-    <string name="wol_waking_pc">Probouzení PC…</string>
     <string name="nettest_text_success">Vypadá to, že vaše síť LunarStreamLight neblokuje. Pokud máte i tak potíže s připojením, zkontrolujte nastavení firewallu vašeho PC.
 \n
 \nPokud se pokoušíte streamovat po internetu, nainstalujte si na svůj počítač LunarStreamLight Internet Hosting Tool a spusťte přiložený program Internet Streaming Tester pro kontrolu vašeho připojení k Internetu.</string>
@@ -45,14 +44,11 @@
 \nUjistěte se, že je GameStream povolen v záložce SHIELD v nastavení GeForce Experience.</string>
     <string name="applist_menu_quit">Ukončit</string>
     <string name="applist_menu_quit_and_start">Ukončit současnou hru a spustit</string>
-    <string name="applist_menu_cancel">Zrušit</string>
-    <string name="applist_menu_tv_channel">Přidat do kanálu</string>
     <string name="applist_refresh_title">Seznam aplikací</string>
     <string name="applist_menu_resume">Pokračovat</string>
     <string name="applist_menu_details">Zobrazit detaily</string>
     <string name="applist_menu_scut">Vytvořit zkratku</string>
     <string name="addpc_success">Počítač přidán úspěšně</string>
-    <string name="applist_details_id">ID aplikace:</string>
     <string name="addpc_fail">K zadanému počítači se nepodařilo připojit. Ujistěte se, že jsou ve firewallu povoleny nezbytné porty.</string>
     <string name="addpc_enter_ip">Musíte zadat IP adresu</string>
     <string name="title_native_res_dialog">Varování pro nativní rozlišení</string>
@@ -85,7 +81,6 @@
     <string name="title_checkbox_disable_warnings">Zakázat varovací zprávy</string>
     <string name="category_help">Nápověda</string>
     <string name="summary_checkbox_disable_warnings">Zakáže varování o pomalém připojení během streamování</string>
-    <string name="title_disable_frame_drop">Nezahazovat snímky</string>
     <string name="title_enable_perf_overlay">Zobrazit během streamování informace o výkonu</string>
     <string name="summary_enable_perf_overlay">Zobrazit realtime informace o výkonu streamu během streamování</string>
     <string name="resolution_4k">4K</string>
@@ -116,7 +111,6 @@
     <string name="pcview_menu_header_unknown">Obnovování</string>
     <string name="pcview_menu_app_list">Zobrazit všechny aplikace</string>
     <string name="pcview_menu_pair_pc">Spárovat s PC</string>
-    <string name="pcview_menu_unpair_pc">Zrušit párování</string>
     <string name="pcview_menu_send_wol">Poslat Wake-On-LAN požadavek</string>
     <string name="pcview_menu_delete_pc">Smazat PC</string>
     <string name="pcview_menu_test_network">Otestovat připojení k síti</string>
@@ -151,8 +145,6 @@
     <string name="perf_overlay_renderingfps">Vykreslovací snímková frekvence: %1$.2f FPS</string>
     <string name="perf_overlay_netdrops">Snímky zahozeny vašim připojením: %1$.2f%%</string>
     <string name="applist_refresh_msg">Obnovování aplikací…</string>
-    <string name="applist_refresh_error_title">Chyba</string>
-    <string name="applist_refresh_error_msg">Nezdařilo se získat seznam aplikací</string>
     <string name="applist_quit_app">Ukončování</string>
     <string name="applist_quit_success">Úspěšně ukončeno</string>
     <string name="applist_quit_fail">Ukončení se nezdařilo</string>
@@ -220,7 +212,6 @@
     <string name="summary_checkbox_small_icon_mode">Díky menšímu box artu v seznamu aplikací uvidíte na obrazovce více aplikací naráz</string>
     <string name="category_host_settings">Nastavení hostitele</string>
     <string name="title_checkbox_enable_sops">Optimalizovat herní nastavení</string>
-    <string name="summary_disable_frame_drop">Může na některých zařízeních snížit mikrozádrhy, ale může zvýšit zpoždění</string>
     <string name="title_video_format">Změnit nastavení HEVC</string>
     <string name="summary_video_format">HEVC sníží datový přenos, ale vyžaduje novější zařízení</string>
     <string name="title_enable_hdr">Povolit HDR (experimentální)</string>

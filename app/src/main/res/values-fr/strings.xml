@@ -12,7 +12,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Afficher toutes les applis</string>
     <string name="pcview_menu_pair_pc">Appairer avec ce PC</string>
-    <string name="pcview_menu_unpair_pc">Désappairer</string>
     <string name="pcview_menu_send_wol">Envoyer une requête Wake-On-LAN</string>
     <string name="pcview_menu_delete_pc">Supprimer le PC</string>
     <string name="pcview_menu_details">Voir les détails</string>
@@ -43,7 +42,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">L\'ordinateur est en ligne</string>
     <string name="wol_no_mac">Impossible de réveiller le PC car il n\'y a pas d\'addresse MAC enregistrée pour ce PC</string>
-    <string name="wol_waking_pc">Réveil PC…</string>
     <string name="wol_waking_msg">Votre PC peut prendre quelques secondes pour démarrer. S\'il ne démarre toujours pas, assurez-vous qu\'il est correctement configuré pour le Wake-On-LAN.</string>
     <string name="wol_fail">Échec de l\'envoi des paquets Wake-On-LAN</string>
     <!-- Unpair messages -->
@@ -97,19 +95,14 @@
     <string name="applist_menu_resume">Reprendre la session</string>
     <string name="applist_menu_quit">Quitter la session</string>
     <string name="applist_menu_quit_and_start">Quitter le jeu actuel et démarrer</string>
-    <string name="applist_menu_cancel">Annuler</string>
     <string name="applist_menu_details">Voir les détails</string>
     <string name="applist_menu_scut">Créer un raccourci</string>
-    <string name="applist_menu_tv_channel">Ajouter à la liste de chaînes</string>
     <string name="applist_refresh_title">Liste des applications</string>
     <string name="applist_refresh_msg">Actualisation des applications…</string>
-    <string name="applist_refresh_error_title">Erreur</string>
-    <string name="applist_refresh_error_msg">Impossible d\'obtenir la liste des applications</string>
     <string name="applist_quit_app">Fermeture de</string>
     <string name="applist_quit_success">Application fermée avec succès</string>
     <string name="applist_quit_fail">Échec de la fermeture</string>
     <string name="applist_quit_confirmation">Voulez-vous vraiment quitter l\'application en cours d\'exécution \? Toutes les données non enregistrées seront perdues.</string>
-    <string name="applist_details_id">ID de l\'appli :</string>
     <!-- Add computer manually activity -->
     <string name="title_add_pc">Ajouter un PC manuellement</string>
     <string name="msg_add_pc">Connexion au PC…</string>
@@ -164,8 +157,6 @@
     <string name="title_unlock_fps">Débloquer toutes les fréquences d\'images possibles</string>
     <string name="summary_unlock_fps">Le streaming à 90 ou 120 FPS peut réduire la latence sur les appareils haut de gamme, mais peut entraîner un décalage ou une instabilité sur les appareils qui ne le supporte pas</string>
     <string name="summary_checkbox_disable_warnings">Désactive les messages d\'avertissement sur la connexion pendant le stream</string>
-    <string name="title_disable_frame_drop">Ne jamais perdre d\'images</string>
-    <string name="summary_disable_frame_drop">Peut réduire les micro-saccades sur certains appareils, mais peut augmenter la latence</string>
     <string name="title_video_format">Modifier les paramètres de codec</string>
     <string name="summary_video_format">Les nouveaux codecs peuvent réduire la bande passante vidéo requise si votre appareil les prend en charge. Les codecs séléctionnés peuvent être ignorés si ils ne sont pas prises en charge par le logiciel hôte ou le GPU.</string>
     <string name="title_enable_hdr">Activer le HDR (expérimental)</string>

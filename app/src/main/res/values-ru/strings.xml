@@ -3,7 +3,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Посмотреть список игр</string>
     <string name="pcview_menu_pair_pc">Создать пару с ПК</string>
-    <string name="pcview_menu_unpair_pc">Разорвать пару</string>
     <string name="pcview_menu_send_wol">Отправить Wake-On-LAN запрос</string>
     <string name="pcview_menu_delete_pc">Удалить ПК</string>
     <!-- Network test strings -->
@@ -26,7 +25,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">Компьютер в сети</string>
     <string name="wol_no_mac">Невозможно разбудить компьютер, поскольку нет сохраненного MAC-адреса</string>
-    <string name="wol_waking_pc">Пробуждение ПК…</string>
     <string name="wol_waking_msg">Пробуждение ПК может занять несколько секунд. Если этого не происходит, удостоверьтесь что Wake-On-LAN настроен правильно.</string>
     <string name="wol_fail">Ошибка при отправке Wake-On-LAN пакетов</string>
     <!-- Unpair messages -->
@@ -63,12 +61,8 @@
     <string name="applist_menu_resume">Возобновить сессию</string>
     <string name="applist_menu_quit">Выйти из сессии</string>
     <string name="applist_menu_quit_and_start">Выйти из текущей игры и запустить</string>
-    <string name="applist_menu_cancel">Отмена</string>
-    <string name="applist_menu_tv_channel">Добавить в канал</string>
     <string name="applist_refresh_title">Список приложений</string>
     <string name="applist_refresh_msg">Обновление приложений…</string>
-    <string name="applist_refresh_error_title">Ошибка</string>
-    <string name="applist_refresh_error_msg">Ошибка при получении списка приложений</string>
     <string name="applist_quit_app">Выход из</string>
     <string name="applist_quit_success">Выход произошёл успешно из</string>
     <string name="applist_quit_fail">Ошибка при выходе</string>
@@ -132,8 +126,6 @@
     <string name="summary_checkbox_usb_bind_all">Заставляет USB драйвер LunarStreamLight взять на себя работу со всеми поддерживаемыми Xbox геймпадами</string>
     <string name="title_checkbox_mouse_emulation">Эмуляция мыши на геймпаде</string>
     <string name="summary_checkbox_mouse_emulation">Долгое нажатие кнопки Start переключит геймпад в режим мыши</string>
-    <string name="title_disable_frame_drop">Никогда не пропускать кадры</string>
-    <string name="summary_disable_frame_drop">Может уменьшить микрозависания на некоторых устройствах, но также увеличить задержку</string>
     <string name="title_enable_hdr">Включить HDR (Экспериментально)</string>
     <string name="summary_enable_hdr">Потоковая передача с HDR, когда игра и графический процессор ПК поддерживают эту функцию. Для HDR требуется графический процессор с поддержкой кодирования HEVC Main 10.</string>
     <string name="title_enable_post_stream_toast">Показывать отчёт о задержке после трансляции</string>
@@ -148,7 +140,6 @@
     <string name="title_details">Детали</string>
     <string name="title_enable_perf_overlay">Включить отображение статистики</string>
     <string name="title_unlock_fps">Показать неподдерживаемые настройки частоты кадров</string>
-    <string name="applist_details_id">ID приложения:</string>
     <string name="title_checkbox_vibrate_fallback">Эмуляция виброотдачи</string>
     <string name="summary_checkbox_vibrate_fallback">Вибрировать устройство для эмуляции виброотдачи для геймпадов без поддержки вибрации</string>
     <string name="summary_checkbox_mouse_nav_buttons">Включение этой опции может привести к неправильной работе правой кнопки мыши на некоторых устройствах</string>

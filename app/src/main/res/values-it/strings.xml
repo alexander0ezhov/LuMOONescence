@@ -9,7 +9,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Vedi Tutte le Applicazioni</string>
     <string name="pcview_menu_pair_pc">Accoppia PC</string>
-    <string name="pcview_menu_unpair_pc">Disaccoppia PC</string>
     <string name="pcview_menu_send_wol">Invia richiesta Wake-On-LAN</string>
     <string name="pcview_menu_delete_pc">Rimuovi PC</string>
     <!-- Pair messages -->
@@ -24,7 +23,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">PC già avviato</string>
     <string name="wol_no_mac">Impossibile risvegliare il PC perché non è stato salvato nessun indirizzo MAC</string>
-    <string name="wol_waking_pc">Risveglio PC…</string>
     <string name="wol_waking_msg">Il PC potrebbe impiegare qualche secondo per risvegliarsi.
         Se non succede niente, assicurati che l\'opzione Wake-On-LAN sia configurata correttamente.
     </string>
@@ -72,11 +70,8 @@
     <string name="applist_menu_resume">Riprendi sessione</string>
     <string name="applist_menu_quit">Chiudi sessione</string>
     <string name="applist_menu_quit_and_start">Chiudi sessione corrente e avvia</string>
-    <string name="applist_menu_cancel">Annulla</string>
     <string name="applist_refresh_title">Lista applicazioni</string>
     <string name="applist_refresh_msg">Aggiornamento lista in corso…</string>
-    <string name="applist_refresh_error_title">Errore</string>
-    <string name="applist_refresh_error_msg">Ricezione lista applicazioni fallita</string>
     <string name="applist_quit_app">Chiusura in corso</string>
     <string name="applist_quit_success">Sessione chiusa con successo</string>
     <string name="applist_quit_fail">Chiusura sessione fallita</string>
@@ -122,8 +117,6 @@
     <string name="title_checkbox_host_audio">Riproduci audio sul PC</string>
     <string name="summary_checkbox_host_audio">Riproduce l\'audio sul PC e su questo dispositivo</string>
     <string name="category_advanced_settings">Impostazioni avanzate</string>
-    <string name="title_disable_frame_drop">Non saltare i fotogrammi</string>
-    <string name="summary_disable_frame_drop">Potrebbe ridurre il micro-stuttering su alcuni dispositivi, ma può aumentare la latenza</string>
     <string name="title_video_format">Modifica impostazioni del codec</string>
     <string name="summary_video_format">I nuovi codec possono ridurre i requisiti di larghezza di banda video se il tuo dispositivo li supporta. La scelta del codec può essere ignorata se non è supportato dal software dell\'host o dalla GPU.</string>
     <string name="title_enable_hdr">Abilita HDR (sperimentale)</string>
@@ -143,10 +136,8 @@
     <string name="poor_connection_msg">Connessione al PC di bassa qualità</string>
     <string name="applist_menu_hide_app">Nascondi App</string>
     <string name="applist_menu_scut">Crea Collegamento</string>
-    <string name="applist_menu_tv_channel">Aggiungi al Canale</string>
     <string name="applist_menu_details">Mostra Dettagli</string>
     <string name="summary_fps_list">Aumentare per uno streaming video più fluido. Diminuire per prestazioni migliori su dispositivi di fascia più bassa.</string>
-    <string name="applist_details_id">ID Applicazione:</string>
     <string name="perf_overlay_decoder">Decoder: %1$s</string>
     <string name="perf_overlay_dectime">Tempo medio di decodifica: %1$.2f ms</string>
     <string name="perf_overlay_streamdetails">Flusso video: %1$s %2$.2f FPS</string>

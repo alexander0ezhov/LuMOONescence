@@ -3,7 +3,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Alle apps bekijken</string>
     <string name="pcview_menu_pair_pc">Koppelen met PC</string>
-    <string name="pcview_menu_unpair_pc">Ontkoppelen</string>
     <string name="pcview_menu_send_wol">Wake-on-LAN-verzoek sturen</string>
     <string name="pcview_menu_delete_pc">PC verwijderen</string>
     <!-- Pair messages -->
@@ -17,7 +16,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">Computer is online</string>
     <string name="wol_no_mac">PC kan niet uit slaapstand worden geactiveerd omdat er geen MAC-adres is vastgelegd</string>
-    <string name="wol_waking_pc">PC uit slaapstand halen…</string>
     <string name="wol_waking_msg"> Het kan even duren voordat de PC reageert.
     Als dit niet gebeurt controleer de Wake-On-LAN instellingen.
   </string>
@@ -56,11 +54,8 @@
     <string name="applist_menu_resume">Sessie hervatten</string>
     <string name="applist_menu_quit">Sessie afsluiten</string>
     <string name="applist_menu_quit_and_start">Stop Huidige Spel en Start</string>
-    <string name="applist_menu_cancel">Annuleren</string>
     <string name="applist_refresh_title">App-lijst</string>
     <string name="applist_refresh_msg">Apps verversen…</string>
-    <string name="applist_refresh_error_title">Fout</string>
-    <string name="applist_refresh_error_msg">App lijst ophalen mislukt</string>
     <string name="applist_quit_app">Stoppen</string>
     <string name="applist_quit_success">Succesvol afgesloten</string>
     <string name="applist_quit_fail">Stoppen mislukt</string>
@@ -142,7 +137,6 @@
     <string name="applist_menu_details">Details bekijken</string>
     <string name="applist_menu_scut">Snelkoppeling Maken</string>
     <string name="applist_menu_hide_app">App Verbergen</string>
-    <string name="applist_details_id">App-id:</string>
     <string name="title_fps_list">Video frame rate</string>
     <string name="suffix_seekbar_bitrate_mbps">Mbps</string>
     <string name="resolution_prefix_native">Oorspronkelijk</string>
@@ -153,8 +147,6 @@
     <string name="title_checkbox_mouse_nav_buttons">Vorige en volgende muisknoppen activeren</string>
     <string name="summary_checkbox_flip_face_buttons">Schakelt de face-knoppen A/B en X/Y om voor gamepads en voor on-screen besturing</string>
     <string name="title_checkbox_enable_pip">Scherm-in-Scherm toeschouwermodus inschakelen</string>
-    <string name="title_disable_frame_drop">Frames nooit overslaan</string>
-    <string name="summary_disable_frame_drop">Kan micro-stotteren op sommige toestellen verminderen, maar kan vertraging verhogen</string>
     <string name="title_enable_hdr">HDR Inschakelen (Experimenteel)</string>
     <string name="summary_enable_hdr">Stream HDR wanneer het spel en PC-GPU dit ondersteunen. HDR vereist een GPU met HEVC Main 10-coderingsondersteuning.</string>
     <string name="title_enable_perf_overlay">Prestatiestatistieken tonen tijdens het streamen</string>
@@ -188,7 +180,6 @@
     <string name="perf_overlay_renderingfps">Rendering framesnelheid: %1$.2f FPS</string>
     <string name="perf_overlay_netdrops">Frames overgeslagen door uw netwerkverbinding: %1$.2f%%</string>
     <string name="perf_overlay_dectime">Gemiddelde decodeertijd: %1$.2f ms</string>
-    <string name="applist_menu_tv_channel">Toevoegen aan Kanaal</string>
     <!-- Array strings -->
     <string name="videoformat_hevcalways">Voorkeur geven aan HEVC</string>
     <string name="pair_pairing_help">Als uw host-PC Sunshine draait, navigeert u naar de Sunshine-webinterface om de PIN in te voeren.</string>

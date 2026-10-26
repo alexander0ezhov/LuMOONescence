@@ -17,7 +17,6 @@
     <string name="pcview_menu_header_unknown">Refreshing</string>
     <string name="pcview_menu_app_list">View All Apps</string>
     <string name="pcview_menu_pair_pc">Pair with PC</string>
-    <string name="pcview_menu_unpair_pc">Unpair</string>
     <string name="pcview_menu_send_wol">Send Wake-On-LAN request</string>
     <string name="pcview_menu_delete_pc">Delete PC</string>
     <string name="pcview_menu_test_network">Test Network Connection</string>
@@ -47,7 +46,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">Computer is online</string>
     <string name="wol_no_mac">Unable to wake PC because there is no stored MAC address</string>
-    <string name="wol_waking_pc">Waking PC…</string>
     <string name="wol_waking_msg">It may take a few seconds for your PC to wake up.
 	    If it doesn\'t, make sure it\'s configured properly for Wake-On-LAN.
     </string>
@@ -119,20 +117,15 @@
     <string name="applist_menu_resume">Resume Session</string>
     <string name="applist_menu_quit">Quit Session</string>
     <string name="applist_menu_quit_and_start">Quit Current Game and Start</string>
-    <string name="applist_menu_cancel">Cancel</string>
     <string name="applist_menu_details">View Details</string>
     <string name="applist_menu_scut">Create Shortcut</string>
-    <string name="applist_menu_tv_channel">Add to Channel</string>
     <string name="applist_menu_hide_app">Hide App</string>
     <string name="applist_refresh_title">App List</string>
     <string name="applist_refresh_msg">Refreshing apps…</string>
-    <string name="applist_refresh_error_title">Error</string>
-    <string name="applist_refresh_error_msg">Failed to get app list</string>
     <string name="applist_quit_app">Quitting</string>
     <string name="applist_quit_success">Successfully quit</string>
     <string name="applist_quit_fail">Failed to quit</string>
     <string name="applist_quit_confirmation">Are you sure you want to quit the running app? All unsaved data will be lost.</string>
-    <string name="applist_details_id">App ID:</string>
 
     <!-- Add computer manually activity -->
     <string name="title_add_pc">Add PC Manually</string>
@@ -200,21 +193,18 @@
     <string name="title_checkbox_mouse_nav_buttons">Enable back and forward mouse buttons</string>
     <string name="summary_checkbox_mouse_nav_buttons">Enabling this option may break right clicking on some buggy devices</string>
 
-    <string name="toast_reset_universal_layout_success">Universal layout controls reset to default</string>
 
     <string name="back">Back</string>
     <string name="title_universal_layouts">On-screen layouts</string>
     <string name="title_add_layout">Add layout</string>
     <string name="title_layout_image">Layout image</string>
     <string name="title_edit_controls">Edit controls</string>
-    <string name="title_finish_editing">Done</string>
     <string name="title_reset_controls">Reset</string>
     <string name="title_pick_image">Image</string>
     <string name="title_use_default_image">Use default</string>
     <string name="msg_layouts_help">Pick the layout used while streaming. Tap a layout to edit or remove it; add new ones with the plus button.</string>
     <string name="msg_no_layouts">No layouts yet. Tap plus to create one.</string>
     <string name="msg_layout_selected">Selected</string>
-    <string name="msg_layouts_disabled_hint">The universal layout is turned off. Enable it to use it while streaming.</string>
     <string name="msg_no_images">No images found on this device.</string>
     <string name="msg_image_permission_needed">Access to your images was not granted, so there is nothing to choose from. Grant the permission and open this screen again, or keep the default image.</string>
     <string name="msg_image_picker_failed">Could not load the images from this device.</string>
@@ -224,20 +214,15 @@
     <string name="menu_choose_image">Change image</string>
     <string name="menu_use_layout">Use this layout</string>
     <string name="menu_delete_layout">Delete</string>
-    <string name="dialog_title_delete_layout">Delete layout</string>
-    <string name="dialog_text_delete_layout">Delete &quot;%s&quot;? Its arrangement of controls will be lost.</string>
     <string name="dialog_text_reset_layout_controls">Reset the controls of this layout to their default size and position?</string>
     <string name="toast_layout_controls_reset">Controls reset to default</string>
     <string name="toast_layout_adjusted_to_fit">This layout was arranged on a different screen size and has been scaled to fit. Use Reset if you want a layout made for this screen.</string>
-    <string name="msg_editor_hint_idle">Tap &quot;Edit controls&quot;, then drag controls to move them and drag their edge to resize.</string>
-    <string name="msg_editor_hint_editing">Drag a control to move it, or drag its edge to resize it. Tap &quot;Done&quot; when finished.</string>
 
     <string name="title_layout_settings">Layout settings</string>
     <string name="control_type_button">Button</string>
     <string name="control_type_stick">Stick</string>
     <string name="control_type_dpad">D-pad</string>
     <string name="control_type_element">Control</string>
-    <string name="action_stop_editing">Stop editing</string>
     <string name="editor_label_center_button">Middle button</string>
     <string name="editor_label_corner_radius">Corner radius</string>
     <string name="editor_section_center_button">Middle of the stick</string>
@@ -260,8 +245,8 @@
     <string name="stream_menu_touch">Touch input</string>
     <string name="stream_menu_touch_off">Off</string>
     <string name="stream_menu_touch_trackpad">Touchpad</string>
-    <string name="stream_menu_touch_screen">Touch (mouse)</string>
     <string name="stream_menu_touch_right_stick">Right stick</string>
+    <string name="stream_menu_touch_left_stick">Left stick</string>
     <string name="stream_menu_touch_events">Touch native (experimental)</string>
     <string name="stream_menu_opacity">Opacity</string>
     <string name="stream_menu_touchpad_mode">Touchpad mode</string>
@@ -273,7 +258,6 @@
     <string name="stream_menu_controls">On-screen controls</string>
     <string name="editor_label_pass_through">Pass through to touch (hold and move to look around)</string>
     <string name="stream_menu_layout">Layout</string>
-    <string name="stream_menu_no_layouts">No layouts</string>
     <string name="stream_menu_exit">Exit stream</string>
     <string name="stream_menu_layout_next_time">"%1$s" will be used the next time you start streaming</string>
     <string name="dialog_title_save_changes">Save changes?</string>
@@ -284,7 +268,6 @@
     <string name="toast_layout_saved">Layout saved</string>
     <string name="toast_layout_saved_as">Saved as &quot;%s&quot;</string>
     <string name="toast_element_added">Added. Drag it into place.</string>
-    <string name="msg_no_element_selected">Tap a control to edit it. Drag it to move, drag its edge to resize.</string>
     <string name="editor_section_element">Control</string>
     <string name="editor_section_position">Position and size</string>
     <string name="editor_section_action">Action</string>
@@ -294,7 +277,6 @@
     <string name="import_failed">Could not read that file</string>
     <string name="import_done">Imported "%1$s"</string>
     <string name="import_done_rescaled">Imported "%1$s", arranged for this screen</string>
-    <string name="import_logged">Could not read that file: %1$s</string>
     <string name="editor_label_name">Name</string>
     <string name="editor_label_x">X</string>
     <string name="editor_label_y">Y</string>
@@ -348,8 +330,6 @@
     <string name="summary_checkbox_reduce_refresh_rate">Lower display refresh rates can save power at the expense of some additional video latency</string>
     <string name="title_checkbox_disable_warnings">Disable warning messages</string>
     <string name="summary_checkbox_disable_warnings">Disable on-screen connection warning messages while streaming</string>
-    <string name="title_disable_frame_drop">Never drop frames</string>
-    <string name="summary_disable_frame_drop">May reduce micro-stuttering on some devices, but can increase latency</string>
     <string name="title_video_format">Change codec settings</string>
     <string name="summary_video_format">Newer codecs can lower video bandwidth requirements if your device supports them. Codec selections may be ignored if not supported by the host software or GPU.</string>
     <string name="title_enable_hdr">Enable HDR (Experimental)</string>
@@ -376,7 +356,6 @@
     <string name="toast_controller_type_changed">Gamepad type may be changed due to motion sensor emulation</string>
 
     <!-- Permission justification -->
-    <string name="local_network_rationale">LunarStreamLight requires local network permissions to communicate with nearby hosts</string>
 
     <!-- Array strings -->
     <string name="resolution_360p">360p</string>

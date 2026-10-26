@@ -259,6 +259,11 @@ public class UniversalStreamDrawer {
                 host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK,
                 PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK);
 
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touch_left_stick),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK,
+                PreferenceConfiguration.TOUCH_MODE_LEFT_STICK);
+
         return row.withChoices(choices);
     }
 
@@ -706,6 +711,10 @@ public class UniversalStreamDrawer {
 
         if (mode == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS) {
             return getString(R.string.stream_menu_touch_events);
+        }
+
+        if (mode == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK) {
+            return getString(R.string.stream_menu_touch_left_stick);
         }
 
         return getString(R.string.stream_menu_touch_right_stick);

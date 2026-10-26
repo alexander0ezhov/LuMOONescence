@@ -12,7 +12,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">檢視遊戲清單</string>
     <string name="pcview_menu_pair_pc"> 和電腦配對 </string>
-    <string name="pcview_menu_unpair_pc"> 取消配對 </string>
     <string name="pcview_menu_send_wol">傳送 Wake-On-LAN 要求</string>
     <string name="pcview_menu_delete_pc"> 刪除電腦 </string>
     <string name="pcview_menu_details">檢視詳細資料</string>
@@ -28,7 +27,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">電腦已上線</string>
     <string name="wol_no_mac">無法喚醒電腦，因為沒有已儲存的 MAC 位址</string>
-    <string name="wol_waking_pc">正在喚醒電腦…</string>
     <string name="wol_waking_msg">喚醒電腦需要一些時間。如果電腦沒有喚醒，請確保 Wake-On-LAN 設定無誤。</string>
     <string name="wol_fail">無法傳送 Wake-On-LAN 資料包</string>
     <!-- Unpair messages -->
@@ -83,19 +81,14 @@
     <string name="applist_menu_resume">繼續工作階段</string>
     <string name="applist_menu_quit">結束工作階段</string>
     <string name="applist_menu_quit_and_start">結束目前遊戲並開始這個遊戲</string>
-    <string name="applist_menu_cancel"> 取消 </string>
     <string name="applist_menu_details">檢視詳細資料</string>
     <string name="applist_menu_scut">建立捷徑</string>
-    <string name="applist_menu_tv_channel">新增至頻道</string>
     <string name="applist_refresh_title">遊戲清單</string>
     <string name="applist_refresh_msg">正在重新整理…</string>
-    <string name="applist_refresh_error_title"> 錯誤 </string>
-    <string name="applist_refresh_error_msg">無法取得遊戲清單</string>
     <string name="applist_quit_app">正在結束</string>
     <string name="applist_quit_success">成功結束</string>
     <string name="applist_quit_fail">無法結束</string>
     <string name="applist_quit_confirmation">您確定要結束執行中的遊戲？所有未儲存的資料將丟失。</string>
-    <string name="applist_details_id">App ID：</string>
     <!-- Add computer manually activity -->
     <string name="title_add_pc">手動新增電腦</string>
     <string name="msg_add_pc">正在連線電腦…</string>
@@ -150,8 +143,6 @@
     <string name="title_checkbox_host_audio">在電腦上播放音訊</string>
     <string name="summary_checkbox_host_audio">在電腦和本裝置同時輸出音訊</string>
     <string name="category_advanced_settings">進階設定</string>
-    <string name="title_disable_frame_drop">永不丟失影格</string>
-    <string name="summary_disable_frame_drop">可能會減少在一些裝置上的卡頓，但會增加延時</string>
     <string name="title_video_format">變更轉碼器設定</string>
     <string name="summary_video_format">較新的轉碼器可以降低視訊頻寬需求 (若您的裝置支援)。如果主機軟體或 GPU 不支援，轉碼器選取項目可能會被忽略。</string>
     <string name="title_enable_hdr">啟用 HDR (實驗性)</string>

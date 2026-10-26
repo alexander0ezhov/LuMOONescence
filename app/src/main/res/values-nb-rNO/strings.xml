@@ -47,7 +47,6 @@
     <string name="title_seekbar_deadzone">Dødsonejustering for analogstikke</string>
     <string name="title_checkbox_xb1_driver">Driver for Xbox 360/One USB-spillkontroller</string>
     <string name="title_video_format">Endre HEVC-innstillinger</string>
-    <string name="title_disable_frame_drop">Aldri forkast bilderammer</string>
     <string name="title_checkbox_disable_warnings">Skru av advarselsmeldinger</string>
     <string name="title_unlock_fps">Lås opp alle mulige bilderammetakter</string>
     <string name="category_advanced_settings">Avanserte innstillinger</string>
@@ -68,18 +67,13 @@
     <string name="addpc_success">Datamaskin tillagt</string>
     <string name="msg_add_pc">Kobler til PC-en …</string>
     <string name="title_add_pc">Legg til PC manuelt</string>
-    <string name="applist_details_id">Program-ID:</string>
     <string name="applist_quit_fail">Klarte ikke å avslutte</string>
     <string name="applist_quit_success">Avsluttet</string>
     <string name="applist_quit_app">Avslutter …</string>
-    <string name="applist_refresh_error_msg">Klarte ikke å hente programliste</string>
-    <string name="applist_refresh_error_title">Feil</string>
     <string name="applist_refresh_title">Programliste</string>
     <string name="applist_menu_hide_app">Skjul prgram</string>
-    <string name="applist_menu_tv_channel">Legg til i kanal</string>
     <string name="applist_menu_scut">Opprett snarvei</string>
     <string name="applist_menu_details">Vis detaljer</string>
-    <string name="applist_menu_cancel">Avbryt</string>
     <string name="applist_menu_quit_and_start">Avslutt nåværende spill og start</string>
     <string name="applist_menu_quit">Avslutt økt</string>
     <string name="applist_menu_resume">Fortsett økt</string>
@@ -101,7 +95,6 @@
     <string name="conn_establishing_msg">Starter tilkobling</string>
     <string name="conn_establishing_title">Etablerer tilkobling</string>
     <string name="error_pc_offline">Datamaskinen er frakoblet</string>
-    <string name="wol_waking_pc">Vekker opp PC …</string>
     <string name="wol_pc_online">Datamaskinen er tilkoblet</string>
     <string name="pair_incorrect_pin">Feil PIN</string>
     <string name="pair_pc_offline">Datamaskinen er frakoblet</string>
@@ -155,7 +148,6 @@
     <string name="title_enable_post_stream_toast">Vis latensmelding etter strømming</string>
     <string name="title_enable_hdr">Skru på HDR (eksperimentelt)</string>
     <string name="summary_video_format">HEVC senker båndbreddekravene, men krever en nyere enhet</string>
-    <string name="summary_disable_frame_drop">Kan redusere mikro-hakking på noen enheter, men kan øke latens</string>
     <string name="summary_checkbox_disable_warnings">Skru av visning av tilkoblingsadvarsler på skjermen under strømming</string>
     <string name="summary_unlock_fps">Strømming i 90 eller 120 BPS kan redusere latens på flaggskipsenheter, men kan forårsake forsinkelser eller ustabilitet på enheter som ikke klarer det.</string>
     <string name="summary_checkbox_host_audio">Spill lyd fra datamaskinen og denne enheten</string>
@@ -171,7 +163,6 @@
     <string name="nettest_text_waiting">LunarStreamLight tester din nettverksforbindelse for å fastsette hvorvidt NVIDIA GameStream er blokkert.
 \n
 \nDette kan ta noen sekunder …</string>
-    <string name="pcview_menu_unpair_pc">Opphev parring</string>
     <string name="pcview_menu_pair_pc">Parr med PC</string>
     <string name="scut_not_paired">PC ikke parret</string>
     <string name="summary_checkbox_flip_face_buttons">Veksler A/B og X/Y-knapper for spillkontrollere, og innstillingskontroller som vises på skjermen</string>

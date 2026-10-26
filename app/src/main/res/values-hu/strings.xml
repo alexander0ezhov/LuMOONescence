@@ -8,8 +8,6 @@
     <string name="title_enable_hdr">HDR engedélyezése (Kísérleti)</string>
     <string name="summary_video_format">Az újabb kodekek csökkenthetik a videó sávszélességigényét, ha a készülék támogatja őket. A codec-kiválasztások figyelmen kívül hagyhatók, ha a gazdaszoftver vagy a GPU nem támogatja őket.</string>
     <string name="title_video_format">Kodekbeállítások módosítása</string>
-    <string name="summary_disable_frame_drop">Csökkentheti a mikroakadozást egyes eszközökön, de növelheti a késleltetést</string>
-    <string name="title_disable_frame_drop">Soha ne dobjon el képkockákat</string>
     <string name="summary_checkbox_disable_warnings">Streamelés közben a képernyőn megjelenő csatlakozási figyelmeztető üzenetek kikapcsolása</string>
     <string name="title_checkbox_disable_warnings">Figyelmeztető üzenetek kikapcsolása</string>
     <string name="summary_unlock_fps">A 90 vagy 120 FPS-en történő streamelés csökkentheti a csúcskategóriás eszközök késleltetését, de akadozást vagy instabilitást okozhat azokon az eszközökön, amelyek ezt nem támogatják</string>
@@ -66,22 +64,17 @@
     <string name="addpc_fail">Nem sikerült csatlakozni a megadott számítógéphez. Győződj meg arról, hogy a szükséges portok engedélyezve vannak a tűzfalon keresztül.</string>
     <string name="msg_add_pc">Csatlakozás a számítógéphez…</string>
     <string name="title_add_pc">Számítógép hozzáadása manuálisan</string>
-    <string name="applist_details_id">Alkalmazásazonosító:</string>
     <string name="applist_quit_confirmation">Biztosan kilépsz a futó alkalmazásból? Minden nem mentett adat elvész.</string>
     <string name="applist_quit_fail">Nem sikerült kilépni</string>
     <string name="applist_quit_success">Sikeresen kiléptél</string>
     <string name="applist_quit_app">Kilépés</string>
-    <string name="applist_refresh_error_msg">Nem sikerült lekérni az alkalmazások listáját</string>
-    <string name="applist_refresh_error_title">Hiba</string>
     <string name="applist_refresh_msg">Alkalmazáslista frissítése…</string>
     <string name="applist_refresh_title">Alkalmazáslista</string>
     <string name="applist_menu_quit">Kilépés a munkamenetből</string>
     <string name="applist_menu_resume">Munkamenet folytatása</string>
     <string name="applist_menu_hide_app">Alkalmazás elrejtése</string>
-    <string name="applist_menu_tv_channel">Hozzáadás a csatornához</string>
     <string name="applist_menu_scut">Parancsikon létrehozása</string>
     <string name="applist_menu_details">Részletek megtekintése</string>
-    <string name="applist_menu_cancel">Mégse</string>
     <string name="applist_menu_quit_and_start">Lépjen ki az aktuális játékból és indítsa el</string>
     <string name="applist_connect_msg">Csatlakozás a számítógéphez…</string>
     <string name="perf_overlay_dectime">Átlagos dekódolási idő: %1$.2f ms</string>
@@ -133,7 +126,6 @@
     <string name="unpairing">Párosítás megszüntetése…</string>
     <string name="wol_fail">Nem sikerült elküldeni a Wake-On-LAN csomagokat</string>
     <string name="wol_waking_msg">Néhány másodpercbe telhet, mire a számítógép felébred. Ha ez nem történik meg, ellenőrizd, hogy megfelelően van-e konfigurálva a Wake-On-LAN számára.</string>
-    <string name="wol_waking_pc">A számítógép felébresztése…</string>
     <string name="wol_no_mac">Nem lehet felébreszteni a számítógépet, mert nincs tárolt MAC-cím</string>
     <string name="wol_pc_online">A számítógép elérhető</string>
     <string name="pair_already_in_progress">A párosítás már folyamatban van</string>
@@ -155,7 +147,6 @@
     <string name="pcview_menu_details">Részletek megtekintése</string>
     <string name="pcview_menu_delete_pc">Számítógép törlése</string>
     <string name="pcview_menu_send_wol">Wake-On-LAN kérés küldése</string>
-    <string name="pcview_menu_unpair_pc">Párosítás megszüntetése</string>
     <string name="pcview_menu_pair_pc">Számítógép párosítása</string>
     <string name="pcview_menu_app_list">Összes alkalmazás megjelenítése</string>
     <string name="pcview_menu_header_unknown">Újratöltés</string>

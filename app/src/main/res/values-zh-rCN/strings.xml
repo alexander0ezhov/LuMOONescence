@@ -12,7 +12,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list"> 浏览游戏列表 </string>
     <string name="pcview_menu_pair_pc"> 和电脑配对 </string>
-    <string name="pcview_menu_unpair_pc"> 取消配对 </string>
     <string name="pcview_menu_send_wol"> 发送 Wake-On-LAN 请求 </string>
     <string name="pcview_menu_delete_pc"> 删除电脑 </string>
     <string name="pcview_menu_details"> 查看详情 </string>
@@ -28,7 +27,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online"> 电脑在线中 </string>
     <string name="wol_no_mac">无法唤醒电脑，因为没有存储的 MAC 地址</string>
-    <string name="wol_waking_pc"> 唤醒电脑中…… </string>
     <string name="wol_waking_msg">唤醒电脑需要一些时间。如果电脑没有唤醒，请确保 Wake-On-LAN 设置无误。</string>
     <string name="wol_fail"> 无法发送Wake-On-LAN数据包 </string>
     <!-- Unpair messages -->
@@ -82,19 +80,14 @@
     <string name="applist_menu_resume"> 恢复串流 </string>
     <string name="applist_menu_quit"> 退出串流 </string>
     <string name="applist_menu_quit_and_start"> 退出当前游戏并开始这个游戏 </string>
-    <string name="applist_menu_cancel"> 取消 </string>
     <string name="applist_menu_details"> 查看详情 </string>
     <string name="applist_menu_scut"> 创建快捷方式 </string>
-    <string name="applist_menu_tv_channel"> 添加到频道 </string>
     <string name="applist_refresh_title"> 游戏列表 </string>
     <string name="applist_refresh_msg"> 刷新中…… </string>
-    <string name="applist_refresh_error_title"> 错误 </string>
-    <string name="applist_refresh_error_msg"> 获取列表失败 </string>
     <string name="applist_quit_app"> 退出中 </string>
     <string name="applist_quit_success"> 成功退出串流 </string>
     <string name="applist_quit_fail"> 退出串流失败 </string>
     <string name="applist_quit_confirmation">您确定要退出当前游戏？所有未保存的数据将丢失。</string>
-    <string name="applist_details_id">App ID：</string>
     <!-- Add computer manually activity -->
     <string name="title_add_pc"> 手动添加电脑 </string>
     <string name="msg_add_pc"> 正在连接电脑…… </string>
@@ -149,8 +142,6 @@
     <string name="title_checkbox_host_audio"> 在电脑上播放声音 </string>
     <string name="summary_checkbox_host_audio"> 在电脑和本设备同时输出声音 </string>
     <string name="category_advanced_settings"> 高级设置 </string>
-    <string name="title_disable_frame_drop"> 永不掉帧 </string>
-    <string name="summary_disable_frame_drop"> 可能会减少在一些设备上的卡顿，但会增加延迟 </string>
     <string name="title_video_format">更改编解码器设置</string>
     <string name="summary_video_format">如果您的设备支持较新的编解码器，则可以降低视频带宽要求。如果主机软件或显卡不支持编解码器选择，则可能会忽略编解码器选择。</string>
     <string name="title_enable_hdr">启用 HDR (实验性)</string>

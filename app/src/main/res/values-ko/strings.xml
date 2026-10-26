@@ -9,7 +9,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">모든 게임 보기</string>
     <string name="pcview_menu_pair_pc">PC와 페어링</string>
-    <string name="pcview_menu_unpair_pc">페어링 해제</string>
     <string name="pcview_menu_send_wol">Wake-On-LAN request 보내기</string>
     <string name="pcview_menu_delete_pc">PC 삭제</string>
     <!-- Pair messages -->
@@ -24,7 +23,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">컴퓨터가 온라인 상태입니다</string>
     <string name="wol_no_mac">저장된 MAC 주소가 없기 때문에 PC를 켤 수 없습니다</string>
-    <string name="wol_waking_pc">PC를 깨우는 중…</string>
     <string name="wol_waking_msg">PC를 켜는 데에 약간의 시간이 걸립니다. PC가 켜지지 않으면, Wake-On-Lan이 설정되어있는지 확인하세요.</string>
     <string name="wol_fail">Wake-On-LAN 패킷을 보내는 데에 실패했습니다</string>
     <!-- Unpair messages -->
@@ -65,11 +63,8 @@
     <string name="applist_menu_resume">세션 계속</string>
     <string name="applist_menu_quit">세션 종료</string>
     <string name="applist_menu_quit_and_start">현재 게임 종료 후 시작</string>
-    <string name="applist_menu_cancel">취소</string>
     <string name="applist_refresh_title">앱 리스트</string>
     <string name="applist_refresh_msg">앱 로드 중…</string>
-    <string name="applist_refresh_error_title">오류</string>
-    <string name="applist_refresh_error_msg">앱 리스트를 얻는데 실패함</string>
     <string name="applist_quit_app">종료중</string>
     <string name="applist_quit_success">종료됨</string>
     <string name="applist_quit_fail">종료 실패</string>
@@ -128,7 +123,6 @@
 \n모니터가 필요한 디스플레이 구성을 지원하지 않을 경우 가상 모니터 설정을 시도할 수 있습니다. 장치나 호스트 PC가 특정 해상도나 새로 고침 빈도로 스트리밍을 지원하지 않을 수 있습니다.</string>
     <string name="title_native_res_dialog">네이티브 해상도 주의사항</string>
     <string name="addpc_wrong_sitelocal">주소가 잘못된 것 같습니다. 인터넷을 통해 스트리밍하려면 라우터의 공용 IP 주소를 사용해야합니다.</string>
-    <string name="applist_details_id">앱 ID:</string>
     <string name="applist_menu_hide_app">게임 숨기기</string>
     <string name="applist_menu_scut">바로가기 만들기</string>
     <string name="applist_menu_details">세부사항</string>
@@ -176,7 +170,6 @@
     <string name="pcview_menu_details">PC 세부정보</string>
     <string name="scut_pc_not_found">PC를 찾을 수 없음</string>
     <string name="suffix_seekbar_bitrate_mbps">Mbps</string>
-    <string name="applist_menu_tv_channel">채널 추가하기</string>
     <string name="scut_invalid_uuid">PC를 사용할 수 없음</string>
     <string name="scut_invalid_app_id">앱을 사용할 수 없음</string>
     <string name="summary_enable_post_stream_toast">스트림 종료 후 지연시간 정보 표시</string>
@@ -185,8 +178,6 @@
     <string name="summary_enable_perf_overlay">스트리밍하는 동안 실시간 스트림 성능 정보 표시</string>
     <string name="summary_enable_hdr">게임 및 PC의 GPU가 HDR을 지원하는 경우 HDR을 활성화합니다. HDR에는 HEVC Main 10 인코딩을 지원하는 GPU가 필요합니다.</string>
     <string name="title_enable_hdr">HDR활성화 (실험용)</string>
-    <string name="summary_disable_frame_drop">일부 장치에서 미세한 끊김 현상을 줄일 수 있지만 지연 시간이 늘어날 수 있습니다</string>
-    <string name="title_disable_frame_drop">프레임드랍 최적화</string>
     <string name="summary_unlock_fps">90 또는 120FPS로 스트리밍하면 지연 시간이 줄어들 수 있지만 이를 지원할 수 없는 장치에서는 지연 또는 불안정 할 수 있습니다</string>
     <string name="title_unlock_fps">모든 프레임 속도 잠금 해제</string>
     <string name="summary_checkbox_enable_pip">PIP모드를 사용하는 중에 화면은 볼 수 있지만 제어는 할 수 없습니다</string>

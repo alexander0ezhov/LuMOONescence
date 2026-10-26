@@ -99,6 +99,9 @@ public class PreferenceConfiguration {
      */
     public static final int TOUCH_MODE_TRACKPAD_NO_CLICKS = 5;
 
+    /** The touchscreen pushes the left analog stick, for a game that turns with it. */
+    public static final int TOUCH_MODE_LEFT_STICK = 6;
+
     /**
      * Whether the touchscreen behaves as some kind of trackpad, which is what decides if the
      * choice of how it behaves is worth offering.

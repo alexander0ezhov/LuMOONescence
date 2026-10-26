@@ -26,14 +26,11 @@
     <string name="perf_overlay_incomingfps">Przychodząca liczba klatek na sekundę z sieci: %1$.2f FPS</string>
     <string name="applist_menu_quit_and_start">Zakończ bieżącą grę i uruchom</string>
     <string name="applist_menu_scut">Utwórz skrót</string>
-    <string name="applist_menu_tv_channel">Dodaj do kanału</string>
     <string name="applist_refresh_title">Lista aplikacji</string>
-    <string name="applist_refresh_error_msg">Nie udało się pobrać listy aplikacji</string>
     <string name="applist_quit_app">Rezygnacja</string>
     <string name="applist_quit_success">Zakończono z powodzeniem</string>
     <string name="applist_quit_fail">Nie udało się zakończyć</string>
     <string name="applist_quit_confirmation">Czy na pewno chcesz zamknąć uruchomioną aplikację? Wszystkie niezapisane dane zostaną utracone.</string>
-    <string name="applist_details_id">App ID:</string>
     <string name="title_add_pc">Dodaj komputer ręcznie</string>
     <string name="msg_add_pc">Podłączanie do komputera…</string>
     <string name="addpc_unknown_host">Nie można określić adresu komputera. Upewnij się, że nie popełniłeś literówki w adresie.</string>
@@ -93,10 +90,8 @@
     <string name="summary_unlock_fps">Przesyłanie strumieniowe w 90 lub 120 klatkach na sekundę może zmniejszyć opóźnienia na urządzeniach wysokiej klasy, ale może powodować opóźnienia lub niestabilność na urządzeniach, które nie są w stanie tego obsłużyć</string>
     <string name="title_checkbox_disable_warnings">Wyłączanie komunikatów ostrzegawczych</string>
     <string name="summary_checkbox_disable_warnings">Wyłączanie wyświetlanych na ekranie komunikatów ostrzegawczych o połączeniu podczas przesyłania strumieniowego</string>
-    <string name="title_disable_frame_drop">Nigdy nie porzucaj klatek</string>
     <string name="title_video_format">Zmiana ustawień kodeka</string>
     <string name="summary_video_format">Nowsze kodeki mogą obniżyć wymagania dotyczące przepustowości wideo, jeśli urządzenie je obsługuje. Wybrane kodeki mogą zostać zignorowane, jeśli nie są obsługiwane przez oprogramowanie hosta lub procesor graficzny.</string>
-    <string name="summary_disable_frame_drop">Może zmniejszyć mikroprzycięcia na niektórych urządzeniach, ale może zwiększyć opóźnienia</string>
     <string name="title_enable_hdr">Włącz HDR (eksperymentalnie)</string>
     <string name="summary_enable_hdr">Przesyłaj strumieniowo HDR, gdy gra i procesor graficzny komputera obsługują tę funkcję. HDR wymaga GPU z obsługą kodowania HEVC Main 10.</string>
     <string name="title_full_range">Wymuś pełny zakres wideo (eksperymentalne)</string>
@@ -141,7 +136,6 @@
     <string name="pair_already_in_progress">Parowanie jest już w toku</string>
     <string name="wol_pc_online">Komputer jest online</string>
     <string name="wol_no_mac">Nie można wybudzić komputera, ponieważ nie ma zapisanego adresu MAC</string>
-    <string name="wol_waking_pc">Uruchamianie PC…</string>
     <string name="wol_waking_msg">Uruchomienie komputera może potrwać kilka sekund. Jeśli tak się nie stanie, upewnij się, że jest prawidłowo skonfigurowany do Wake-On-LAN.</string>
     <string name="unpair_fail">Rozparowanie nie powiodło się</string>
     <string name="unpair_error">Urządzenie nie zostało sparowane</string>
@@ -158,7 +152,6 @@
     <string name="conn_error_msg">Nie udało się uruchomić</string>
     <string name="conn_terminated_msg">Połączenie zostało przerwane.</string>
     <string name="perf_overlay_renderingfps">Liczba klatek na sekundę renderowania: %1$.2f FPS</string>
-    <string name="applist_refresh_error_title">Błąd</string>
     <string name="applist_refresh_msg">Odświeżanie aplikacji…</string>
     <string name="addpc_enter_ip">Należy wprowadzić adres IP</string>
     <string name="category_audio_settings">Ustawienia audio</string>
@@ -208,7 +201,6 @@
     <string name="pcview_menu_app_list">Wyświetl wszystkie aplikacje</string>
     <string name="help_loading_title">Przeglądarka pomocy</string>
     <string name="pcview_menu_pair_pc">Sparuj z PC</string>
-    <string name="pcview_menu_unpair_pc">Rozparuj</string>
     <string name="pcview_menu_send_wol">Wyślij żądanie Wake-On-LAN</string>
     <string name="nettest_text_waiting">LunarStreamLight testuje połączenie sieciowe w celu ustalenia, czy wymagane porty są zablokowane.
 \n
@@ -232,7 +224,6 @@
 \nSpróbuj wyłączyć tryb HDR, zmienić rozdzielczość przesyłania strumieniowego lub rozdzielczość wyświetlacza komputera hosta.</string>
     <string name="conn_terminated_title">Połączenie zakończone</string>
     <string name="ip_hint">Adres IP komputera hosta</string>
-    <string name="applist_menu_cancel">Anuluj</string>
     <string name="applist_menu_hide_app">Ukryj aplikację</string>
     <string name="applist_menu_details">Wyświetl szczegóły</string>
     <string name="addpc_fail">Nie można połączyć się z określonym komputerem. Upewnij się, że wymagane porty są dozwolone przez zaporę sieciową.</string>

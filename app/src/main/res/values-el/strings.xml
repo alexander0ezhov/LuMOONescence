@@ -13,7 +13,6 @@
     <string name="pcview_menu_header_unknown">Ανανέωση</string>
     <string name="pcview_menu_app_list">Προβολή όλων των εφαρμογών</string>
     <string name="pcview_menu_pair_pc">Σύζευξη με υπολογιστή</string>
-    <string name="pcview_menu_unpair_pc">Κατάργηση ζεύξης</string>
     <string name="pcview_menu_send_wol">Αποστολή αιτήματος Wake-On-LAN</string>
     <string name="nettest_title_waiting">Δοκιμή σύνδεσης δικτύου</string>
     <string name="nettest_title_done">Ολοκληρώθηκε η δοκιμή δικτύου</string>
@@ -27,7 +26,6 @@
     <string name="pair_incorrect_pin">Λανθασμένο PIN</string>
     <string name="pair_already_in_progress">Η σύζευξη βρίσκεται ήδη σε εξέλιξη</string>
     <string name="wol_pc_online">Ο υπολογιστής είναι συνδεδεμένος</string>
-    <string name="wol_waking_pc">Αφύπνιση υπολογιστή…</string>
     <string name="wol_waking_msg">Μπορεί να χρειαστούν μερικά δευτερόλεπτα για να αφυπνισθεί ο υπολογιστής σας. Αν δεν το κάνει, βεβαιωθείτε ότι έχει ρυθμιστεί σωστά για Wake-On-LAN.</string>
     <string name="scut_invalid_app_id">Η παρεχόμενη εφαρμογή δεν είναι έγκυρη</string>
     <string name="scut_invalid_uuid">Ο παρεχόμενος υπολογιστής δεν είναι έγκυρος</string>
@@ -39,8 +37,6 @@
     <string name="perf_overlay_netlatency">Μέσος λανθάνων χρόνος δικτύου: %1$d MS (διακύμανση: %2$d ms)</string>
     <string name="applist_menu_hide_app">Απόκρυψη εφαρμογής</string>
     <string name="applist_refresh_title">Λίστα εφαρμογών</string>
-    <string name="applist_refresh_error_title">Σφάλμα</string>
-    <string name="applist_refresh_error_msg">Απέτυχε η λήψη λίστας εφαρμογών</string>
     <string name="applist_quit_fail">Αποτυχία διακοπής</string>
     <string name="applist_quit_confirmation">Είστε σίγουροι ότι θέλετε να τερματίσετε την τρέχουσα εφαρμογή; Όλα τα μη αποθηκευμένα δεδομένα θα χαθούν.</string>
     <string name="title_enable_perf_overlay">Εμφάνιση στατιστικών στοιχείων απόδοσης κατά τη ροή</string>
@@ -67,8 +63,6 @@
     <string name="perf_overlay_streamdetails">Ροή βίντεο: %1$s %2$.2f FPS</string>
     <string name="perf_overlay_decoder">Αποκωδικοποιητής: %1$s</string>
     <string name="perf_overlay_incomingfps">Ρυθμός εισερχόμενων καρέ από το δίκτυο: %1$.2f FPS</string>
-    <string name="applist_menu_cancel">Ακύρωση</string>
-    <string name="applist_menu_tv_channel">Προσθήκη στο κανάλι</string>
     <string name="applist_refresh_msg">Ανανέωση εφαρμογών…</string>
     <string name="addpc_success">Ο υπολογιστής προστέθηκε με επιτυχία</string>
     <string name="addpc_unknown_host">Αδυναμία επίλυσης διεύθυνσης υπολογιστή. Βεβαιωθείτε ότι δεν κάνατε τυπογραφικό λάθος στη διεύθυνση.</string>
@@ -118,7 +112,6 @@
     <string name="summary_checkbox_host_audio">Αναπαραγωγή ήχου από τον υπολογιστή και αυτή τη συσκευή</string>
     <string name="title_checkbox_disable_warnings">Απενεργοποίηση προειδοποιητικών μηνυμάτων</string>
     <string name="summary_checkbox_disable_warnings">Απενεργοποίηση των προειδοποιητικών μηνυμάτων σύνδεσης στην οθόνη κατά τη ροή</string>
-    <string name="summary_disable_frame_drop">Μπορεί να μειώσει το micro-stuttering σε ορισμένες συσκευές, αλλά μπορεί να αυξήσει την καθυστέρηση</string>
     <string name="title_enable_hdr">Ενεργοποίηση HDR (πειραματικό)</string>
     <string name="summary_enable_hdr">Μεταδώστε HDR όταν το παιχνίδι και η GPU του υπολογιστή το υποστηρίζουν. Το HDR απαιτεί GPU της σειράς GTX 1000 ή νεότερη.</string>
     <string name="summary_enable_perf_overlay">Εμφάνιση πληροφοριών απόδοσης ροής σε πραγματικό χρόνο κατά τη ροή</string>
@@ -160,7 +153,6 @@
     <string name="applist_menu_details">Προβολή λεπτομερειών</string>
     <string name="applist_quit_success">Επιτυχής έξοδος</string>
     <string name="applist_menu_scut">Δημιουργία συντόμευσης</string>
-    <string name="applist_details_id">Αναγνωριστικό εφαρμογής:</string>
     <string name="addpc_fail">Αδυναμία σύνδεσης με τον καθορισμένο υπολογιστή. Βεβαιωθείτε ότι οι απαιτούμενες θύρες επιτρέπονται μέσω του τείχους προστασίας.</string>
     <string name="addpc_enter_ip">Πρέπει να εισαγάγετε μια διεύθυνση IP</string>
     <string name="title_resolution_list">Ανάλυση βίντεο</string>

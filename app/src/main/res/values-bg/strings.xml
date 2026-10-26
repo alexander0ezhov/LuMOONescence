@@ -19,7 +19,6 @@
     <string name="pair_pc_offline">Компютърът е извън линия</string>
     <string name="pair_pc_ingame">Компютърът в момента е в игра. Трябва да затворите играта преди сдвояването.</string>
     <string name="pair_pairing_title">Сдвояване</string>
-    <string name="wol_waking_pc">Събуждане на компютъра…</string>
     <string name="unpair_fail">Неуспешно раздвояване</string>
     <string name="unpair_error">Устройството не беше сдвоено</string>
     <string name="error_pc_offline">Компютърът е извън линия</string>
@@ -45,7 +44,6 @@
     <string name="pcview_menu_pair_pc">Сдвояване с компютър</string>
     <string name="pcview_menu_header_offline">Извън линия</string>
     <string name="pcview_menu_app_list">Преглед на всички приложения</string>
-    <string name="pcview_menu_unpair_pc">Раздвояване</string>
     <string name="nettest_text_waiting">LunarStreamLight тества мрежовата връзка, за да определи дали някой от необходимите портове не е блокиран.\n\nТова може да отнеме няколко секунди…</string>
     <string name="nettest_text_success">Вашата мрежа изглежда не блокира LunarStreamLight. Ако все още имате проблеми със свързването, проверете настройките на защитната стена на компютъра си.\n\nАко се опитвате да осъществите достъп през Интернет, инсталирайте „LunarStreamLight Internet Hosting Tool“ на компютъра си и стартирайте включения тестер за достъп през Интернет, за да проверите връзката на компютъра си с Интернет.</string>
     <string name="nettest_text_inconclusive">Мрежовият тест не може да бъде извършен, защото нито един от сървърите за проверка на връзката на LunarStreamLight не е достъпен. Проверете връзката си с Интернет или опитайте отново по-късно.</string>
@@ -100,16 +98,11 @@
     <string name="msg_add_pc">Свързване към компютъра…</string>
     <string name="applist_menu_resume">Възобновяване на сесията</string>
     <string name="applist_menu_quit_and_start">Изключване на текущата игра и стартиране</string>
-    <string name="applist_menu_cancel">Отказ</string>
     <string name="applist_menu_details">Преглед на подробностите</string>
     <string name="applist_menu_scut">Създаване на пряк път</string>
-    <string name="applist_refresh_error_title">Грешка</string>
-    <string name="applist_menu_tv_channel">Добавяне към канал</string>
-    <string name="applist_refresh_error_msg">Неуспешно получаване на списъка с приложения</string>
     <string name="applist_quit_success">Успешно затваряне</string>
     <string name="applist_quit_app">Затваряне</string>
     <string name="applist_quit_fail">Неуспешно затваряне</string>
-    <string name="applist_details_id">Идентификатор на приложението:</string>
     <string name="applist_quit_confirmation">Наистина ли искате да затворите работещото приложение? Всички незапазени данни ще бъдат загубени.</string>
     <string name="title_add_pc">Ръчно добавяне на компютър</string>
     <string name="addpc_fail">Не може да се установи връзка с посочения компютър. Уверете се, че необходимите портове са разрешени в защитната стена.</string>
@@ -187,7 +180,6 @@
     <string name="summary_full_range">Това може да предизвика влошено качество в много светлите и тъмни области, ако устройството не може да възпроизвежда правилно видео с пълен диапазон.</string>
     <string name="summary_enable_post_stream_toast">Показване на информация относно забавянето след като поточното предаване приключи</string>
     <string name="toast_controller_type_changed">Видът на контролера може да бъде променен, поради симулирането на сензори за движение</string>
-    <string name="title_disable_frame_drop">Никога да не се пропускат кадри</string>
     <string name="title_full_range">Принудително ползване на видео с пълен диапазон (експериментално)</string>
     <string name="summary_troubleshooting">Вижте съвети за анализиране и отстраняване на чести проблеми с поточното предаване</string>
     <string name="analogscroll_right">Десен аналогов стик</string>
@@ -230,7 +222,6 @@
     <string name="summary_enable_perf_overlay">Показване на информация относно производителността на поточното предаване в реално време</string>
     <string name="title_setup_guide">Ръководство за настройка</string>
     <string name="category_help">Помощ</string>
-    <string name="summary_disable_frame_drop">Може да намали малките засичания на някои устройства, но може и да увеличи забавянето</string>
     <string name="pcview_menu_eol">NVIDIA GameStream – прекратяване на услугата</string>
     <string name="videoformat_h264always">Предпочитане на H.264</string>
 </resources>

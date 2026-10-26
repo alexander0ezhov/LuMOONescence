@@ -22,7 +22,6 @@
     <string name="pcview_menu_details">Ayrıntıları Görüntüle</string>
     <string name="pcview_menu_test_network">Ağ Bağlantısını Test Et</string>
     <string name="pcview_menu_delete_pc">PC\'yi sil</string>
-    <string name="pcview_menu_unpair_pc">Eşleşmeyi kaldır</string>
     <string name="pcview_menu_pair_pc">PC ile eşle</string>
     <string name="pcview_menu_app_list">Bütün Uygulamaları Göster</string>
     <string name="pcview_menu_header_unknown">Yenileniyor</string>
@@ -50,7 +49,6 @@
     <string name="pair_already_in_progress">Eşleştirme zaten devam ediyor</string>
     <string name="wol_pc_online">Bilgisayar çevrimiçi</string>
     <string name="wol_no_mac">Kayıtlı bir MAC adresi olmadığından bilgisayar uyandırılamıyor</string>
-    <string name="wol_waking_pc">Bilgisayar uyandırılıyor…</string>
     <string name="wol_fail">Yerel Ağda Uyandırma paketleri gönderilemedi</string>
     <string name="wol_waking_msg">Bilgisayarınızın uyanması birkaç saniye sürebilir. Eğer uyanmazsa, Yerel Ağda Uyandırma için doğru şekilde yapılandırıldığından emin olun.</string>
     <string name="unpair_fail">Eşleşme kaldırılamadı</string>
@@ -97,18 +95,14 @@
     <string name="applist_menu_resume">Oturumu Sürdür</string>
     <string name="applist_menu_quit">Oturumu Sonlandır</string>
     <string name="applist_menu_quit_and_start">Mevcut Oyundan Çık ve Başlat</string>
-    <string name="applist_menu_cancel">İptal</string>
     <string name="applist_menu_details">Ayrıntıları Göster</string>
     <string name="applist_menu_scut">Kısayol Oluştur</string>
-    <string name="applist_menu_tv_channel">Kanala Ekle</string>
     <string name="applist_menu_hide_app">Uygulamayı Gizle</string>
     <string name="applist_refresh_title">Uygulama Listesi</string>
     <string name="applist_quit_success">Başarıyla çıkıldı</string>
-    <string name="applist_refresh_error_msg">Uygulama listesi alınamadı</string>
     <string name="applist_quit_app">Çıkılıyor</string>
     <string name="applist_quit_fail">Çıkılamadı</string>
     <string name="applist_quit_confirmation">Çalışan uygulamadan çıkmak istediğinizden emin misiniz\? Kaydedilmemiş tüm veriler kaybolacaktır.</string>
-    <string name="applist_details_id">Uygulama kimliği:</string>
     <string name="msg_add_pc">Bilgisayara bağlanıyor…</string>
     <string name="addpc_success">Bilgisayar başarıyla eklendi</string>
     <string name="addpc_fail">Belirtilen bilgisayara bağlanılamıyor. Gerekli bağlantı noktalarına güvenlik duvarı üzerinden izin verildiğinden emin olun.</string>
@@ -125,7 +119,6 @@
     <string name="conn_client_latency_hw">donanım kod çözücü gecikmesi:</string>
     <string name="pcview_menu_send_wol">Yerel ağdan uyandırma isteği gönder</string>
     <string name="applist_refresh_msg">Uygulamalar yenileniyor…</string>
-    <string name="applist_refresh_error_title">Hata</string>
     <string name="title_add_pc">Bilgisayarı manuel olarak Ekle</string>
     <string name="title_resolution_list">Video çözünürlüğü</string>
     <string name="summary_fps_list">Daha akıcı bir video akışı için artırın. Düşük uçlu cihazlarda daha iyi performans için azaltın.</string>
@@ -197,7 +190,6 @@
     <string name="title_checkbox_reduce_refresh_rate">Yenileme hızının azaltılmasına izin ver</string>
     <string name="summary_checkbox_reduce_refresh_rate">Daha düşük ekran yenileme hızları, bazı ek video gecikmeleri pahasına güç tasarrufu sağlayabilir</string>
     <string name="summary_checkbox_disable_warnings">Akış sırasında ekrandaki bağlantı uyarı mesajlarını devre dışı bırakın</string>
-    <string name="title_disable_frame_drop">Asla kare hızlarını düşürme</string>
     <string name="title_video_format">Çözücü ayarlarını değiştir</string>
     <string name="summary_video_format">Daha yeni çözücü bileşenleri, cihazınız destekliyorsa video bant genişliği gereksinimlerini azaltabilir. Ana yazılım veya GPU tarafından desteklenmiyorsa çözücü seçimleri göz ardı edilebilir.</string>
     <string name="title_enable_hdr">HDR etkinleştir (Deneysel)</string>
@@ -243,7 +235,6 @@
     <string name="title_checkbox_disable_warnings">Uyarı mesajlarını devre dışı bırak</string>
     <string name="resolution_prefix_native_landscape">(Manzara)</string>
     <string name="resolution_prefix_native_portrait">(Portre)</string>
-    <string name="summary_disable_frame_drop">Bazı cihazlarda mikro kekemeliği azaltabilir ancak gecikmeyi artırabilir</string>
     <string name="resolution_360p">360p</string>
     <string name="pcview_menu_eol">NVIDIA GameStream Hizmet Şartları</string>
     <string name="resolution_720p">720p</string>

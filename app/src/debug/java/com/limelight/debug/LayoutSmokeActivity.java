@@ -667,6 +667,7 @@ public class LayoutSmokeActivity extends Activity {
         checkEditorPassThroughOrder();
         checkLayoutsScreenIsTidy();
         checkTriggerEventNames();
+        checkStickAxisSigns();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -2928,6 +2929,7 @@ public class LayoutSmokeActivity extends Activity {
         wantedOrder.add(getString(R.string.stream_menu_touch_trackpad));
         wantedOrder.add(getString(R.string.stream_menu_touch_events));
         wantedOrder.add(getString(R.string.stream_menu_touch_right_stick));
+        wantedOrder.add(getString(R.string.stream_menu_touch_left_stick));
 
         check("the touch modes are offered in the order the user asked for",
                 touchChoices.equals(wantedOrder));
@@ -3953,6 +3955,60 @@ public class LayoutSmokeActivity extends Activity {
         check("a trigger event says which trigger it is",
                 "Pad: LT".equals(com.limelight.binding.input.virtual_controller.universal.action
                         .InputEventNames.describe(leftTrigger)));
+    }
+
+
+    /**
+     * The stick reports upwards as positive, which is what the host expects and what the
+     * touch modes had wrong.
+     */
+    private void checkStickAxisSigns() {
+        UniversalVirtualController controller = universalController;
+        UniversalVirtualControllerElement rs = null;
+
+        for (UniversalVirtualControllerElement element : controller.getElements()) {
+            if (element.getElementId() == UniversalVirtualControllerElement.EID_RS) {
+                rs = element;
+                break;
+            }
+        }
+
+        check("the layout has a right stick", rs != null);
+
+        if (rs == null) {
+            return;
+        }
+
+        // The stick needs a size before it has a centre or a range to move in
+        rs.measure(View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(300, View.MeasureSpec.EXACTLY));
+        rs.layout(0, 0, 300, 300);
+
+        UniversalVirtualController.ControllerMode original = controller.getControllerMode();
+        controller.setControllerMode(UniversalVirtualController.ControllerMode.Active);
+
+        try {
+            // Press at the middle, then push the finger upwards
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_MOVE, 0.5f, 0.15f));
+
+            short up = controller.getControllerInputContext().rightStickY;
+
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_MOVE, 0.5f, 0.85f));
+            short down = controller.getControllerInputContext().rightStickY;
+
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+
+            android.util.Log.i("LayoutSmoke", "stick axes: up=" + up + " down=" + down);
+
+            check("the on-screen right stick reports up as positive", up > 0);
+            check("the on-screen right stick reports down as negative", down < 0);
+        } finally {
+            rs.releaseConfiguredActions();
+            controller.setControllerMode(original);
+            controller.getControllerInputContext().rightStickX = 0;
+            controller.getControllerInputContext().rightStickY = 0;
+        }
     }
 
     private static boolean contains(String[] labels, String needle) {

@@ -9,6 +9,7 @@ import com.limelight.binding.input.capture.InputCaptureManager;
 import com.limelight.binding.input.capture.InputCaptureProvider;
 import com.limelight.binding.input.touch.AbsoluteTouchContext;
 import com.limelight.binding.input.touch.OffTouchContext;
+import com.limelight.binding.input.touch.LeftStickTouchContext;
 import com.limelight.binding.input.touch.RightStickTouchContext;
 import com.limelight.binding.input.touch.RelativeTouchContext;
 import com.limelight.binding.input.driver.UsbDriverService;
@@ -705,8 +706,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                 break;
             }
 
-            case PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK: {
-                // The press is the centre of a stick, the same way the right stick mode works
+            case PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK:
+            case PreferenceConfiguration.TOUCH_MODE_LEFT_STICK: {
+                // The press is the centre of a stick, the same way the stick touch modes work
                 int shorter = Math.min(streamView.getWidth(), streamView.getHeight());
                 float travel = Math.max(1f, shorter * 0.18f);
 
@@ -717,11 +719,19 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
                 short axisX = distance <= 0 ? (short) 0
                         : (short) Math.round(offsetX / distance * reach * 32767);
-                short axisY = distance <= 0 ? (short) 0
-                        : (short) Math.round(offsetY / distance * reach * 32767);
 
-                controllerHandler.reportOscState(0, (short) 0, (short) 0, axisX, axisY,
-                        (byte) 0, (byte) 0);
+                // Screen coordinates grow downwards, the stick reports upwards as positive
+                short axisY = distance <= 0 ? (short) 0
+                        : (short) Math.round(-offsetY / distance * reach * 32767);
+
+                // Only the stick is reported, so the control that passes the movement on keeps
+                // its own press while the same finger turns the view
+                if (prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK) {
+                    controllerHandler.reportOscRightStick(axisX, axisY);
+                }
+                else {
+                    controllerHandler.reportOscLeftStick(axisX, axisY);
+                }
                 break;
             }
 
@@ -743,8 +753,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         passThroughActive = false;
 
         if (prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK) {
-            controllerHandler.reportOscState(0, (short) 0, (short) 0, (short) 0, (short) 0,
-                    (byte) 0, (byte) 0);
+            controllerHandler.reportOscRightStick((short) 0, (short) 0);
+        }
+        else if (prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK) {
+            controllerHandler.reportOscLeftStick((short) 0, (short) 0);
         }
     }
 
@@ -1828,6 +1840,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
                 case PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK:
                     touchContextMap[i] = new RightStickTouchContext(controllerHandler, i, streamView);
+                    break;
+
+                case PreferenceConfiguration.TOUCH_MODE_LEFT_STICK:
+                    touchContextMap[i] = new LeftStickTouchContext(controllerHandler, i, streamView);
                     break;
 
                 case PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN:
