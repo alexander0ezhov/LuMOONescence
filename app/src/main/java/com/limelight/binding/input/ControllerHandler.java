@@ -2822,22 +2822,46 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         return true;
     }
 
+    /**
+     * What the touch input is putting on the sticks.
+     *
+     * It is kept apart from the state of the on-screen layout, because the layout sends its
+     * whole state on every press: a stick pushed by a finger has to survive that, and the
+     * layout's own sticks have to survive the touch input letting go. Two sources, one packet.
+     */
+    private final OscStickState oscSticks = new OscStickState();
+
     public void reportOscState(int buttonFlags,
                                short leftStickX, short leftStickY,
                                short rightStickX, short rightStickY,
                                byte leftTrigger, byte rightTrigger) {
-        defaultContext.leftStickX = leftStickX;
-        defaultContext.leftStickY = leftStickY;
+        applyOscState(buttonFlags, leftStickX, leftStickY, rightStickX, rightStickY,
+                leftTrigger, rightTrigger);
 
-        defaultContext.rightStickX = rightStickX;
-        defaultContext.rightStickY = rightStickY;
+        sendControllerInputPacket(defaultContext);
+    }
+
+    /**
+     * Puts the two sources of a packet together.
+     *
+     * A stick the touch input is pushing keeps its value: the on-screen layout sends its whole
+     * state on every press, and without this it would put that stick back to the middle as soon
+     * as another control was touched.
+     */
+    private void applyOscState(int buttonFlags,
+                               short leftStickX, short leftStickY,
+                               short rightStickX, short rightStickY,
+                               byte leftTrigger, byte rightTrigger) {
+        defaultContext.leftStickX = oscSticks.mergeLeftX(leftStickX);
+        defaultContext.leftStickY = oscSticks.mergeLeftY(leftStickY);
+
+        defaultContext.rightStickX = oscSticks.mergeRightX(rightStickX);
+        defaultContext.rightStickY = oscSticks.mergeRightY(rightStickY);
 
         defaultContext.leftTrigger = leftTrigger;
         defaultContext.rightTrigger = rightTrigger;
 
         defaultContext.inputMap = buttonFlags;
-
-        sendControllerInputPacket(defaultContext);
     }
 
     /**
@@ -2848,6 +2872,8 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
      * whole packet would clear the buttons that control has pressed.
      */
     public void reportOscRightStick(short x, short y) {
+        oscSticks.setTouchRight(x, y);
+
         defaultContext.rightStickX = x;
         defaultContext.rightStickY = y;
 
@@ -2855,11 +2881,14 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
     }
 
     public void reportOscLeftStick(short x, short y) {
+        oscSticks.setTouchLeft(x, y);
+
         defaultContext.leftStickX = x;
         defaultContext.leftStickY = y;
 
         sendControllerInputPacket(defaultContext);
     }
+
 
     /**
      * Sends a keyboard event originating from the on-screen controller (OSC).

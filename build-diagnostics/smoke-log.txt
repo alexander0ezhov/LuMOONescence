@@ -1,0 +1,1821 @@
+--------- beginning of main
+10-26 15:45:46.124 11571 11571 I LayoutSmoke: ok   the built-in layout exists
+10-26 15:45:46.124 11571 11571 I LayoutSmoke: ok   the built-in layout cannot be deleted
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   a layout can be created
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   a new layout becomes the selected one
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   a duplicate name is made unique
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   the selected layout can be changed
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   a layout can be deleted
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   deleting the selected layout selects another
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   the editor is open
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   the editor built a controller
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   the layout has controls
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   the drawer is hidden while nothing is selected
+10-26 15:45:46.125 11571 11571 I LayoutSmoke: ok   every control has a configuration
+10-26 15:45:46.172 11571 11571 I LayoutSmoke: ok   a tapped control becomes the selected one
+10-26 15:45:46.172 11571 11571 I LayoutSmoke: ok   the selected control is marked
+10-26 15:45:46.172 11571 11571 I LayoutSmoke: ok   the panel has rows for the selected control
+10-26 15:45:46.173 11571 11571 I LayoutSmoke: ok   a control can be duplicated
+10-26 15:45:46.173 11571 11571 I LayoutSmoke: ok   the duplicate is added
+10-26 15:45:46.173 11571 11571 I LayoutSmoke: duplicate: first=1 copy=1015 next=1016
+10-26 15:45:46.173 11571 11571 I LayoutSmoke: ok   the duplicate has its own ID
+10-26 15:45:46.173 11571 11571 I LayoutSmoke: controls sharing the duplicate's ID: 0
+10-26 15:45:46.173 11571 11571 I LayoutSmoke: ok   no other control shares the duplicate's ID
+10-26 15:45:46.173 11571 11571 I LayoutSmoke: ok   a size can be pasted onto another control
+10-26 15:45:46.174 11571 11571 I LayoutSmoke: ok   a control can be deleted
+10-26 15:45:46.175 11571 11571 I LayoutSmoke: ok   a button can be added
+10-26 15:45:46.175 11571 11571 I LayoutSmoke: ok   the added button has a button configuration
+10-26 15:45:46.175 11571 11571 I LayoutSmoke: ok   a stick can be added
+10-26 15:45:46.175 11571 11571 I LayoutSmoke: ok   the added stick has a stick configuration
+10-26 15:45:46.175 11571 11571 I LayoutSmoke: ok   two controls were added
+10-26 15:45:46.194 11571 11571 I LayoutSmoke: ok   the stick becomes the selected one
+10-26 15:45:46.194 11571 11571 I LayoutSmoke: ok   the panel has rows for a stick
+10-26 15:45:46.204 11571 11571 I LayoutSmoke: ok   the button becomes the selected one again
+10-26 15:45:46.204 11571 11571 I LayoutSmoke: ok   the layout can be marked as having unsaved changes
+10-26 15:45:46.204 11571 11571 I LayoutSmoke: ok   the unsaved marker can be cleared
+10-26 15:45:46.206 11571 11571 I LayoutSmoke: ok   the layout was saved
+10-26 15:45:46.206 11571 11571 I LayoutSmoke: ok   the saved layout records its size
+10-26 15:45:46.206 11571 11571 I LayoutSmoke: ok   every control was saved
+10-26 15:45:46.206 11571 11571 I LayoutSmoke: ok   the saved form carries element IDs
+10-26 15:45:46.206 11571 11571 I LayoutSmoke: ok   the saved form carries actions
+10-26 15:45:46.209 11571 11571 I LayoutSmoke: ok   the saved layout can be rebuilt
+10-26 15:45:46.230 11571 11571 I LayoutSmoke: ok   a tap on a control selects it
+10-26 15:45:46.230 11571 11571 I LayoutSmoke: ok   selecting a control shows the drawer
+10-26 15:45:46.230 11571 11571 I LayoutSmoke: ok   tapping empty space clears the selection
+10-26 15:45:46.230 11571 11571 I LayoutSmoke: ok   tapping empty space hides the drawer
+10-26 15:45:46.251 11571 11571 I LayoutSmoke: ok   a touch on empty space clears the selection
+10-26 15:45:46.251 11571 11571 I LayoutSmoke: ok   a touch on empty space hides the drawer
+10-26 15:45:46.271 11571 11571 I LayoutSmoke: ok   dragging a control moves it
+10-26 15:45:46.271 11571 11571 I LayoutSmoke: ok   dragging keeps the control at or after the origin
+10-26 15:45:46.271 11571 11571 I LayoutSmoke: ok   the control can be put back
+10-26 15:45:47.193 11571 11571 I LayoutSmoke: ok   holding a control reaches the editor as a hold
+10-26 15:45:47.193 11571 11571 I LayoutSmoke: ok   holding a control does not drag it
+10-26 15:45:47.193 11571 11571 I LayoutSmoke: ok   the floating settings button is on screen
+10-26 15:45:47.193 11571 11571 I LayoutSmoke: ok   the floating settings button is visible
+10-26 15:45:48.011 11571 11571 I LayoutSmoke: ok   the settings button opens the layout menu
+10-26 15:45:48.011 11571 11571 I LayoutSmoke: ok   the layout menu offers adding a button
+10-26 15:45:48.011 11571 11571 I LayoutSmoke: ok   the layout menu offers adding a stick
+10-26 15:45:48.011 11571 11571 I LayoutSmoke: ok   the layout menu offers adding a D-pad
+10-26 15:45:48.011 11571 11571 I LayoutSmoke: ok   the layout menu offers saving
+10-26 15:45:48.011 11571 11571 I LayoutSmoke: ok   the layout menu offers saving as
+10-26 15:45:48.011 11571 11571 I LayoutSmoke: ok   the layout menu offers leaving
+10-26 15:45:48.826 11571 11571 I LayoutSmoke: ok   choosing save as opens a dialog
+10-26 15:45:48.827 11571 11571 I LayoutSmoke: ok   the save as dialog asks for a name
+10-26 15:45:48.851 11571 11571 I LayoutSmoke: ok   the back gesture is handled through the registered callback
+10-26 15:45:48.851 11571 11571 I LayoutSmoke: ok   the back gesture asks about unsaved changes like the Exit entry does
+10-26 15:45:48.853 11571 11571 I LayoutSmoke: ok   the width slider is on screen
+10-26 15:45:48.853 11571 11571 I LayoutSmoke: ok   the height slider is on screen
+10-26 15:45:48.857 11571 11571 I LayoutSmoke: ok   dragging the width slider applies the width
+10-26 15:45:48.857 11571 11571 I LayoutSmoke: ok   dragging the width slider leaves the height alone
+10-26 15:45:48.858 11571 11571 I LayoutSmoke: ok   dragging the height slider applies the height
+10-26 15:45:48.858 11571 11571 I LayoutSmoke: ok   dragging the height slider keeps the dragged width
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   a rebuilt width row shows the size the control has
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   a rebuilt height row shows the size the control has
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   the layout has a stick
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   the middle of the stick does nothing while it is switched off
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   the middle of the stick presses its binding once switched on
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   moving the stick does not also press its middle button
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   a trigger event pulls the left trigger
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   a trigger event pulls the right trigger
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   releasing a trigger event lets the left trigger out
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   releasing a trigger event lets the right trigger out
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   a D-pad can be added
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   the added D-pad has a D-pad configuration
+10-26 15:45:48.882 11571 11571 I LayoutSmoke: ok   adding a D-pad adds one control
+10-26 15:45:48.904 11571 11571 I LayoutSmoke: ok   the D-pad becomes the selected one
+10-26 15:45:48.904 11571 11571 I LayoutSmoke: ok   the panel has rows for a D-pad
+10-26 15:45:48.906 11571 11571 I LayoutSmoke: ok   a corner radius survives being saved and loaded
+10-26 15:45:48.906 11571 11571 I LayoutSmoke: ok   the panel offers a corner radius slider
+10-26 15:45:48.906 11571 11571 I LayoutSmoke: ok   the corner radius reaches the control
+10-26 15:45:48.906 11571 11571 I LayoutSmoke: ok   a size can be copied
+10-26 15:45:48.927 11571 11571 I LayoutSmoke: ok   a pasted size brings the width
+10-26 15:45:48.927 11571 11571 I LayoutSmoke: ok   a pasted size brings the height
+10-26 15:45:48.927 11571 11571 I LayoutSmoke: ok   a pasted size brings the corner radius
+10-26 15:45:48.927 11571 11571 I LayoutSmoke: ok   a pasted size leaves the position alone
+10-26 15:45:48.928 11571 11571 I LayoutSmoke: ok   a held button looks pressed
+10-26 15:45:48.938 11571 11571 I LayoutSmoke: ok   a released button stops looking pressed
+10-26 15:45:48.938 11571 11571 I LayoutSmoke: ok   a released button is not left holding its action
+10-26 15:45:48.938 11571 11571 I LayoutSmoke: ok   a latched button stays lit after the finger is lifted
+10-26 15:45:48.938 11571 11571 I LayoutSmoke: ok   a latched button goes out on the next tap
+10-26 15:45:48.938 11571 11571 I LayoutSmoke: ok   the layout opacity is read from the settings
+10-26 15:45:48.938 11571 11571 I LayoutSmoke: ok   the layout opacity reaches every control
+10-26 15:45:48.944 11571 11571 I LayoutSmoke: ok   drawing honours the layout opacity
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the D-pad answers to the up button
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the D-pad answers to the down button
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the D-pad answers to the left button
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the D-pad answers to the right button
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   a diagonal between two arms presses two directions
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   a press on the up arm off to one side presses only up
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   a press on the left arm off to one side presses only left
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   a press outside the D-pad presses nothing
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the up zone reaches wider than the drawn button
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the left zone reaches taller than the drawn button
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the up button is drawn above the middle
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the down button is drawn below the middle
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the left button is drawn left of the middle
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the right button is drawn right of the middle
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   pressing near the top edge does not also press left or right
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   pressing near the left edge does not also press up or down
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   the middle of the D-pad presses nothing
+10-26 15:45:48.945 11571 11571 I LayoutSmoke: ok   there is a control that is not being edited
+10-26 15:45:48.967 11571 11571 I LayoutSmoke: ok   moving a control that is not being edited is an unsaved change
+10-26 15:45:48.988 11571 11571 I LayoutSmoke: ok   the drag moved the control on screen
+10-26 15:45:48.988 11571 11571 I LayoutSmoke: ok   a dragged control is written where it is on screen
+10-26 15:45:48.988 11571 11571 I LayoutSmoke: ok   a dragged control keeps its size when it is written
+10-26 15:45:48.988 11571 11571 I LayoutSmoke: ok   a control read back from a save is where it was saved
+10-26 15:45:48.992 11571 11571 I LayoutSmoke: ok   the saved profile holds the position the control was dragged to
+10-26 15:45:48.995 11571 11571 I LayoutSmoke: ok   the on-screen layout names player one
+10-26 15:45:48.995 11571 11571 I LayoutSmoke: ok   no on-screen layout leaves player one out
+10-26 15:45:49.001 11571 11571 I LayoutSmoke: ok   the built-in layout has a left trigger
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   the left trigger is an ordinary button
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   no control is of a trigger kind any more
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   a trigger pulls its axis with the action the layout gives it
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   a trigger lets its axis out again
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   a weak reading on its own is kept
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   a pushed axis is not flipped by another controller's drift
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   the stronger reading wins whichever way it points
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   combining by bits would have flipped the sign
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   a direction bound to a pad button says so
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   a pad binding is recognised again
+10-26 15:45:49.002 11571 11571 I LayoutSmoke: ok   a pad binding sends one gamepad event
+10-26 15:45:49.021 11571 11571 I LayoutSmoke: ok   a direction bound to a key counts as assigned
+10-26 15:45:49.021 11571 11571 I LayoutSmoke: ok   a key binding is recognised again
+10-26 15:45:49.021 11571 11571 I LayoutSmoke: ok   a key binding does not leave a pad button behind
+10-26 15:45:49.021 11571 11571 I LayoutSmoke: ok   a key binding sends one keyboard event
+10-26 15:45:49.021 11571 11571 I LayoutSmoke: ok   a key binding can be read back after being written
+10-26 15:45:49.021 11571 11571 I LayoutSmoke: ok   binding a pad button again clears the key
+10-26 15:45:49.022 11571 11571 I LayoutSmoke: ok   a control added to a faded layout is faded as well
+10-26 15:45:49.025 11571 11571 I LayoutSmoke: dpad at rest: up=10 down=9 left=9 right=9
+10-26 15:45:49.025 11571 11571 I LayoutSmoke: ok   the arms of a D-pad look the same when nothing is pressed
+10-26 15:45:49.027 11571 11571 I LayoutSmoke: dpad left pressed: up=10 down=9 left=12 right=9
+10-26 15:45:49.027 11571 11571 I LayoutSmoke: ok   pressing left lights the left arm
+10-26 15:45:49.027 11571 11571 I LayoutSmoke: ok   pressing left does not light the up arm
+10-26 15:45:49.027 11571 11571 I LayoutSmoke: ok   pressing left does not light the down arm
+10-26 15:45:49.027 11571 11571 I LayoutSmoke: ok   pressing left does not light the right arm
+10-26 15:45:49.027 11571 11571 I LayoutSmoke: ok   an untouched button is not pressed
+10-26 15:45:49.039 11571 11571 I LayoutSmoke: ok   one tap latches the toggle on
+10-26 15:45:49.039 11571 11571 I LayoutSmoke: ok   the second tap lets the toggle go
+10-26 15:45:49.054 11571 11571 I LayoutSmoke: toggle off differs from its untouched self in 0 pixels, first at -1,0
+10-26 15:45:49.054 11571 11571 I LayoutSmoke: ok   a toggle switched off looks like it did before it was pressed
+10-26 15:45:49.057 11571 11571 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/toggle-before.png
+10-26 15:45:49.058 11571 11571 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/toggle-after.png
+10-26 15:45:49.059 11571 11571 I LayoutSmoke: arm up: rgb=40,45,52 alpha=198 bounds=111.0,-7.6293945E-6 189.0,138.0
+10-26 15:45:49.059 11571 11571 I LayoutSmoke: arm down: rgb=35,39,45 alpha=202 bounds=111.0,162.0 189.0,300.0
+10-26 15:45:49.059 11571 11571 I LayoutSmoke: arm left: rgb=38,42,48 alpha=200 bounds=-7.6293945E-6,111.0 138.0,189.0
+10-26 15:45:49.059 11571 11571 I LayoutSmoke: arm right: rgb=38,42,48 alpha=200 bounds=162.0,111.0 300.0,189.0
+10-26 15:45:49.059 11571 11571 I LayoutSmoke: ok   every arm of a D-pad has the same transparency
+10-26 15:45:49.059 11571 11571 I LayoutSmoke: ok   every arm of a D-pad has the same shade
+10-26 15:45:49.066 11571 11571 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/dpad-at-rest.png
+10-26 15:45:49.070 11571 11571 I LayoutSmoke: glow at the edge: button=219 dpad arm=222
+10-26 15:45:49.070 11571 11571 I LayoutSmoke: ok   a pressed arm of a D-pad is lit like a pressed button
+10-26 15:45:49.070 11571 11571 I LayoutSmoke: alpha at the sharp corner of an arm: 0
+10-26 15:45:49.070 11571 11571 I LayoutSmoke: ok   the light of an arm does not stick out past its rounded corner
+10-26 15:45:49.079 11571 11571 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/dpad-pressed.png
+10-26 15:45:49.079 11571 11571 I LayoutSmoke: ok   a control is in the layout for the leaving check
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   editing marks the layout as having unsaved changes
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   editing does not write the stored layout
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   answering don't save clears the unsaved marker
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   answering don't save leaves the stored layout as it was
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   a control is in the layout for the position check
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   the editor knows how big the layout area is
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   the drawer has a position slider for x
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   the drawer has a position slider for y
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: area=2510x1156 x slider max=2426 y slider max=1072
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   the x slider stops before the right edge
+10-26 15:45:49.100 11571 11571 I LayoutSmoke: ok   the y slider stops before the bottom edge
+10-26 15:45:49.101 11571 11571 I LayoutSmoke: ok   the row keeps a typed value the slider cannot show
+10-26 15:45:49.101 11571 11571 I LayoutSmoke: typed 9999,9999 placed at 2426,1072 within 2510x1156
+10-26 15:45:49.101 11571 11571 I LayoutSmoke: ok   a typed position keeps the control inside the layout
+10-26 15:45:49.101 11571 11571 I LayoutSmoke: ok   a typed position keeps a piece of the control on screen
+10-26 15:45:49.101 11571 11571 I LayoutSmoke: ok   a typed position is held back rather than thrown to zero
+10-26 15:45:49.101 11571 11571 I LayoutSmoke: ok   the piece left on screen is wide enough to press
+10-26 15:45:49.102 11571 11571 I LayoutSmoke: dragged to left=300 forced to 2426,1072 within 2510x1156
+10-26 15:45:49.102 11571 11571 I LayoutSmoke: ok   dragging a control to the right edge keeps a piece on screen
+10-26 15:45:49.102 11571 11571 I LayoutSmoke: ok   dragging a control to the bottom edge keeps a piece on screen
+10-26 15:45:49.102 11571 11571 I LayoutSmoke: ok   a control dragged to the limit can still be pressed
+10-26 15:45:49.124 11571 11571 I LayoutSmoke: ok   a control is in the layout for the actions check
+10-26 15:45:49.124 11571 11571 I LayoutSmoke: drawer buttons: [Pad: D-pad Up, Remove, Add event, Remove step, Add step, Pad: D-pad Down, Remove, Add event, Remove step, Add step, Pad: D-pad Left, Remove, Add event, Remove step, Add step, Pad: D-pad Right, Remove, Add event, Remove step, Add step, Copy size, Paste size, Duplicate, Delete]
+10-26 15:45:49.124 11571 11571 I LayoutSmoke: ok   the drawer offers duplicating a control
+10-26 15:45:49.124 11571 11571 I LayoutSmoke: ok   the drawer offers copying the size of a control
+10-26 15:45:49.124 11571 11571 I LayoutSmoke: ok   the drawer offers deleting a control
+10-26 15:45:49.124 11571 11571 I LayoutSmoke: ok   pasting is offered exactly when a size has been copied
+10-26 15:45:49.124 11571 11571 I LayoutSmoke: ok   pasting is offered once a size is copied
+10-26 15:45:49.146 11571 11571 I LayoutSmoke: ok   holding a control selects it instead of opening a menu
+10-26 15:45:49.146 11571 11571 I LayoutSmoke: ok   holding a control leaves no dialog behind
+10-26 15:45:49.146 11571 11571 I LayoutSmoke: ok   a control is in the layout for the drag check
+10-26 15:45:49.147 11571 11571 I LayoutSmoke: ok   no control is selected to begin with
+10-26 15:45:49.147 11571 11571 I LayoutSmoke: ok   the drawer is closed with nothing selected
+10-26 15:45:49.168 11571 11571 I LayoutSmoke: ok   dragging a control selects it
+10-26 15:45:49.168 11571 11571 I LayoutSmoke: ok   dragging a control opens its drawer
+10-26 15:45:49.191 11571 11571 I LayoutSmoke: actions in order: copy=20 paste=21 duplicate=22 delete=23
+10-26 15:45:49.191 11571 11571 I LayoutSmoke: ok   copying and pasting share a row
+10-26 15:45:49.191 11571 11571 I LayoutSmoke: ok   duplicating comes after copying and pasting
+10-26 15:45:49.191 11571 11571 I LayoutSmoke: ok   deleting is the last of the actions
+10-26 15:45:49.191 11571 11571 I LayoutSmoke: ok   nothing is out of reach once a size is copied
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: out of reach: [Paste size]
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   pasting is out of reach before a size is copied
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   pasting is still shown, so the row does not move
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: 200x100 (100,50) 25x25 -> 400x400 (200,200) 50x50
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   a moved control keeps its place across the screen
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   a moved control keeps its place down the screen
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   a moved control is not stretched
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   a control on a wider screen doubles where it sat
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   a control on a wider screen keeps its height
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   a control on a wider screen is not stretched sideways
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   a layout opened on its own screen is left alone
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: ok   a control is in the layout for the fitting check
+10-26 15:45:49.214 11571 11571 I LayoutSmoke: before fitting: config has 100,50 25x25
+10-26 15:45:49.218 11571 11571 I LayoutSmoke: layout says it was arranged on 200x100
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: fitted from 200x100 to 2510x1156: 1255,578 289x289 expected 1255,578 289x289
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a control keeps its share of the screen across
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a control keeps its share of the screen down
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a control is not stretched by the fitting
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   fitting a layout marks it as having unsaved changes
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a fitted layout is remembered as fitted
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   fitting a layout twice changes nothing the second time
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a layout can be written out and read back
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   the name of a layout survives being written out
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a layout file says which screen it was arranged on
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a control comes back where it was
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a control comes back the size it was
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a file that is not a layout is refused
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a layout from a newer version of the app is refused
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a control with no place is refused
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a shared layout is given a file name a file system accepts
+10-26 15:45:49.219 11571 11571 I LayoutSmoke: ok   a file name cannot escape its folder
+10-26 15:45:49.220 11571 11571 I LayoutSmoke: ok   an imported layout is created
+10-26 15:45:49.220 11571 11571 I LayoutSmoke: imported control: 2156,337 160x160 saved screen 2510x1156
+10-26 15:45:49.220 11571 11571 I LayoutSmoke: ok   importing does not shrink a control
+10-26 15:45:49.220 11571 11571 I LayoutSmoke: ok   importing does not move a control
+10-26 15:45:49.220 11571 11571 I LayoutSmoke: ok   an imported layout remembers the screen it was arranged on
+10-26 15:45:49.220 11571 11571 I LayoutSmoke: ok   an imported layout is not marked as already fitted
+10-26 15:45:49.220 11571 11571 I LayoutSmoke: ok   importing the same layout twice makes a second layout
+10-26 15:45:49.225 11571 11571 I LayoutSmoke: ok   a layout can be exported and imported
+10-26 15:45:49.226 11571 11571 I LayoutSmoke: ok   the layout comes back with the same number of controls
+10-26 15:45:49.226 11571 11571 I LayoutSmoke: export and import compared 27 controls, 0 changed
+10-26 15:45:49.226 11571 11571 I LayoutSmoke: ok   every control of an exported layout comes back
+10-26 15:45:49.226 11571 11571 I LayoutSmoke: ok   no control moves or changes size in an export and an import
+10-26 15:45:49.226 11571 11571 I LayoutSmoke: ok   a layout can be written out for sharing
+10-26 15:45:49.226 11571 11571 I LayoutSmoke: ok   a layout can be written to a share file
+10-26 15:45:49.226 11571 11571 I LayoutSmoke: shared as content://io.github.alexander0ezhov.lunarstreamlight.debug.fileprovider/Smoke-layout.json
+10-26 15:45:49.227 11571 11571 I LayoutSmoke: ok   the shared layout is offered under its file name
+10-26 15:45:49.227 11571 11571 I LayoutSmoke: ok   the shared layout can be read back through its address
+10-26 15:45:49.227 11571 11571 I LayoutSmoke: ok   a shared layout address cannot reach outside its folder
+10-26 15:45:49.252 11571 11571 I LayoutSmoke: ok   the stream menu starts closed
+10-26 15:45:49.252 11571 11571 I LayoutSmoke: ok   the stream menu has a sheet over the screen
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: ok   the first press of back opens the stream menu
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: ok   the stream menu is open after back
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: stream menu rows: [Show keyboard, Touch input   ·   Touchpad, Touchpad mode   ·   Trackpad, Sensitivity, 100, On-screen controls, Layout   ·   First layout, Opacity, 100, Extras, Vibration]
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: ok   the stream menu offers the keyboard
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: ok   the stream menu offers the touch setting
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: ok   the stream menu offers the layout
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: exit button: android.widget.Button{d011819 VFED..C.. ......I. 0,0-0,0} text=Exit stream expected=Exit stream tree=FrameLayout[LinearLayout[TextView(Stream menu), ScrollView[LinearLayout[TextView(Show keyboard), LinearLayout[LinearLayout[TextView(Touch input   ·   Touchpad), ImageView], RadioGroup[RadioButton(Off), RadioButton(Touchpad), RadioButton(Touch native (experimental)), RadioButton(Right stick), RadioButton(Left stick)]], LinearLayout[LinearLayout[TextView(Touchpad mode   ·   Trackpad), ImageView], RadioGroup[RadioButton(Trackpad), RadioButton(Direct cursor), RadioButton(No clicks)]], LinearLayout[TextView(Sensitivity), SeekBar, TextView(100)], LinearLayout[TextView(On-screen controls), Switch()], LinearLayout[LinearLayout[TextView(Layout   ·   First layout), ImageView], RadioGroup[RadioButton(First layout), RadioButton(Second layout)]], LinearLayout[TextView(Opacity), SeekBar, TextView(100)], LinearLayout[LinearLayout[TextView(Extras), ImageView], LinearLayout[LinearLayout[TextView(Vibration), Switch()]]]]], LinearLayout[Button(Exit stream)]]]
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: ok   the transparency row is under the layout row
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: touch choices: [Off, Touchpad, Touch native (experimental), Right stick, Left stick]
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: ok   the touch modes are offered in the order the user asked for
+10-26 15:45:49.259 11571 11571 I LayoutSmoke: ok   the touchpad's own row appears with the touchpad
+10-26 15:45:49.260 11571 11571 I LayoutSmoke: touchpad choices: [Trackpad, Direct cursor, No clicks]
+10-26 15:45:49.260 11571 11571 I LayoutSmoke: ok   the touchpad offers its three kinds in order
+10-26 15:45:49.266 11571 11571 I LayoutSmoke: ok   choosing the kind of touchpad keeps the menu open
+10-26 15:45:49.266 11571 11571 I LayoutSmoke: ok   the kind of touchpad is reported
+10-26 15:45:49.272 11571 11571 I LayoutSmoke: ok   choosing a layout keeps the menu open
+10-26 15:45:49.272 11571 11571 I LayoutSmoke: ok   the main list reports the touchpad
+10-26 15:45:49.272 11571 11571 I LayoutSmoke: ok   the menu names the native touch mode as the user asked
+10-26 15:45:49.272 11571 11571 I LayoutSmoke: ok   the native touch mode is called what the user asked for
+10-26 15:45:49.272 11571 11571 I LayoutSmoke: ok   the cursor-following touchpad is called what it is
+10-26 15:45:49.272 11571 11571 I LayoutSmoke: ok   the stream menu has a button to leave the stream
+10-26 15:45:49.273 11571 11571 I LayoutSmoke: ok   a press of back while the menu is open is used
+10-26 15:45:49.273 11571 11571 I LayoutSmoke: ok   a press of back while the menu is open leaves the stream
+10-26 15:45:49.273 11571 11571 I LayoutSmoke: ok   tapping outside the stream menu closes it
+10-26 15:45:49.273 11571 11571 I LayoutSmoke: ok   tapping outside the stream menu does not leave the stream
+10-26 15:45:49.279 11571 11571 I LayoutSmoke: ok   the touch setting unfolds
+10-26 15:45:49.283 11571 11571 I LayoutSmoke: ok   the touch setting offers turning the touchscreen off
+10-26 15:45:49.284 11571 11571 I LayoutSmoke: ok   choosing a touch mode reports it
+10-26 15:45:49.284 11571 11571 I LayoutSmoke: ok   choosing a touch mode keeps the menu open
+10-26 15:45:49.284 11571 11571 I LayoutSmoke: ok   the touch setting unfolds again
+10-26 15:45:49.289 11571 11571 I LayoutSmoke: ok   the touch setting offers the right stick
+10-26 15:45:49.289 11571 11571 I LayoutSmoke: ok   the right stick can be chosen
+10-26 15:45:49.289 11571 11571 I LayoutSmoke: ok   the layout row unfolds
+10-26 15:45:49.294 11571 11571 I LayoutSmoke: ok   a layout can be chosen
+10-26 15:45:49.294 11571 11571 I LayoutSmoke: ok   choosing a layout reports it
+10-26 15:45:49.294 11571 11571 I LayoutSmoke: ok   choosing a layout keeps the menu open
+10-26 15:45:49.294 11571 11571 I LayoutSmoke: ok   the keyboard row answers a press
+10-26 15:45:49.294 11571 11571 I LayoutSmoke: ok   the keyboard row asks for the keyboard
+10-26 15:45:49.294 11571 11571 I LayoutSmoke: ok   the keyboard row closes the menu
+10-26 15:45:49.299 11571 11571 I LayoutSmoke: ok   the button at the bottom leaves the stream
+10-26 15:45:49.299 11571 11571 I LayoutSmoke: ok   a row that unfolds has an arrow
+10-26 15:45:49.299 11571 11571 I LayoutSmoke: ok   the arrow of a closed row points down
+10-26 15:45:49.299 11571 11571 I LayoutSmoke: ok   the arrow turns over while the row is open
+10-26 15:45:49.299 11571 11571 I LayoutSmoke: ok   the arrow points down again once the row is closed
+10-26 15:45:49.300 11571 11571 I LayoutSmoke: ok   a row that unfolds has an arrow on the layout row too
+10-26 15:45:49.300 11571 11571 I LayoutSmoke: ok   a row that does not unfold has no arrow
+10-26 15:45:49.300 11571 11571 I LayoutSmoke: ok   the choices of a row are exclusive
+10-26 15:45:49.300 11571 11571 I LayoutSmoke: ok   only one touch mode is marked at a time
+10-26 15:45:49.304 11571 11571 I LayoutSmoke: ok   choosing another mode leaves one marked
+10-26 15:45:49.308 11571 11571 I LayoutSmoke: ok   the experimental real touch mode can be chosen
+10-26 15:45:49.308 11571 11571 I LayoutSmoke: ok   the experimental mode is reported
+10-26 15:45:49.308 11571 11571 I LayoutSmoke: ok   the switch for the on-screen controls is its own row
+10-26 15:45:49.308 11571 11571 I LayoutSmoke: ok   the controls are shown to begin with
+10-26 15:45:49.309 11571 11571 I LayoutSmoke: ok   the switch turns the controls off
+10-26 15:45:49.309 11571 11571 I LayoutSmoke: ok   the switch turns the controls back on
+10-26 15:45:49.309 11571 11571 I LayoutSmoke: layout choices: [First layout, Second layout]
+10-26 15:45:49.309 11571 11571 I LayoutSmoke: ok   the layout list holds only layouts
+10-26 15:45:49.309 11571 11571 I LayoutSmoke: ok   the menu has an opacity slider
+10-26 15:45:49.311 11571 11571 I LayoutSmoke: ok   the opacity slider can be dragged
+10-26 15:45:49.311 11571 11571 I LayoutSmoke: opacity from the menu slider: 41
+10-26 15:45:49.311 11571 11571 I LayoutSmoke: ok   dragging the opacity slider reports a new value
+10-26 15:45:49.311 11571 11571 I LayoutSmoke: ok   a control is in the layout for the delete check
+10-26 15:45:49.311 11571 11571 I LayoutSmoke: ok   editing a control opens its drawer
+10-26 15:45:49.311 11571 11571 I LayoutSmoke: ok   the control is the selected one
+10-26 15:45:49.314 11571 11571 I LayoutSmoke: ok   deleting the edited control clears the selection
+10-26 15:45:49.314 11571 11571 I LayoutSmoke: ok   deleting the edited control closes its drawer
+10-26 15:45:49.316 11571 11571 I LayoutSmoke: ok   hiding the layout hides its controls
+10-26 15:45:49.316 11571 11571 I LayoutSmoke: ok   the controller says the layout is hidden
+10-26 15:45:49.319 11571 11571 I LayoutSmoke: ok   a layout that was rebuilt while hidden is still hidden
+10-26 15:45:49.319 11571 11571 I LayoutSmoke: after showing again: 26 of 26 controls are visible
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   showing the layout again shows every control
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a control does not pass movement on unless it is told to
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a control can be told to pass movement on
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   passing movement on survives being saved
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   copying a control copies the setting
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: movements passed on: 2
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a held control passes its finger's movement on
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a control without the setting passes nothing on
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a quick still tap with one finger is a click
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a tap that is held too long is not a click
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a tap that moved too far is not a click
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a finger that has already dragged does not also click
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   two fingers lifting within the wider limits is a click
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   two fingers are given more room than one
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   two fingers are given longer than one
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a finger lifting while another is still down is not a click
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a tap with two fingers is the right button
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   the right button is kept when the first finger lifts last
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a tap with one finger is the left button
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a touch right behind a tap starts dragging
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a tap long after the first one does not start dragging
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a touch with no tap before it does not start dragging
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: trackpad: two-finger tap limit 320ms within 32px, drag after a tap within 600ms
+10-26 15:45:49.320 11571 11571 I LayoutSmoke: ok   a control is in the layout for the typing check
+10-26 15:45:49.332 11571 11571 I LayoutSmoke: ok   the drawer has a field for the position
+10-26 15:45:49.332 11571 11571 I LayoutSmoke: ok   a half typed number is not acted on
+10-26 15:45:49.332 11571 11571 I LayoutSmoke: ok   a number typed so far is not acted on
+10-26 15:45:49.332 11571 11571 I LayoutSmoke: ok   nothing was acted on while typing
+10-26 15:45:49.332 11571 11571 I LayoutSmoke: ok   the field remembers what was typed
+10-26 15:45:49.332 11571 11571 I LayoutSmoke: ok   the field knows the entry is unfinished
+10-26 15:45:49.333 11571 11571 I LayoutSmoke: typed 1024: left was 35045, came out 1024
+10-26 15:45:49.333 11571 11571 I LayoutSmoke: ok   finishing the entry applies the number
+10-26 15:45:49.333 11571 11571 I LayoutSmoke: ok   the entry is no longer waiting
+10-26 15:45:49.333 11571 11571 I LayoutSmoke: ok   a newly typed number waits again
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: settings keys: 41 [category_basic_settings, list_resolution, list_fps, seekbar_bitrate_kbps, frame_pacing, checkbox_stretch_video, list_audio_config, checkbox_enable_audiofx, category_gamepad_settings, seekbar_deadzone, checkbox_multi_controller, checkbox_usb_driver, checkbox_usb_bind_all, checkbox_mouse_emulation, analog_scrolling, checkbox_vibrate_fallback, seekbar_vibrate_fallback_strength, checkbox_flip_face_buttons, checkbox_gamepad_touchpad_as_mouse, checkbox_gamepad_motion_sensors, checkbox_gamepad_motion_fallback, category_input_settings, checkbox_mouse_nav_buttons, checkbox_absolute_mouse_mode, checkbox_enable_sops, checkbox_host_audio, category_ui_settings, checkbox_enable_pip, list_languages, checkbox_small_icon_mode, category_advanced_settings, checkbox_unlock_fps, checkbox_reduce_refresh_rate, checkbox_disable_warnings, video_format, checkbox_enable_hdr, checkbox_full_range, checkbox_enable_perf_overlay, checkbox_enable_post_stream_toast, category_about, open_source_licenses]
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings no longer offer checkbox_touchscreen_trackpad
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings no longer offer checkbox_show_onscreen_controls
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings no longer offer checkbox_vibrate_osc
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings no longer offer checkbox_only_show_L3R3
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings no longer offer checkbox_show_guide_button
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings no longer offer seekbar_osc_opacity
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings no longer offer checkbox_show_universal_layout
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings still offer the video options
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings still offer the mouse options
+10-26 15:45:49.334 11571 11571 I LayoutSmoke: ok   the settings still offer the advanced options
+10-26 15:45:49.346 11571 11571 I LayoutSmoke: menu rows: [Show keyboard, Touch input   ·   Touchpad, Touchpad mode   ·   Trackpad, Sensitivity, 100, On-screen controls, Layout, Opacity, 100, Extras, Vibration]
+10-26 15:45:49.346 11571 11571 I LayoutSmoke: ok   the stream menu has a row for the extra options
+10-26 15:45:49.346 11571 11571 I LayoutSmoke: ok   the extra options come last
+10-26 15:45:49.346 11571 11571 I LayoutSmoke: ok   the extra options unfold
+10-26 15:45:49.346 11571 11571 I LayoutSmoke: ok   the extra options hold the vibration switch
+10-26 15:45:49.346 11571 11571 I LayoutSmoke: ok   the vibration switch can be pressed
+10-26 15:45:49.346 11571 11571 I LayoutSmoke: ok   the vibration switch turns vibration off
+10-26 15:45:49.346 11571 11571 I LayoutSmoke: ok   the vibration switch can be pressed again
+10-26 15:45:49.346 11571 11571 I LayoutSmoke: ok   the vibration switch turns vibration back on
+10-26 15:45:49.357 11571 11571 I LayoutSmoke: editor checkboxes: [Toggle (tap to press, tap again to release), Pass through to touch (hold and move to look around)]
+10-26 15:45:49.357 11571 11571 I LayoutSmoke: ok   the editor offers the toggle
+10-26 15:45:49.357 11571 11571 I LayoutSmoke: ok   the editor offers pass through
+10-26 15:45:49.357 11571 11571 I LayoutSmoke: ok   pass through sits under the toggle
+10-26 15:45:49.357 11571 11571 I LayoutSmoke: ok   pass through follows the toggle directly
+10-26 15:45:49.357 11571 11571 I LayoutSmoke: ok   the toggle is available while pass through is off
+10-26 15:45:49.357 11571 11571 I LayoutSmoke: ok   pass through can be turned on
+10-26 15:45:49.357 11571 11571 I LayoutSmoke: ok   the control now passes movement on
+10-26 15:45:49.357 11571 11571 I LayoutSmoke: ok   pass through is marked as on
+10-26 15:45:49.364 11571 11571 I LayoutSmoke: ok   the toggle is out of reach while pass through is on
+10-26 15:45:49.364 11571 11571 I LayoutSmoke: ok   the toggle is off while pass through is on
+10-26 15:45:49.370 11571 11571 I LayoutSmoke: ok   pass through wins over a toggle set beforehand
+10-26 15:45:49.376 11571 11571 I LayoutSmoke: ok   the toggle comes back once pass through is off
+10-26 15:45:49.376 11571 11571 I LayoutSmoke: ok   the layouts screen no longer offers the master switch
+10-26 15:45:49.376 11571 11571 I LayoutSmoke: ok   the layouts screen no longer offers the transparency slider
+10-26 15:45:49.376 11571 11571 I LayoutSmoke: ok   the layouts screen no longer labels the transparency
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: ok   the layouts screen still builds
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: ok   the layouts screen still has its grid
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: pad events: [Pad: A, Pad: B, Pad: X, Pad: Y, Pad: D-pad Up, Pad: D-pad Down, Pad: D-pad Left, Pad: D-pad Right, Pad: LB, Pad: RB, Pad: LT, Pad: RT, Pad: Left stick click, Pad: Right stick click, Pad: Start, Pad: Back, Pad: Guide, Pad: Touchpad, Pad: Paddle 1, Pad: Paddle 2, Pad: Paddle 3, Pad: Paddle 4, Pad: Share / Capture]
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: ok   the shoulder buttons are offered
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: ok   the triggers are named like the other pad buttons
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: ok   the triggers sit next to the shoulder buttons
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: ok   no event is named the old way
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: ok   a trigger event says which trigger it is
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: ok   the layout has a right stick
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: stick axes: up=30718 down=-30718
+10-26 15:45:49.379 11571 11571 I LayoutSmoke: ok   the on-screen right stick reports up as positive
+10-26 15:45:49.380 11571 11571 I LayoutSmoke: ok   the on-screen right stick reports down as negative
+10-26 15:45:49.380 11571 11571 I LayoutSmoke: stick thumb: up=45.0 down=255.0
+10-26 15:45:49.380 11571 11571 I LayoutSmoke: ok   the thumb is drawn above the middle when the finger is above it
+10-26 15:45:49.380 11571 11571 I LayoutSmoke: ok   the thumb is drawn below the middle when the finger is below it
+10-26 15:45:49.380 11571 11571 I LayoutSmoke: ok   a flipped stick sends the opposite direction
+10-26 15:45:49.380 11571 11571 I LayoutSmoke: ok   a flipped stick still draws the thumb under the finger
+10-26 15:45:49.380 11571 11571 I LayoutSmoke: ok   a stick that is not flipped saves without the flip
+10-26 15:45:49.380 11571 11571 I LayoutSmoke: ok   the flip is saved with the stick
+10-26 15:45:49.389 11571 11571 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 0
+10-26 15:45:49.401 11571 11571 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 1
+10-26 15:45:49.402 11571 11571 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 1
+10-26 15:45:49.402 11571 11571 I LayoutSmoke: sensitivity for mode 1: 147
+10-26 15:45:49.402 11571 11571 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 1
+10-26 15:45:49.414 11571 11571 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 5
+10-26 15:45:49.414 11571 11571 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 5
+10-26 15:45:49.414 11571 11571 I LayoutSmoke: sensitivity for mode 5: 147
+10-26 15:45:49.414 11571 11571 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 5
+10-26 15:45:49.426 11571 11571 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 2
+10-26 15:45:49.427 11571 11571 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 2
+10-26 15:45:49.427 11571 11571 I LayoutSmoke: sensitivity for mode 2: 147
+10-26 15:45:49.427 11571 11571 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 2
+10-26 15:45:49.435 11571 11571 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 4
+10-26 15:45:49.445 11571 11571 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 3
+10-26 15:45:49.446 11571 11571 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 3
+10-26 15:45:49.446 11571 11571 I LayoutSmoke: sensitivity for mode 3: 147
+10-26 15:45:49.446 11571 11571 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 3
+10-26 15:45:49.455 11571 11571 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 6
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 6
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: sensitivity for mode 6: 147
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 6
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   nothing is followed at first
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   a finger on the background is followed
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   a finger on a control is not counted
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   two fingers on the background are two
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   the first finger is still the first
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   the second finger is the second
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   lifting one finger leaves one
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   the remaining finger is found by its id
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   a slot that is done holds no finger
+10-26 15:45:49.456 11571 11571 I LayoutSmoke: ok   a cancelled gesture follows nothing
+10-26 15:45:52.242 16265 16265 I LayoutSmoke: ok   the built-in layout exists
+10-26 15:45:52.242 16265 16265 I LayoutSmoke: ok   the built-in layout cannot be deleted
+10-26 15:45:52.243 16265 16265 I LayoutSmoke: ok   a layout can be created
+10-26 15:45:52.243 16265 16265 I LayoutSmoke: ok   a new layout becomes the selected one
+10-26 15:45:52.243 16265 16265 I LayoutSmoke: ok   a duplicate name is made unique
+10-26 15:45:52.244 16265 16265 I LayoutSmoke: ok   the selected layout can be changed
+10-26 15:45:52.245 16265 16265 I LayoutSmoke: ok   a layout can be deleted
+10-26 15:45:52.245 16265 16265 I LayoutSmoke: ok   deleting the selected layout selects another
+10-26 15:45:52.245 16265 16265 I LayoutSmoke: ok   the editor is open
+10-26 15:45:52.245 16265 16265 I LayoutSmoke: ok   the editor built a controller
+10-26 15:45:52.245 16265 16265 I LayoutSmoke: ok   the layout has controls
+10-26 15:45:52.245 16265 16265 I LayoutSmoke: ok   the drawer is hidden while nothing is selected
+10-26 15:45:52.245 16265 16265 I LayoutSmoke: ok   every control has a configuration
+10-26 15:45:52.295 16265 16265 I LayoutSmoke: ok   a tapped control becomes the selected one
+10-26 15:45:52.295 16265 16265 I LayoutSmoke: ok   the selected control is marked
+10-26 15:45:52.296 16265 16265 I LayoutSmoke: ok   the panel has rows for the selected control
+10-26 15:45:52.296 16265 16265 I LayoutSmoke: ok   a control can be duplicated
+10-26 15:45:52.296 16265 16265 I LayoutSmoke: ok   the duplicate is added
+10-26 15:45:52.296 16265 16265 I LayoutSmoke: duplicate: first=1 copy=1015 next=1016
+10-26 15:45:52.296 16265 16265 I LayoutSmoke: ok   the duplicate has its own ID
+10-26 15:45:52.296 16265 16265 I LayoutSmoke: controls sharing the duplicate's ID: 0
+10-26 15:45:52.296 16265 16265 I LayoutSmoke: ok   no other control shares the duplicate's ID
+10-26 15:45:52.296 16265 16265 I LayoutSmoke: ok   a size can be pasted onto another control
+10-26 15:45:52.298 16265 16265 I LayoutSmoke: ok   a control can be deleted
+10-26 15:45:52.298 16265 16265 I LayoutSmoke: ok   a button can be added
+10-26 15:45:52.298 16265 16265 I LayoutSmoke: ok   the added button has a button configuration
+10-26 15:45:52.298 16265 16265 I LayoutSmoke: ok   a stick can be added
+10-26 15:45:52.298 16265 16265 I LayoutSmoke: ok   the added stick has a stick configuration
+10-26 15:45:52.298 16265 16265 I LayoutSmoke: ok   two controls were added
+10-26 15:45:52.319 16265 16265 I LayoutSmoke: ok   the stick becomes the selected one
+10-26 15:45:52.319 16265 16265 I LayoutSmoke: ok   the panel has rows for a stick
+10-26 15:45:52.329 16265 16265 I LayoutSmoke: ok   the button becomes the selected one again
+10-26 15:45:52.329 16265 16265 I LayoutSmoke: ok   the layout can be marked as having unsaved changes
+10-26 15:45:52.329 16265 16265 I LayoutSmoke: ok   the unsaved marker can be cleared
+10-26 15:45:52.331 16265 16265 I LayoutSmoke: ok   the layout was saved
+10-26 15:45:52.331 16265 16265 I LayoutSmoke: ok   the saved layout records its size
+10-26 15:45:52.331 16265 16265 I LayoutSmoke: ok   every control was saved
+10-26 15:45:52.331 16265 16265 I LayoutSmoke: ok   the saved form carries element IDs
+10-26 15:45:52.331 16265 16265 I LayoutSmoke: ok   the saved form carries actions
+10-26 15:45:52.334 16265 16265 I LayoutSmoke: ok   the saved layout can be rebuilt
+10-26 15:45:52.355 16265 16265 I LayoutSmoke: ok   a tap on a control selects it
+10-26 15:45:52.355 16265 16265 I LayoutSmoke: ok   selecting a control shows the drawer
+10-26 15:45:52.355 16265 16265 I LayoutSmoke: ok   tapping empty space clears the selection
+10-26 15:45:52.355 16265 16265 I LayoutSmoke: ok   tapping empty space hides the drawer
+10-26 15:45:52.376 16265 16265 I LayoutSmoke: ok   a touch on empty space clears the selection
+10-26 15:45:52.376 16265 16265 I LayoutSmoke: ok   a touch on empty space hides the drawer
+10-26 15:45:52.395 16265 16265 I LayoutSmoke: ok   dragging a control moves it
+10-26 15:45:52.395 16265 16265 I LayoutSmoke: ok   dragging keeps the control at or after the origin
+10-26 15:45:52.395 16265 16265 I LayoutSmoke: ok   the control can be put back
+10-26 15:45:53.328 16265 16265 I LayoutSmoke: ok   holding a control reaches the editor as a hold
+10-26 15:45:53.328 16265 16265 I LayoutSmoke: ok   holding a control does not drag it
+10-26 15:45:53.328 16265 16265 I LayoutSmoke: ok   the floating settings button is on screen
+10-26 15:45:53.328 16265 16265 I LayoutSmoke: ok   the floating settings button is visible
+10-26 15:45:54.150 16265 16265 I LayoutSmoke: ok   the settings button opens the layout menu
+10-26 15:45:54.150 16265 16265 I LayoutSmoke: ok   the layout menu offers adding a button
+10-26 15:45:54.150 16265 16265 I LayoutSmoke: ok   the layout menu offers adding a stick
+10-26 15:45:54.150 16265 16265 I LayoutSmoke: ok   the layout menu offers adding a D-pad
+10-26 15:45:54.150 16265 16265 I LayoutSmoke: ok   the layout menu offers saving
+10-26 15:45:54.150 16265 16265 I LayoutSmoke: ok   the layout menu offers saving as
+10-26 15:45:54.150 16265 16265 I LayoutSmoke: ok   the layout menu offers leaving
+10-26 15:45:54.967 16265 16265 I LayoutSmoke: ok   choosing save as opens a dialog
+10-26 15:45:54.967 16265 16265 I LayoutSmoke: ok   the save as dialog asks for a name
+10-26 15:45:54.987 16265 16265 I LayoutSmoke: ok   the back gesture is handled through the registered callback
+10-26 15:45:54.987 16265 16265 I LayoutSmoke: ok   the back gesture asks about unsaved changes like the Exit entry does
+10-26 15:45:54.990 16265 16265 I LayoutSmoke: ok   the width slider is on screen
+10-26 15:45:54.990 16265 16265 I LayoutSmoke: ok   the height slider is on screen
+10-26 15:45:54.993 16265 16265 I LayoutSmoke: ok   dragging the width slider applies the width
+10-26 15:45:54.993 16265 16265 I LayoutSmoke: ok   dragging the width slider leaves the height alone
+10-26 15:45:54.994 16265 16265 I LayoutSmoke: ok   dragging the height slider applies the height
+10-26 15:45:54.994 16265 16265 I LayoutSmoke: ok   dragging the height slider keeps the dragged width
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   a rebuilt width row shows the size the control has
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   a rebuilt height row shows the size the control has
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   the layout has a stick
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   the middle of the stick does nothing while it is switched off
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   the middle of the stick presses its binding once switched on
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   moving the stick does not also press its middle button
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   a trigger event pulls the left trigger
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   a trigger event pulls the right trigger
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   releasing a trigger event lets the left trigger out
+10-26 15:45:55.018 16265 16265 I LayoutSmoke: ok   releasing a trigger event lets the right trigger out
+10-26 15:45:55.019 16265 16265 I LayoutSmoke: ok   a D-pad can be added
+10-26 15:45:55.019 16265 16265 I LayoutSmoke: ok   the added D-pad has a D-pad configuration
+10-26 15:45:55.019 16265 16265 I LayoutSmoke: ok   adding a D-pad adds one control
+10-26 15:45:55.040 16265 16265 I LayoutSmoke: ok   the D-pad becomes the selected one
+10-26 15:45:55.040 16265 16265 I LayoutSmoke: ok   the panel has rows for a D-pad
+10-26 15:45:55.042 16265 16265 I LayoutSmoke: ok   a corner radius survives being saved and loaded
+10-26 15:45:55.042 16265 16265 I LayoutSmoke: ok   the panel offers a corner radius slider
+10-26 15:45:55.042 16265 16265 I LayoutSmoke: ok   the corner radius reaches the control
+10-26 15:45:55.042 16265 16265 I LayoutSmoke: ok   a size can be copied
+10-26 15:45:55.063 16265 16265 I LayoutSmoke: ok   a pasted size brings the width
+10-26 15:45:55.063 16265 16265 I LayoutSmoke: ok   a pasted size brings the height
+10-26 15:45:55.063 16265 16265 I LayoutSmoke: ok   a pasted size brings the corner radius
+10-26 15:45:55.063 16265 16265 I LayoutSmoke: ok   a pasted size leaves the position alone
+10-26 15:45:55.064 16265 16265 I LayoutSmoke: ok   a held button looks pressed
+10-26 15:45:55.074 16265 16265 I LayoutSmoke: ok   a released button stops looking pressed
+10-26 15:45:55.074 16265 16265 I LayoutSmoke: ok   a released button is not left holding its action
+10-26 15:45:55.074 16265 16265 I LayoutSmoke: ok   a latched button stays lit after the finger is lifted
+10-26 15:45:55.074 16265 16265 I LayoutSmoke: ok   a latched button goes out on the next tap
+10-26 15:45:55.074 16265 16265 I LayoutSmoke: ok   the layout opacity is read from the settings
+10-26 15:45:55.074 16265 16265 I LayoutSmoke: ok   the layout opacity reaches every control
+10-26 15:45:55.080 16265 16265 I LayoutSmoke: ok   drawing honours the layout opacity
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the D-pad answers to the up button
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the D-pad answers to the down button
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the D-pad answers to the left button
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the D-pad answers to the right button
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   a diagonal between two arms presses two directions
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   a press on the up arm off to one side presses only up
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   a press on the left arm off to one side presses only left
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   a press outside the D-pad presses nothing
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the up zone reaches wider than the drawn button
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the left zone reaches taller than the drawn button
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the up button is drawn above the middle
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the down button is drawn below the middle
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the left button is drawn left of the middle
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the right button is drawn right of the middle
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   pressing near the top edge does not also press left or right
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   pressing near the left edge does not also press up or down
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   the middle of the D-pad presses nothing
+10-26 15:45:55.081 16265 16265 I LayoutSmoke: ok   there is a control that is not being edited
+10-26 15:45:55.104 16265 16265 I LayoutSmoke: ok   moving a control that is not being edited is an unsaved change
+10-26 15:45:55.126 16265 16265 I LayoutSmoke: ok   the drag moved the control on screen
+10-26 15:45:55.126 16265 16265 I LayoutSmoke: ok   a dragged control is written where it is on screen
+10-26 15:45:55.126 16265 16265 I LayoutSmoke: ok   a dragged control keeps its size when it is written
+10-26 15:45:55.126 16265 16265 I LayoutSmoke: ok   a control read back from a save is where it was saved
+10-26 15:45:55.129 16265 16265 I LayoutSmoke: ok   the saved profile holds the position the control was dragged to
+10-26 15:45:55.132 16265 16265 I LayoutSmoke: ok   the on-screen layout names player one
+10-26 15:45:55.132 16265 16265 I LayoutSmoke: ok   no on-screen layout leaves player one out
+10-26 15:45:55.138 16265 16265 I LayoutSmoke: ok   the built-in layout has a left trigger
+10-26 15:45:55.138 16265 16265 I LayoutSmoke: ok   the left trigger is an ordinary button
+10-26 15:45:55.138 16265 16265 I LayoutSmoke: ok   no control is of a trigger kind any more
+10-26 15:45:55.138 16265 16265 I LayoutSmoke: ok   a trigger pulls its axis with the action the layout gives it
+10-26 15:45:55.138 16265 16265 I LayoutSmoke: ok   a trigger lets its axis out again
+10-26 15:45:55.139 16265 16265 I LayoutSmoke: ok   a weak reading on its own is kept
+10-26 15:45:55.139 16265 16265 I LayoutSmoke: ok   a pushed axis is not flipped by another controller's drift
+10-26 15:45:55.139 16265 16265 I LayoutSmoke: ok   the stronger reading wins whichever way it points
+10-26 15:45:55.139 16265 16265 I LayoutSmoke: ok   combining by bits would have flipped the sign
+10-26 15:45:55.139 16265 16265 I LayoutSmoke: ok   a direction bound to a pad button says so
+10-26 15:45:55.139 16265 16265 I LayoutSmoke: ok   a pad binding is recognised again
+10-26 15:45:55.139 16265 16265 I LayoutSmoke: ok   a pad binding sends one gamepad event
+10-26 15:45:55.158 16265 16265 I LayoutSmoke: ok   a direction bound to a key counts as assigned
+10-26 15:45:55.158 16265 16265 I LayoutSmoke: ok   a key binding is recognised again
+10-26 15:45:55.158 16265 16265 I LayoutSmoke: ok   a key binding does not leave a pad button behind
+10-26 15:45:55.158 16265 16265 I LayoutSmoke: ok   a key binding sends one keyboard event
+10-26 15:45:55.158 16265 16265 I LayoutSmoke: ok   a key binding can be read back after being written
+10-26 15:45:55.158 16265 16265 I LayoutSmoke: ok   binding a pad button again clears the key
+10-26 15:45:55.158 16265 16265 I LayoutSmoke: ok   a control added to a faded layout is faded as well
+10-26 15:45:55.162 16265 16265 I LayoutSmoke: dpad at rest: up=10 down=9 left=9 right=9
+10-26 15:45:55.162 16265 16265 I LayoutSmoke: ok   the arms of a D-pad look the same when nothing is pressed
+10-26 15:45:55.163 16265 16265 I LayoutSmoke: dpad left pressed: up=10 down=9 left=12 right=9
+10-26 15:45:55.163 16265 16265 I LayoutSmoke: ok   pressing left lights the left arm
+10-26 15:45:55.163 16265 16265 I LayoutSmoke: ok   pressing left does not light the up arm
+10-26 15:45:55.163 16265 16265 I LayoutSmoke: ok   pressing left does not light the down arm
+10-26 15:45:55.163 16265 16265 I LayoutSmoke: ok   pressing left does not light the right arm
+10-26 15:45:55.164 16265 16265 I LayoutSmoke: ok   an untouched button is not pressed
+10-26 15:45:55.177 16265 16265 I LayoutSmoke: ok   one tap latches the toggle on
+10-26 15:45:55.177 16265 16265 I LayoutSmoke: ok   the second tap lets the toggle go
+10-26 15:45:55.193 16265 16265 I LayoutSmoke: toggle off differs from its untouched self in 0 pixels, first at -1,0
+10-26 15:45:55.193 16265 16265 I LayoutSmoke: ok   a toggle switched off looks like it did before it was pressed
+10-26 15:45:55.196 16265 16265 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/toggle-before.png
+10-26 15:45:55.198 16265 16265 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/toggle-after.png
+10-26 15:45:55.199 16265 16265 I LayoutSmoke: arm up: rgb=40,45,52 alpha=198 bounds=111.0,-7.6293945E-6 189.0,138.0
+10-26 15:45:55.199 16265 16265 I LayoutSmoke: arm down: rgb=35,39,45 alpha=202 bounds=111.0,162.0 189.0,300.0
+10-26 15:45:55.199 16265 16265 I LayoutSmoke: arm left: rgb=38,42,48 alpha=200 bounds=-7.6293945E-6,111.0 138.0,189.0
+10-26 15:45:55.199 16265 16265 I LayoutSmoke: arm right: rgb=38,42,48 alpha=200 bounds=162.0,111.0 300.0,189.0
+10-26 15:45:55.199 16265 16265 I LayoutSmoke: ok   every arm of a D-pad has the same transparency
+10-26 15:45:55.199 16265 16265 I LayoutSmoke: ok   every arm of a D-pad has the same shade
+10-26 15:45:55.207 16265 16265 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/dpad-at-rest.png
+10-26 15:45:55.211 16265 16265 I LayoutSmoke: glow at the edge: button=219 dpad arm=222
+10-26 15:45:55.211 16265 16265 I LayoutSmoke: ok   a pressed arm of a D-pad is lit like a pressed button
+10-26 15:45:55.211 16265 16265 I LayoutSmoke: alpha at the sharp corner of an arm: 0
+10-26 15:45:55.211 16265 16265 I LayoutSmoke: ok   the light of an arm does not stick out past its rounded corner
+10-26 15:45:55.221 16265 16265 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/dpad-pressed.png
+10-26 15:45:55.221 16265 16265 I LayoutSmoke: ok   a control is in the layout for the leaving check
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   editing marks the layout as having unsaved changes
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   editing does not write the stored layout
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   answering don't save clears the unsaved marker
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   answering don't save leaves the stored layout as it was
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   a control is in the layout for the position check
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   the editor knows how big the layout area is
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   the drawer has a position slider for x
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   the drawer has a position slider for y
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: area=2510x1156 x slider max=2426 y slider max=1072
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   the x slider stops before the right edge
+10-26 15:45:55.245 16265 16265 I LayoutSmoke: ok   the y slider stops before the bottom edge
+10-26 15:45:55.246 16265 16265 I LayoutSmoke: ok   the row keeps a typed value the slider cannot show
+10-26 15:45:55.246 16265 16265 I LayoutSmoke: typed 9999,9999 placed at 2426,1072 within 2510x1156
+10-26 15:45:55.246 16265 16265 I LayoutSmoke: ok   a typed position keeps the control inside the layout
+10-26 15:45:55.246 16265 16265 I LayoutSmoke: ok   a typed position keeps a piece of the control on screen
+10-26 15:45:55.246 16265 16265 I LayoutSmoke: ok   a typed position is held back rather than thrown to zero
+10-26 15:45:55.246 16265 16265 I LayoutSmoke: ok   the piece left on screen is wide enough to press
+10-26 15:45:55.247 16265 16265 I LayoutSmoke: dragged to left=300 forced to 2426,1072 within 2510x1156
+10-26 15:45:55.247 16265 16265 I LayoutSmoke: ok   dragging a control to the right edge keeps a piece on screen
+10-26 15:45:55.247 16265 16265 I LayoutSmoke: ok   dragging a control to the bottom edge keeps a piece on screen
+10-26 15:45:55.247 16265 16265 I LayoutSmoke: ok   a control dragged to the limit can still be pressed
+10-26 15:45:55.271 16265 16265 I LayoutSmoke: ok   a control is in the layout for the actions check
+10-26 15:45:55.271 16265 16265 I LayoutSmoke: drawer buttons: [Pad: D-pad Up, Remove, Add event, Remove step, Add step, Pad: D-pad Down, Remove, Add event, Remove step, Add step, Pad: D-pad Left, Remove, Add event, Remove step, Add step, Pad: D-pad Right, Remove, Add event, Remove step, Add step, Copy size, Paste size, Duplicate, Delete]
+10-26 15:45:55.271 16265 16265 I LayoutSmoke: ok   the drawer offers duplicating a control
+10-26 15:45:55.271 16265 16265 I LayoutSmoke: ok   the drawer offers copying the size of a control
+10-26 15:45:55.271 16265 16265 I LayoutSmoke: ok   the drawer offers deleting a control
+10-26 15:45:55.271 16265 16265 I LayoutSmoke: ok   pasting is offered exactly when a size has been copied
+10-26 15:45:55.271 16265 16265 I LayoutSmoke: ok   pasting is offered once a size is copied
+10-26 15:45:55.294 16265 16265 I LayoutSmoke: ok   holding a control selects it instead of opening a menu
+10-26 15:45:55.294 16265 16265 I LayoutSmoke: ok   holding a control leaves no dialog behind
+10-26 15:45:55.294 16265 16265 I LayoutSmoke: ok   a control is in the layout for the drag check
+10-26 15:45:55.296 16265 16265 I LayoutSmoke: ok   no control is selected to begin with
+10-26 15:45:55.296 16265 16265 I LayoutSmoke: ok   the drawer is closed with nothing selected
+10-26 15:45:55.317 16265 16265 I LayoutSmoke: ok   dragging a control selects it
+10-26 15:45:55.317 16265 16265 I LayoutSmoke: ok   dragging a control opens its drawer
+10-26 15:45:55.342 16265 16265 I LayoutSmoke: actions in order: copy=20 paste=21 duplicate=22 delete=23
+10-26 15:45:55.342 16265 16265 I LayoutSmoke: ok   copying and pasting share a row
+10-26 15:45:55.342 16265 16265 I LayoutSmoke: ok   duplicating comes after copying and pasting
+10-26 15:45:55.342 16265 16265 I LayoutSmoke: ok   deleting is the last of the actions
+10-26 15:45:55.342 16265 16265 I LayoutSmoke: ok   nothing is out of reach once a size is copied
+10-26 15:45:55.365 16265 16265 I LayoutSmoke: out of reach: [Paste size]
+10-26 15:45:55.365 16265 16265 I LayoutSmoke: ok   pasting is out of reach before a size is copied
+10-26 15:45:55.365 16265 16265 I LayoutSmoke: ok   pasting is still shown, so the row does not move
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: 200x100 (100,50) 25x25 -> 400x400 (200,200) 50x50
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: ok   a moved control keeps its place across the screen
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: ok   a moved control keeps its place down the screen
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: ok   a moved control is not stretched
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: ok   a control on a wider screen doubles where it sat
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: ok   a control on a wider screen keeps its height
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: ok   a control on a wider screen is not stretched sideways
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: ok   a layout opened on its own screen is left alone
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: ok   a control is in the layout for the fitting check
+10-26 15:45:55.366 16265 16265 I LayoutSmoke: before fitting: config has 100,50 25x25
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: layout says it was arranged on 200x100
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: fitted from 200x100 to 2510x1156: 1255,578 289x289 expected 1255,578 289x289
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a control keeps its share of the screen across
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a control keeps its share of the screen down
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a control is not stretched by the fitting
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   fitting a layout marks it as having unsaved changes
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a fitted layout is remembered as fitted
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   fitting a layout twice changes nothing the second time
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a layout can be written out and read back
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   the name of a layout survives being written out
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a layout file says which screen it was arranged on
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a control comes back where it was
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a control comes back the size it was
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a file that is not a layout is refused
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a layout from a newer version of the app is refused
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a control with no place is refused
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a shared layout is given a file name a file system accepts
+10-26 15:45:55.370 16265 16265 I LayoutSmoke: ok   a file name cannot escape its folder
+10-26 15:45:55.371 16265 16265 I LayoutSmoke: ok   an imported layout is created
+10-26 15:45:55.371 16265 16265 I LayoutSmoke: imported control: 2156,337 160x160 saved screen 2510x1156
+10-26 15:45:55.371 16265 16265 I LayoutSmoke: ok   importing does not shrink a control
+10-26 15:45:55.371 16265 16265 I LayoutSmoke: ok   importing does not move a control
+10-26 15:45:55.371 16265 16265 I LayoutSmoke: ok   an imported layout remembers the screen it was arranged on
+10-26 15:45:55.371 16265 16265 I LayoutSmoke: ok   an imported layout is not marked as already fitted
+10-26 15:45:55.372 16265 16265 I LayoutSmoke: ok   importing the same layout twice makes a second layout
+10-26 15:45:55.376 16265 16265 I LayoutSmoke: ok   a layout can be exported and imported
+10-26 15:45:55.377 16265 16265 I LayoutSmoke: ok   the layout comes back with the same number of controls
+10-26 15:45:55.377 16265 16265 I LayoutSmoke: export and import compared 27 controls, 0 changed
+10-26 15:45:55.377 16265 16265 I LayoutSmoke: ok   every control of an exported layout comes back
+10-26 15:45:55.377 16265 16265 I LayoutSmoke: ok   no control moves or changes size in an export and an import
+10-26 15:45:55.377 16265 16265 I LayoutSmoke: ok   a layout can be written out for sharing
+10-26 15:45:55.378 16265 16265 I LayoutSmoke: ok   a layout can be written to a share file
+10-26 15:45:55.378 16265 16265 I LayoutSmoke: shared as content://io.github.alexander0ezhov.lunarstreamlight.debug.fileprovider/Smoke-layout.json
+10-26 15:45:55.378 16265 16265 I LayoutSmoke: ok   the shared layout is offered under its file name
+10-26 15:45:55.378 16265 16265 I LayoutSmoke: ok   the shared layout can be read back through its address
+10-26 15:45:55.378 16265 16265 I LayoutSmoke: ok   a shared layout address cannot reach outside its folder
+10-26 15:45:55.402 16265 16265 I LayoutSmoke: ok   the stream menu starts closed
+10-26 15:45:55.402 16265 16265 I LayoutSmoke: ok   the stream menu has a sheet over the screen
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: ok   the first press of back opens the stream menu
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: ok   the stream menu is open after back
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: stream menu rows: [Show keyboard, Touch input   ·   Touchpad, Touchpad mode   ·   Trackpad, Sensitivity, 100, On-screen controls, Layout   ·   First layout, Opacity, 100, Extras, Vibration]
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: ok   the stream menu offers the keyboard
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: ok   the stream menu offers the touch setting
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: ok   the stream menu offers the layout
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: exit button: android.widget.Button{b5d8de1 VFED..C.. ......I. 0,0-0,0} text=Exit stream expected=Exit stream tree=FrameLayout[LinearLayout[TextView(Stream menu), ScrollView[LinearLayout[TextView(Show keyboard), LinearLayout[LinearLayout[TextView(Touch input   ·   Touchpad), ImageView], RadioGroup[RadioButton(Off), RadioButton(Touchpad), RadioButton(Touch native (experimental)), RadioButton(Right stick), RadioButton(Left stick)]], LinearLayout[LinearLayout[TextView(Touchpad mode   ·   Trackpad), ImageView], RadioGroup[RadioButton(Trackpad), RadioButton(Direct cursor), RadioButton(No clicks)]], LinearLayout[TextView(Sensitivity), SeekBar, TextView(100)], LinearLayout[TextView(On-screen controls), Switch()], LinearLayout[LinearLayout[TextView(Layout   ·   First layout), ImageView], RadioGroup[RadioButton(First layout), RadioButton(Second layout)]], LinearLayout[TextView(Opacity), SeekBar, TextView(100)], LinearLayout[LinearLayout[TextView(Extras), ImageView], LinearLayout[LinearLayout[TextView(Vibration), Switch()]]]]], LinearLayout[Button(Exit stream)]]]
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: ok   the transparency row is under the layout row
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: touch choices: [Off, Touchpad, Touch native (experimental), Right stick, Left stick]
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: ok   the touch modes are offered in the order the user asked for
+10-26 15:45:55.408 16265 16265 I LayoutSmoke: ok   the touchpad's own row appears with the touchpad
+10-26 15:45:55.409 16265 16265 I LayoutSmoke: touchpad choices: [Trackpad, Direct cursor, No clicks]
+10-26 15:45:55.409 16265 16265 I LayoutSmoke: ok   the touchpad offers its three kinds in order
+10-26 15:45:55.415 16265 16265 I LayoutSmoke: ok   choosing the kind of touchpad keeps the menu open
+10-26 15:45:55.415 16265 16265 I LayoutSmoke: ok   the kind of touchpad is reported
+10-26 15:45:55.421 16265 16265 I LayoutSmoke: ok   choosing a layout keeps the menu open
+10-26 15:45:55.421 16265 16265 I LayoutSmoke: ok   the main list reports the touchpad
+10-26 15:45:55.421 16265 16265 I LayoutSmoke: ok   the menu names the native touch mode as the user asked
+10-26 15:45:55.421 16265 16265 I LayoutSmoke: ok   the native touch mode is called what the user asked for
+10-26 15:45:55.421 16265 16265 I LayoutSmoke: ok   the cursor-following touchpad is called what it is
+10-26 15:45:55.421 16265 16265 I LayoutSmoke: ok   the stream menu has a button to leave the stream
+10-26 15:45:55.421 16265 16265 I LayoutSmoke: ok   a press of back while the menu is open is used
+10-26 15:45:55.421 16265 16265 I LayoutSmoke: ok   a press of back while the menu is open leaves the stream
+10-26 15:45:55.422 16265 16265 I LayoutSmoke: ok   tapping outside the stream menu closes it
+10-26 15:45:55.422 16265 16265 I LayoutSmoke: ok   tapping outside the stream menu does not leave the stream
+10-26 15:45:55.428 16265 16265 I LayoutSmoke: ok   the touch setting unfolds
+10-26 15:45:55.432 16265 16265 I LayoutSmoke: ok   the touch setting offers turning the touchscreen off
+10-26 15:45:55.432 16265 16265 I LayoutSmoke: ok   choosing a touch mode reports it
+10-26 15:45:55.432 16265 16265 I LayoutSmoke: ok   choosing a touch mode keeps the menu open
+10-26 15:45:55.432 16265 16265 I LayoutSmoke: ok   the touch setting unfolds again
+10-26 15:45:55.438 16265 16265 I LayoutSmoke: ok   the touch setting offers the right stick
+10-26 15:45:55.438 16265 16265 I LayoutSmoke: ok   the right stick can be chosen
+10-26 15:45:55.438 16265 16265 I LayoutSmoke: ok   the layout row unfolds
+10-26 15:45:55.443 16265 16265 I LayoutSmoke: ok   a layout can be chosen
+10-26 15:45:55.443 16265 16265 I LayoutSmoke: ok   choosing a layout reports it
+10-26 15:45:55.443 16265 16265 I LayoutSmoke: ok   choosing a layout keeps the menu open
+10-26 15:45:55.443 16265 16265 I LayoutSmoke: ok   the keyboard row answers a press
+10-26 15:45:55.443 16265 16265 I LayoutSmoke: ok   the keyboard row asks for the keyboard
+10-26 15:45:55.443 16265 16265 I LayoutSmoke: ok   the keyboard row closes the menu
+10-26 15:45:55.448 16265 16265 I LayoutSmoke: ok   the button at the bottom leaves the stream
+10-26 15:45:55.448 16265 16265 I LayoutSmoke: ok   a row that unfolds has an arrow
+10-26 15:45:55.448 16265 16265 I LayoutSmoke: ok   the arrow of a closed row points down
+10-26 15:45:55.448 16265 16265 I LayoutSmoke: ok   the arrow turns over while the row is open
+10-26 15:45:55.448 16265 16265 I LayoutSmoke: ok   the arrow points down again once the row is closed
+10-26 15:45:55.448 16265 16265 I LayoutSmoke: ok   a row that unfolds has an arrow on the layout row too
+10-26 15:45:55.448 16265 16265 I LayoutSmoke: ok   a row that does not unfold has no arrow
+10-26 15:45:55.448 16265 16265 I LayoutSmoke: ok   the choices of a row are exclusive
+10-26 15:45:55.448 16265 16265 I LayoutSmoke: ok   only one touch mode is marked at a time
+10-26 15:45:55.452 16265 16265 I LayoutSmoke: ok   choosing another mode leaves one marked
+10-26 15:45:55.457 16265 16265 I LayoutSmoke: ok   the experimental real touch mode can be chosen
+10-26 15:45:55.457 16265 16265 I LayoutSmoke: ok   the experimental mode is reported
+10-26 15:45:55.457 16265 16265 I LayoutSmoke: ok   the switch for the on-screen controls is its own row
+10-26 15:45:55.457 16265 16265 I LayoutSmoke: ok   the controls are shown to begin with
+10-26 15:45:55.457 16265 16265 I LayoutSmoke: ok   the switch turns the controls off
+10-26 15:45:55.457 16265 16265 I LayoutSmoke: ok   the switch turns the controls back on
+10-26 15:45:55.457 16265 16265 I LayoutSmoke: layout choices: [First layout, Second layout]
+10-26 15:45:55.457 16265 16265 I LayoutSmoke: ok   the layout list holds only layouts
+10-26 15:45:55.457 16265 16265 I LayoutSmoke: ok   the menu has an opacity slider
+10-26 15:45:55.459 16265 16265 I LayoutSmoke: ok   the opacity slider can be dragged
+10-26 15:45:55.459 16265 16265 I LayoutSmoke: opacity from the menu slider: 41
+10-26 15:45:55.459 16265 16265 I LayoutSmoke: ok   dragging the opacity slider reports a new value
+10-26 15:45:55.459 16265 16265 I LayoutSmoke: ok   a control is in the layout for the delete check
+10-26 15:45:55.459 16265 16265 I LayoutSmoke: ok   editing a control opens its drawer
+10-26 15:45:55.459 16265 16265 I LayoutSmoke: ok   the control is the selected one
+10-26 15:45:55.462 16265 16265 I LayoutSmoke: ok   deleting the edited control clears the selection
+10-26 15:45:55.462 16265 16265 I LayoutSmoke: ok   deleting the edited control closes its drawer
+10-26 15:45:55.464 16265 16265 I LayoutSmoke: ok   hiding the layout hides its controls
+10-26 15:45:55.464 16265 16265 I LayoutSmoke: ok   the controller says the layout is hidden
+10-26 15:45:55.468 16265 16265 I LayoutSmoke: ok   a layout that was rebuilt while hidden is still hidden
+10-26 15:45:55.468 16265 16265 I LayoutSmoke: after showing again: 26 of 26 controls are visible
+10-26 15:45:55.468 16265 16265 I LayoutSmoke: ok   showing the layout again shows every control
+10-26 15:45:55.468 16265 16265 I LayoutSmoke: ok   a control does not pass movement on unless it is told to
+10-26 15:45:55.468 16265 16265 I LayoutSmoke: ok   a control can be told to pass movement on
+10-26 15:45:55.468 16265 16265 I LayoutSmoke: ok   passing movement on survives being saved
+10-26 15:45:55.468 16265 16265 I LayoutSmoke: ok   copying a control copies the setting
+10-26 15:45:55.468 16265 16265 I LayoutSmoke: movements passed on: 2
+10-26 15:45:55.468 16265 16265 I LayoutSmoke: ok   a held control passes its finger's movement on
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a control without the setting passes nothing on
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a quick still tap with one finger is a click
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a tap that is held too long is not a click
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a tap that moved too far is not a click
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a finger that has already dragged does not also click
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   two fingers lifting within the wider limits is a click
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   two fingers are given more room than one
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   two fingers are given longer than one
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a finger lifting while another is still down is not a click
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a tap with two fingers is the right button
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   the right button is kept when the first finger lifts last
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a tap with one finger is the left button
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a touch right behind a tap starts dragging
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a tap long after the first one does not start dragging
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a touch with no tap before it does not start dragging
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: trackpad: two-finger tap limit 320ms within 32px, drag after a tap within 600ms
+10-26 15:45:55.469 16265 16265 I LayoutSmoke: ok   a control is in the layout for the typing check
+10-26 15:45:55.481 16265 16265 I LayoutSmoke: ok   the drawer has a field for the position
+10-26 15:45:55.481 16265 16265 I LayoutSmoke: ok   a half typed number is not acted on
+10-26 15:45:55.481 16265 16265 I LayoutSmoke: ok   a number typed so far is not acted on
+10-26 15:45:55.482 16265 16265 I LayoutSmoke: ok   nothing was acted on while typing
+10-26 15:45:55.482 16265 16265 I LayoutSmoke: ok   the field remembers what was typed
+10-26 15:45:55.482 16265 16265 I LayoutSmoke: ok   the field knows the entry is unfinished
+10-26 15:45:55.482 16265 16265 I LayoutSmoke: typed 1024: left was 35045, came out 1024
+10-26 15:45:55.482 16265 16265 I LayoutSmoke: ok   finishing the entry applies the number
+10-26 15:45:55.482 16265 16265 I LayoutSmoke: ok   the entry is no longer waiting
+10-26 15:45:55.482 16265 16265 I LayoutSmoke: ok   a newly typed number waits again
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: settings keys: 41 [category_basic_settings, list_resolution, list_fps, seekbar_bitrate_kbps, frame_pacing, checkbox_stretch_video, list_audio_config, checkbox_enable_audiofx, category_gamepad_settings, seekbar_deadzone, checkbox_multi_controller, checkbox_usb_driver, checkbox_usb_bind_all, checkbox_mouse_emulation, analog_scrolling, checkbox_vibrate_fallback, seekbar_vibrate_fallback_strength, checkbox_flip_face_buttons, checkbox_gamepad_touchpad_as_mouse, checkbox_gamepad_motion_sensors, checkbox_gamepad_motion_fallback, category_input_settings, checkbox_mouse_nav_buttons, checkbox_absolute_mouse_mode, checkbox_enable_sops, checkbox_host_audio, category_ui_settings, checkbox_enable_pip, list_languages, checkbox_small_icon_mode, category_advanced_settings, checkbox_unlock_fps, checkbox_reduce_refresh_rate, checkbox_disable_warnings, video_format, checkbox_enable_hdr, checkbox_full_range, checkbox_enable_perf_overlay, checkbox_enable_post_stream_toast, category_about, open_source_licenses]
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings no longer offer checkbox_touchscreen_trackpad
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings no longer offer checkbox_show_onscreen_controls
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings no longer offer checkbox_vibrate_osc
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings no longer offer checkbox_only_show_L3R3
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings no longer offer checkbox_show_guide_button
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings no longer offer seekbar_osc_opacity
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings no longer offer checkbox_show_universal_layout
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings still offer the video options
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings still offer the mouse options
+10-26 15:45:55.483 16265 16265 I LayoutSmoke: ok   the settings still offer the advanced options
+10-26 15:45:55.496 16265 16265 I LayoutSmoke: menu rows: [Show keyboard, Touch input   ·   Touchpad, Touchpad mode   ·   Trackpad, Sensitivity, 100, On-screen controls, Layout, Opacity, 100, Extras, Vibration]
+10-26 15:45:55.496 16265 16265 I LayoutSmoke: ok   the stream menu has a row for the extra options
+10-26 15:45:55.496 16265 16265 I LayoutSmoke: ok   the extra options come last
+10-26 15:45:55.497 16265 16265 I LayoutSmoke: ok   the extra options unfold
+10-26 15:45:55.497 16265 16265 I LayoutSmoke: ok   the extra options hold the vibration switch
+10-26 15:45:55.497 16265 16265 I LayoutSmoke: ok   the vibration switch can be pressed
+10-26 15:45:55.497 16265 16265 I LayoutSmoke: ok   the vibration switch turns vibration off
+10-26 15:45:55.497 16265 16265 I LayoutSmoke: ok   the vibration switch can be pressed again
+10-26 15:45:55.497 16265 16265 I LayoutSmoke: ok   the vibration switch turns vibration back on
+10-26 15:45:55.508 16265 16265 I LayoutSmoke: editor checkboxes: [Toggle (tap to press, tap again to release), Pass through to touch (hold and move to look around)]
+10-26 15:45:55.508 16265 16265 I LayoutSmoke: ok   the editor offers the toggle
+10-26 15:45:55.508 16265 16265 I LayoutSmoke: ok   the editor offers pass through
+10-26 15:45:55.508 16265 16265 I LayoutSmoke: ok   pass through sits under the toggle
+10-26 15:45:55.508 16265 16265 I LayoutSmoke: ok   pass through follows the toggle directly
+10-26 15:45:55.508 16265 16265 I LayoutSmoke: ok   the toggle is available while pass through is off
+10-26 15:45:55.509 16265 16265 I LayoutSmoke: ok   pass through can be turned on
+10-26 15:45:55.509 16265 16265 I LayoutSmoke: ok   the control now passes movement on
+10-26 15:45:55.509 16265 16265 I LayoutSmoke: ok   pass through is marked as on
+10-26 15:45:55.515 16265 16265 I LayoutSmoke: ok   the toggle is out of reach while pass through is on
+10-26 15:45:55.515 16265 16265 I LayoutSmoke: ok   the toggle is off while pass through is on
+10-26 15:45:55.522 16265 16265 I LayoutSmoke: ok   pass through wins over a toggle set beforehand
+10-26 15:45:55.528 16265 16265 I LayoutSmoke: ok   the toggle comes back once pass through is off
+10-26 15:45:55.528 16265 16265 I LayoutSmoke: ok   the layouts screen no longer offers the master switch
+10-26 15:45:55.528 16265 16265 I LayoutSmoke: ok   the layouts screen no longer offers the transparency slider
+10-26 15:45:55.528 16265 16265 I LayoutSmoke: ok   the layouts screen no longer labels the transparency
+10-26 15:45:55.531 16265 16265 I LayoutSmoke: ok   the layouts screen still builds
+10-26 15:45:55.531 16265 16265 I LayoutSmoke: ok   the layouts screen still has its grid
+10-26 15:45:55.531 16265 16265 I LayoutSmoke: pad events: [Pad: A, Pad: B, Pad: X, Pad: Y, Pad: D-pad Up, Pad: D-pad Down, Pad: D-pad Left, Pad: D-pad Right, Pad: LB, Pad: RB, Pad: LT, Pad: RT, Pad: Left stick click, Pad: Right stick click, Pad: Start, Pad: Back, Pad: Guide, Pad: Touchpad, Pad: Paddle 1, Pad: Paddle 2, Pad: Paddle 3, Pad: Paddle 4, Pad: Share / Capture]
+10-26 15:45:55.531 16265 16265 I LayoutSmoke: ok   the shoulder buttons are offered
+10-26 15:45:55.531 16265 16265 I LayoutSmoke: ok   the triggers are named like the other pad buttons
+10-26 15:45:55.531 16265 16265 I LayoutSmoke: ok   the triggers sit next to the shoulder buttons
+10-26 15:45:55.531 16265 16265 I LayoutSmoke: ok   no event is named the old way
+10-26 15:45:55.531 16265 16265 I LayoutSmoke: ok   a trigger event says which trigger it is
+10-26 15:45:55.531 16265 16265 I LayoutSmoke: ok   the layout has a right stick
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: stick axes: up=30718 down=-30718
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: ok   the on-screen right stick reports up as positive
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: ok   the on-screen right stick reports down as negative
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: stick thumb: up=45.0 down=255.0
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: ok   the thumb is drawn above the middle when the finger is above it
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: ok   the thumb is drawn below the middle when the finger is below it
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: ok   a flipped stick sends the opposite direction
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: ok   a flipped stick still draws the thumb under the finger
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: ok   a stick that is not flipped saves without the flip
+10-26 15:45:55.532 16265 16265 I LayoutSmoke: ok   the flip is saved with the stick
+10-26 15:45:55.542 16265 16265 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 0
+10-26 15:45:55.556 16265 16265 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 1
+10-26 15:45:55.557 16265 16265 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 1
+10-26 15:45:55.557 16265 16265 I LayoutSmoke: sensitivity for mode 1: 147
+10-26 15:45:55.557 16265 16265 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 1
+10-26 15:45:55.569 16265 16265 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 5
+10-26 15:45:55.570 16265 16265 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 5
+10-26 15:45:55.570 16265 16265 I LayoutSmoke: sensitivity for mode 5: 147
+10-26 15:45:55.570 16265 16265 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 5
+10-26 15:45:55.582 16265 16265 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 2
+10-26 15:45:55.583 16265 16265 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 2
+10-26 15:45:55.583 16265 16265 I LayoutSmoke: sensitivity for mode 2: 147
+10-26 15:45:55.583 16265 16265 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 2
+10-26 15:45:55.592 16265 16265 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 4
+10-26 15:45:55.602 16265 16265 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 3
+10-26 15:45:55.603 16265 16265 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 3
+10-26 15:45:55.603 16265 16265 I LayoutSmoke: sensitivity for mode 3: 147
+10-26 15:45:55.603 16265 16265 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 3
+10-26 15:45:55.612 16265 16265 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 6
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 6
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: sensitivity for mode 6: 147
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 6
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   nothing is followed at first
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   a finger on the background is followed
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   a finger on a control is not counted
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   two fingers on the background are two
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   the first finger is still the first
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   the second finger is the second
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   lifting one finger leaves one
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   the remaining finger is found by its id
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   a slot that is done holds no finger
+10-26 15:45:55.613 16265 16265 I LayoutSmoke: ok   a cancelled gesture follows nothing
+10-26 15:45:58.398 16901 16901 I LayoutSmoke: ok   the built-in layout exists
+10-26 15:45:58.398 16901 16901 I LayoutSmoke: ok   the built-in layout cannot be deleted
+10-26 15:45:58.399 16901 16901 I LayoutSmoke: ok   a layout can be created
+10-26 15:45:58.399 16901 16901 I LayoutSmoke: ok   a new layout becomes the selected one
+10-26 15:45:58.399 16901 16901 I LayoutSmoke: ok   a duplicate name is made unique
+10-26 15:45:58.400 16901 16901 I LayoutSmoke: ok   the selected layout can be changed
+10-26 15:45:58.402 16901 16901 I LayoutSmoke: ok   a layout can be deleted
+10-26 15:45:58.402 16901 16901 I LayoutSmoke: ok   deleting the selected layout selects another
+10-26 15:45:58.402 16901 16901 I LayoutSmoke: ok   the editor is open
+10-26 15:45:58.402 16901 16901 I LayoutSmoke: ok   the editor built a controller
+10-26 15:45:58.402 16901 16901 I LayoutSmoke: ok   the layout has controls
+10-26 15:45:58.402 16901 16901 I LayoutSmoke: ok   the drawer is hidden while nothing is selected
+10-26 15:45:58.402 16901 16901 I LayoutSmoke: ok   every control has a configuration
+10-26 15:45:58.451 16901 16901 I LayoutSmoke: ok   a tapped control becomes the selected one
+10-26 15:45:58.451 16901 16901 I LayoutSmoke: ok   the selected control is marked
+10-26 15:45:58.451 16901 16901 I LayoutSmoke: ok   the panel has rows for the selected control
+10-26 15:45:58.451 16901 16901 I LayoutSmoke: ok   a control can be duplicated
+10-26 15:45:58.451 16901 16901 I LayoutSmoke: ok   the duplicate is added
+10-26 15:45:58.451 16901 16901 I LayoutSmoke: duplicate: first=1 copy=1015 next=1016
+10-26 15:45:58.451 16901 16901 I LayoutSmoke: ok   the duplicate has its own ID
+10-26 15:45:58.452 16901 16901 I LayoutSmoke: controls sharing the duplicate's ID: 0
+10-26 15:45:58.452 16901 16901 I LayoutSmoke: ok   no other control shares the duplicate's ID
+10-26 15:45:58.452 16901 16901 I LayoutSmoke: ok   a size can be pasted onto another control
+10-26 15:45:58.453 16901 16901 I LayoutSmoke: ok   a control can be deleted
+10-26 15:45:58.453 16901 16901 I LayoutSmoke: ok   a button can be added
+10-26 15:45:58.453 16901 16901 I LayoutSmoke: ok   the added button has a button configuration
+10-26 15:45:58.453 16901 16901 I LayoutSmoke: ok   a stick can be added
+10-26 15:45:58.453 16901 16901 I LayoutSmoke: ok   the added stick has a stick configuration
+10-26 15:45:58.453 16901 16901 I LayoutSmoke: ok   two controls were added
+10-26 15:45:58.474 16901 16901 I LayoutSmoke: ok   the stick becomes the selected one
+10-26 15:45:58.474 16901 16901 I LayoutSmoke: ok   the panel has rows for a stick
+10-26 15:45:58.484 16901 16901 I LayoutSmoke: ok   the button becomes the selected one again
+10-26 15:45:58.484 16901 16901 I LayoutSmoke: ok   the layout can be marked as having unsaved changes
+10-26 15:45:58.484 16901 16901 I LayoutSmoke: ok   the unsaved marker can be cleared
+10-26 15:45:58.486 16901 16901 I LayoutSmoke: ok   the layout was saved
+10-26 15:45:58.486 16901 16901 I LayoutSmoke: ok   the saved layout records its size
+10-26 15:45:58.486 16901 16901 I LayoutSmoke: ok   every control was saved
+10-26 15:45:58.486 16901 16901 I LayoutSmoke: ok   the saved form carries element IDs
+10-26 15:45:58.486 16901 16901 I LayoutSmoke: ok   the saved form carries actions
+10-26 15:45:58.489 16901 16901 I LayoutSmoke: ok   the saved layout can be rebuilt
+10-26 15:45:58.510 16901 16901 I LayoutSmoke: ok   a tap on a control selects it
+10-26 15:45:58.510 16901 16901 I LayoutSmoke: ok   selecting a control shows the drawer
+10-26 15:45:58.511 16901 16901 I LayoutSmoke: ok   tapping empty space clears the selection
+10-26 15:45:58.511 16901 16901 I LayoutSmoke: ok   tapping empty space hides the drawer
+10-26 15:45:58.532 16901 16901 I LayoutSmoke: ok   a touch on empty space clears the selection
+10-26 15:45:58.532 16901 16901 I LayoutSmoke: ok   a touch on empty space hides the drawer
+10-26 15:45:58.551 16901 16901 I LayoutSmoke: ok   dragging a control moves it
+10-26 15:45:58.551 16901 16901 I LayoutSmoke: ok   dragging keeps the control at or after the origin
+10-26 15:45:58.551 16901 16901 I LayoutSmoke: ok   the control can be put back
+10-26 15:45:59.488 16901 16901 I LayoutSmoke: ok   holding a control reaches the editor as a hold
+10-26 15:45:59.488 16901 16901 I LayoutSmoke: ok   holding a control does not drag it
+10-26 15:45:59.488 16901 16901 I LayoutSmoke: ok   the floating settings button is on screen
+10-26 15:45:59.488 16901 16901 I LayoutSmoke: ok   the floating settings button is visible
+10-26 15:46:00.305 16901 16901 I LayoutSmoke: ok   the settings button opens the layout menu
+10-26 15:46:00.305 16901 16901 I LayoutSmoke: ok   the layout menu offers adding a button
+10-26 15:46:00.305 16901 16901 I LayoutSmoke: ok   the layout menu offers adding a stick
+10-26 15:46:00.305 16901 16901 I LayoutSmoke: ok   the layout menu offers adding a D-pad
+10-26 15:46:00.305 16901 16901 I LayoutSmoke: ok   the layout menu offers saving
+10-26 15:46:00.305 16901 16901 I LayoutSmoke: ok   the layout menu offers saving as
+10-26 15:46:00.305 16901 16901 I LayoutSmoke: ok   the layout menu offers leaving
+10-26 15:46:01.122 16901 16901 I LayoutSmoke: ok   choosing save as opens a dialog
+10-26 15:46:01.122 16901 16901 I LayoutSmoke: ok   the save as dialog asks for a name
+10-26 15:46:01.144 16901 16901 I LayoutSmoke: ok   the back gesture is handled through the registered callback
+10-26 15:46:01.144 16901 16901 I LayoutSmoke: ok   the back gesture asks about unsaved changes like the Exit entry does
+10-26 15:46:01.146 16901 16901 I LayoutSmoke: ok   the width slider is on screen
+10-26 15:46:01.146 16901 16901 I LayoutSmoke: ok   the height slider is on screen
+10-26 15:46:01.149 16901 16901 I LayoutSmoke: ok   dragging the width slider applies the width
+10-26 15:46:01.149 16901 16901 I LayoutSmoke: ok   dragging the width slider leaves the height alone
+10-26 15:46:01.150 16901 16901 I LayoutSmoke: ok   dragging the height slider applies the height
+10-26 15:46:01.150 16901 16901 I LayoutSmoke: ok   dragging the height slider keeps the dragged width
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   a rebuilt width row shows the size the control has
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   a rebuilt height row shows the size the control has
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   the layout has a stick
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   the middle of the stick does nothing while it is switched off
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   the middle of the stick presses its binding once switched on
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   moving the stick does not also press its middle button
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   a trigger event pulls the left trigger
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   a trigger event pulls the right trigger
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   releasing a trigger event lets the left trigger out
+10-26 15:46:01.176 16901 16901 I LayoutSmoke: ok   releasing a trigger event lets the right trigger out
+10-26 15:46:01.177 16901 16901 I LayoutSmoke: ok   a D-pad can be added
+10-26 15:46:01.177 16901 16901 I LayoutSmoke: ok   the added D-pad has a D-pad configuration
+10-26 15:46:01.177 16901 16901 I LayoutSmoke: ok   adding a D-pad adds one control
+10-26 15:46:01.198 16901 16901 I LayoutSmoke: ok   the D-pad becomes the selected one
+10-26 15:46:01.198 16901 16901 I LayoutSmoke: ok   the panel has rows for a D-pad
+10-26 15:46:01.200 16901 16901 I LayoutSmoke: ok   a corner radius survives being saved and loaded
+10-26 15:46:01.200 16901 16901 I LayoutSmoke: ok   the panel offers a corner radius slider
+10-26 15:46:01.200 16901 16901 I LayoutSmoke: ok   the corner radius reaches the control
+10-26 15:46:01.200 16901 16901 I LayoutSmoke: ok   a size can be copied
+10-26 15:46:01.222 16901 16901 I LayoutSmoke: ok   a pasted size brings the width
+10-26 15:46:01.222 16901 16901 I LayoutSmoke: ok   a pasted size brings the height
+10-26 15:46:01.222 16901 16901 I LayoutSmoke: ok   a pasted size brings the corner radius
+10-26 15:46:01.222 16901 16901 I LayoutSmoke: ok   a pasted size leaves the position alone
+10-26 15:46:01.223 16901 16901 I LayoutSmoke: ok   a held button looks pressed
+10-26 15:46:01.233 16901 16901 I LayoutSmoke: ok   a released button stops looking pressed
+10-26 15:46:01.233 16901 16901 I LayoutSmoke: ok   a released button is not left holding its action
+10-26 15:46:01.234 16901 16901 I LayoutSmoke: ok   a latched button stays lit after the finger is lifted
+10-26 15:46:01.234 16901 16901 I LayoutSmoke: ok   a latched button goes out on the next tap
+10-26 15:46:01.234 16901 16901 I LayoutSmoke: ok   the layout opacity is read from the settings
+10-26 15:46:01.234 16901 16901 I LayoutSmoke: ok   the layout opacity reaches every control
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   drawing honours the layout opacity
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   the D-pad answers to the up button
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   the D-pad answers to the down button
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   the D-pad answers to the left button
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   the D-pad answers to the right button
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   a diagonal between two arms presses two directions
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   a press on the up arm off to one side presses only up
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   a press on the left arm off to one side presses only left
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   a press outside the D-pad presses nothing
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   the up zone reaches wider than the drawn button
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   the left zone reaches taller than the drawn button
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   the up button is drawn above the middle
+10-26 15:46:01.242 16901 16901 I LayoutSmoke: ok   the down button is drawn below the middle
+10-26 15:46:01.243 16901 16901 I LayoutSmoke: ok   the left button is drawn left of the middle
+10-26 15:46:01.243 16901 16901 I LayoutSmoke: ok   the right button is drawn right of the middle
+10-26 15:46:01.243 16901 16901 I LayoutSmoke: ok   pressing near the top edge does not also press left or right
+10-26 15:46:01.243 16901 16901 I LayoutSmoke: ok   pressing near the left edge does not also press up or down
+10-26 15:46:01.243 16901 16901 I LayoutSmoke: ok   the middle of the D-pad presses nothing
+10-26 15:46:01.243 16901 16901 I LayoutSmoke: ok   there is a control that is not being edited
+10-26 15:46:01.266 16901 16901 I LayoutSmoke: ok   moving a control that is not being edited is an unsaved change
+10-26 15:46:01.289 16901 16901 I LayoutSmoke: ok   the drag moved the control on screen
+10-26 15:46:01.289 16901 16901 I LayoutSmoke: ok   a dragged control is written where it is on screen
+10-26 15:46:01.289 16901 16901 I LayoutSmoke: ok   a dragged control keeps its size when it is written
+10-26 15:46:01.289 16901 16901 I LayoutSmoke: ok   a control read back from a save is where it was saved
+10-26 15:46:01.292 16901 16901 I LayoutSmoke: ok   the saved profile holds the position the control was dragged to
+10-26 15:46:01.295 16901 16901 I LayoutSmoke: ok   the on-screen layout names player one
+10-26 15:46:01.295 16901 16901 I LayoutSmoke: ok   no on-screen layout leaves player one out
+10-26 15:46:01.302 16901 16901 I LayoutSmoke: ok   the built-in layout has a left trigger
+10-26 15:46:01.302 16901 16901 I LayoutSmoke: ok   the left trigger is an ordinary button
+10-26 15:46:01.303 16901 16901 I LayoutSmoke: ok   no control is of a trigger kind any more
+10-26 15:46:01.303 16901 16901 I LayoutSmoke: ok   a trigger pulls its axis with the action the layout gives it
+10-26 15:46:01.303 16901 16901 I LayoutSmoke: ok   a trigger lets its axis out again
+10-26 15:46:01.304 16901 16901 I LayoutSmoke: ok   a weak reading on its own is kept
+10-26 15:46:01.304 16901 16901 I LayoutSmoke: ok   a pushed axis is not flipped by another controller's drift
+10-26 15:46:01.304 16901 16901 I LayoutSmoke: ok   the stronger reading wins whichever way it points
+10-26 15:46:01.304 16901 16901 I LayoutSmoke: ok   combining by bits would have flipped the sign
+10-26 15:46:01.304 16901 16901 I LayoutSmoke: ok   a direction bound to a pad button says so
+10-26 15:46:01.304 16901 16901 I LayoutSmoke: ok   a pad binding is recognised again
+10-26 15:46:01.304 16901 16901 I LayoutSmoke: ok   a pad binding sends one gamepad event
+10-26 15:46:01.321 16901 16901 I LayoutSmoke: ok   a direction bound to a key counts as assigned
+10-26 15:46:01.321 16901 16901 I LayoutSmoke: ok   a key binding is recognised again
+10-26 15:46:01.321 16901 16901 I LayoutSmoke: ok   a key binding does not leave a pad button behind
+10-26 15:46:01.321 16901 16901 I LayoutSmoke: ok   a key binding sends one keyboard event
+10-26 15:46:01.321 16901 16901 I LayoutSmoke: ok   a key binding can be read back after being written
+10-26 15:46:01.321 16901 16901 I LayoutSmoke: ok   binding a pad button again clears the key
+10-26 15:46:01.321 16901 16901 I LayoutSmoke: ok   a control added to a faded layout is faded as well
+10-26 15:46:01.325 16901 16901 I LayoutSmoke: dpad at rest: up=10 down=9 left=9 right=9
+10-26 15:46:01.325 16901 16901 I LayoutSmoke: ok   the arms of a D-pad look the same when nothing is pressed
+10-26 15:46:01.327 16901 16901 I LayoutSmoke: dpad left pressed: up=10 down=9 left=12 right=9
+10-26 15:46:01.327 16901 16901 I LayoutSmoke: ok   pressing left lights the left arm
+10-26 15:46:01.327 16901 16901 I LayoutSmoke: ok   pressing left does not light the up arm
+10-26 15:46:01.327 16901 16901 I LayoutSmoke: ok   pressing left does not light the down arm
+10-26 15:46:01.327 16901 16901 I LayoutSmoke: ok   pressing left does not light the right arm
+10-26 15:46:01.327 16901 16901 I LayoutSmoke: ok   an untouched button is not pressed
+10-26 15:46:01.339 16901 16901 I LayoutSmoke: ok   one tap latches the toggle on
+10-26 15:46:01.339 16901 16901 I LayoutSmoke: ok   the second tap lets the toggle go
+10-26 15:46:01.354 16901 16901 I LayoutSmoke: toggle off differs from its untouched self in 0 pixels, first at -1,0
+10-26 15:46:01.354 16901 16901 I LayoutSmoke: ok   a toggle switched off looks like it did before it was pressed
+10-26 15:46:01.357 16901 16901 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/toggle-before.png
+10-26 15:46:01.359 16901 16901 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/toggle-after.png
+10-26 15:46:01.359 16901 16901 I LayoutSmoke: arm up: rgb=40,45,52 alpha=198 bounds=111.0,-7.6293945E-6 189.0,138.0
+10-26 15:46:01.359 16901 16901 I LayoutSmoke: arm down: rgb=35,39,45 alpha=202 bounds=111.0,162.0 189.0,300.0
+10-26 15:46:01.360 16901 16901 I LayoutSmoke: arm left: rgb=38,42,48 alpha=200 bounds=-7.6293945E-6,111.0 138.0,189.0
+10-26 15:46:01.360 16901 16901 I LayoutSmoke: arm right: rgb=38,42,48 alpha=200 bounds=162.0,111.0 300.0,189.0
+10-26 15:46:01.360 16901 16901 I LayoutSmoke: ok   every arm of a D-pad has the same transparency
+10-26 15:46:01.360 16901 16901 I LayoutSmoke: ok   every arm of a D-pad has the same shade
+10-26 15:46:01.367 16901 16901 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/dpad-at-rest.png
+10-26 15:46:01.370 16901 16901 I LayoutSmoke: glow at the edge: button=219 dpad arm=222
+10-26 15:46:01.370 16901 16901 I LayoutSmoke: ok   a pressed arm of a D-pad is lit like a pressed button
+10-26 15:46:01.370 16901 16901 I LayoutSmoke: alpha at the sharp corner of an arm: 0
+10-26 15:46:01.370 16901 16901 I LayoutSmoke: ok   the light of an arm does not stick out past its rounded corner
+10-26 15:46:01.379 16901 16901 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/dpad-pressed.png
+10-26 15:46:01.379 16901 16901 I LayoutSmoke: ok   a control is in the layout for the leaving check
+10-26 15:46:01.401 16901 16901 I LayoutSmoke: ok   editing marks the layout as having unsaved changes
+10-26 15:46:01.401 16901 16901 I LayoutSmoke: ok   editing does not write the stored layout
+10-26 15:46:01.401 16901 16901 I LayoutSmoke: ok   answering don't save clears the unsaved marker
+10-26 15:46:01.401 16901 16901 I LayoutSmoke: ok   answering don't save leaves the stored layout as it was
+10-26 15:46:01.401 16901 16901 I LayoutSmoke: ok   a control is in the layout for the position check
+10-26 15:46:01.401 16901 16901 I LayoutSmoke: ok   the editor knows how big the layout area is
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: ok   the drawer has a position slider for x
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: ok   the drawer has a position slider for y
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: area=2510x1156 x slider max=2426 y slider max=1072
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: ok   the x slider stops before the right edge
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: ok   the y slider stops before the bottom edge
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: ok   the row keeps a typed value the slider cannot show
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: typed 9999,9999 placed at 2426,1072 within 2510x1156
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: ok   a typed position keeps the control inside the layout
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: ok   a typed position keeps a piece of the control on screen
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: ok   a typed position is held back rather than thrown to zero
+10-26 15:46:01.402 16901 16901 I LayoutSmoke: ok   the piece left on screen is wide enough to press
+10-26 15:46:01.403 16901 16901 I LayoutSmoke: dragged to left=300 forced to 2426,1072 within 2510x1156
+10-26 15:46:01.403 16901 16901 I LayoutSmoke: ok   dragging a control to the right edge keeps a piece on screen
+10-26 15:46:01.403 16901 16901 I LayoutSmoke: ok   dragging a control to the bottom edge keeps a piece on screen
+10-26 15:46:01.403 16901 16901 I LayoutSmoke: ok   a control dragged to the limit can still be pressed
+10-26 15:46:01.425 16901 16901 I LayoutSmoke: ok   a control is in the layout for the actions check
+10-26 15:46:01.425 16901 16901 I LayoutSmoke: drawer buttons: [Pad: D-pad Up, Remove, Add event, Remove step, Add step, Pad: D-pad Down, Remove, Add event, Remove step, Add step, Pad: D-pad Left, Remove, Add event, Remove step, Add step, Pad: D-pad Right, Remove, Add event, Remove step, Add step, Copy size, Paste size, Duplicate, Delete]
+10-26 15:46:01.425 16901 16901 I LayoutSmoke: ok   the drawer offers duplicating a control
+10-26 15:46:01.425 16901 16901 I LayoutSmoke: ok   the drawer offers copying the size of a control
+10-26 15:46:01.425 16901 16901 I LayoutSmoke: ok   the drawer offers deleting a control
+10-26 15:46:01.425 16901 16901 I LayoutSmoke: ok   pasting is offered exactly when a size has been copied
+10-26 15:46:01.425 16901 16901 I LayoutSmoke: ok   pasting is offered once a size is copied
+10-26 15:46:01.447 16901 16901 I LayoutSmoke: ok   holding a control selects it instead of opening a menu
+10-26 15:46:01.447 16901 16901 I LayoutSmoke: ok   holding a control leaves no dialog behind
+10-26 15:46:01.447 16901 16901 I LayoutSmoke: ok   a control is in the layout for the drag check
+10-26 15:46:01.449 16901 16901 I LayoutSmoke: ok   no control is selected to begin with
+10-26 15:46:01.449 16901 16901 I LayoutSmoke: ok   the drawer is closed with nothing selected
+10-26 15:46:01.470 16901 16901 I LayoutSmoke: ok   dragging a control selects it
+10-26 15:46:01.470 16901 16901 I LayoutSmoke: ok   dragging a control opens its drawer
+10-26 15:46:01.492 16901 16901 I LayoutSmoke: actions in order: copy=20 paste=21 duplicate=22 delete=23
+10-26 15:46:01.492 16901 16901 I LayoutSmoke: ok   copying and pasting share a row
+10-26 15:46:01.492 16901 16901 I LayoutSmoke: ok   duplicating comes after copying and pasting
+10-26 15:46:01.492 16901 16901 I LayoutSmoke: ok   deleting is the last of the actions
+10-26 15:46:01.492 16901 16901 I LayoutSmoke: ok   nothing is out of reach once a size is copied
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: out of reach: [Paste size]
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   pasting is out of reach before a size is copied
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   pasting is still shown, so the row does not move
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: 200x100 (100,50) 25x25 -> 400x400 (200,200) 50x50
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   a moved control keeps its place across the screen
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   a moved control keeps its place down the screen
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   a moved control is not stretched
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   a control on a wider screen doubles where it sat
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   a control on a wider screen keeps its height
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   a control on a wider screen is not stretched sideways
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   a layout opened on its own screen is left alone
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: ok   a control is in the layout for the fitting check
+10-26 15:46:01.515 16901 16901 I LayoutSmoke: before fitting: config has 100,50 25x25
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: layout says it was arranged on 200x100
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: fitted from 200x100 to 2510x1156: 1255,578 289x289 expected 1255,578 289x289
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a control keeps its share of the screen across
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a control keeps its share of the screen down
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a control is not stretched by the fitting
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   fitting a layout marks it as having unsaved changes
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a fitted layout is remembered as fitted
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   fitting a layout twice changes nothing the second time
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a layout can be written out and read back
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   the name of a layout survives being written out
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a layout file says which screen it was arranged on
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a control comes back where it was
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a control comes back the size it was
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a file that is not a layout is refused
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a layout from a newer version of the app is refused
+10-26 15:46:01.517 16901 16901 I LayoutSmoke: ok   a control with no place is refused
+10-26 15:46:01.518 16901 16901 I LayoutSmoke: ok   a shared layout is given a file name a file system accepts
+10-26 15:46:01.518 16901 16901 I LayoutSmoke: ok   a file name cannot escape its folder
+10-26 15:46:01.518 16901 16901 I LayoutSmoke: ok   an imported layout is created
+10-26 15:46:01.518 16901 16901 I LayoutSmoke: imported control: 2156,337 160x160 saved screen 2510x1156
+10-26 15:46:01.518 16901 16901 I LayoutSmoke: ok   importing does not shrink a control
+10-26 15:46:01.518 16901 16901 I LayoutSmoke: ok   importing does not move a control
+10-26 15:46:01.518 16901 16901 I LayoutSmoke: ok   an imported layout remembers the screen it was arranged on
+10-26 15:46:01.518 16901 16901 I LayoutSmoke: ok   an imported layout is not marked as already fitted
+10-26 15:46:01.519 16901 16901 I LayoutSmoke: ok   importing the same layout twice makes a second layout
+10-26 15:46:01.525 16901 16901 I LayoutSmoke: ok   a layout can be exported and imported
+10-26 15:46:01.527 16901 16901 I LayoutSmoke: ok   the layout comes back with the same number of controls
+10-26 15:46:01.527 16901 16901 I LayoutSmoke: export and import compared 27 controls, 0 changed
+10-26 15:46:01.527 16901 16901 I LayoutSmoke: ok   every control of an exported layout comes back
+10-26 15:46:01.527 16901 16901 I LayoutSmoke: ok   no control moves or changes size in an export and an import
+10-26 15:46:01.527 16901 16901 I LayoutSmoke: ok   a layout can be written out for sharing
+10-26 15:46:01.528 16901 16901 I LayoutSmoke: ok   a layout can be written to a share file
+10-26 15:46:01.528 16901 16901 I LayoutSmoke: shared as content://io.github.alexander0ezhov.lunarstreamlight.debug.fileprovider/Smoke-layout.json
+10-26 15:46:01.528 16901 16901 I LayoutSmoke: ok   the shared layout is offered under its file name
+10-26 15:46:01.528 16901 16901 I LayoutSmoke: ok   the shared layout can be read back through its address
+10-26 15:46:01.529 16901 16901 I LayoutSmoke: ok   a shared layout address cannot reach outside its folder
+10-26 15:46:01.551 16901 16901 I LayoutSmoke: ok   the stream menu starts closed
+10-26 15:46:01.551 16901 16901 I LayoutSmoke: ok   the stream menu has a sheet over the screen
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: ok   the first press of back opens the stream menu
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: ok   the stream menu is open after back
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: stream menu rows: [Show keyboard, Touch input   ·   Touchpad, Touchpad mode   ·   Trackpad, Sensitivity, 100, On-screen controls, Layout   ·   First layout, Opacity, 100, Extras, Vibration]
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: ok   the stream menu offers the keyboard
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: ok   the stream menu offers the touch setting
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: ok   the stream menu offers the layout
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: exit button: android.widget.Button{b5d8de1 VFED..C.. ......I. 0,0-0,0} text=Exit stream expected=Exit stream tree=FrameLayout[LinearLayout[TextView(Stream menu), ScrollView[LinearLayout[TextView(Show keyboard), LinearLayout[LinearLayout[TextView(Touch input   ·   Touchpad), ImageView], RadioGroup[RadioButton(Off), RadioButton(Touchpad), RadioButton(Touch native (experimental)), RadioButton(Right stick), RadioButton(Left stick)]], LinearLayout[LinearLayout[TextView(Touchpad mode   ·   Trackpad), ImageView], RadioGroup[RadioButton(Trackpad), RadioButton(Direct cursor), RadioButton(No clicks)]], LinearLayout[TextView(Sensitivity), SeekBar, TextView(100)], LinearLayout[TextView(On-screen controls), Switch()], LinearLayout[LinearLayout[TextView(Layout   ·   First layout), ImageView], RadioGroup[RadioButton(First layout), RadioButton(Second layout)]], LinearLayout[TextView(Opacity), SeekBar, TextView(100)], LinearLayout[LinearLayout[TextView(Extras), ImageView], LinearLayout[LinearLayout[TextView(Vibration), Switch()]]]]], LinearLayout[Button(Exit stream)]]]
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: ok   the transparency row is under the layout row
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: touch choices: [Off, Touchpad, Touch native (experimental), Right stick, Left stick]
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: ok   the touch modes are offered in the order the user asked for
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: ok   the touchpad's own row appears with the touchpad
+10-26 15:46:01.559 16901 16901 I LayoutSmoke: touchpad choices: [Trackpad, Direct cursor, No clicks]
+10-26 15:46:01.560 16901 16901 I LayoutSmoke: ok   the touchpad offers its three kinds in order
+10-26 15:46:01.566 16901 16901 I LayoutSmoke: ok   choosing the kind of touchpad keeps the menu open
+10-26 15:46:01.566 16901 16901 I LayoutSmoke: ok   the kind of touchpad is reported
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   choosing a layout keeps the menu open
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   the main list reports the touchpad
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   the menu names the native touch mode as the user asked
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   the native touch mode is called what the user asked for
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   the cursor-following touchpad is called what it is
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   the stream menu has a button to leave the stream
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   a press of back while the menu is open is used
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   a press of back while the menu is open leaves the stream
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   tapping outside the stream menu closes it
+10-26 15:46:01.573 16901 16901 I LayoutSmoke: ok   tapping outside the stream menu does not leave the stream
+10-26 15:46:01.579 16901 16901 I LayoutSmoke: ok   the touch setting unfolds
+10-26 15:46:01.584 16901 16901 I LayoutSmoke: ok   the touch setting offers turning the touchscreen off
+10-26 15:46:01.584 16901 16901 I LayoutSmoke: ok   choosing a touch mode reports it
+10-26 15:46:01.584 16901 16901 I LayoutSmoke: ok   choosing a touch mode keeps the menu open
+10-26 15:46:01.584 16901 16901 I LayoutSmoke: ok   the touch setting unfolds again
+10-26 15:46:01.589 16901 16901 I LayoutSmoke: ok   the touch setting offers the right stick
+10-26 15:46:01.589 16901 16901 I LayoutSmoke: ok   the right stick can be chosen
+10-26 15:46:01.589 16901 16901 I LayoutSmoke: ok   the layout row unfolds
+10-26 15:46:01.594 16901 16901 I LayoutSmoke: ok   a layout can be chosen
+10-26 15:46:01.594 16901 16901 I LayoutSmoke: ok   choosing a layout reports it
+10-26 15:46:01.594 16901 16901 I LayoutSmoke: ok   choosing a layout keeps the menu open
+10-26 15:46:01.595 16901 16901 I LayoutSmoke: ok   the keyboard row answers a press
+10-26 15:46:01.595 16901 16901 I LayoutSmoke: ok   the keyboard row asks for the keyboard
+10-26 15:46:01.595 16901 16901 I LayoutSmoke: ok   the keyboard row closes the menu
+10-26 15:46:01.599 16901 16901 I LayoutSmoke: ok   the button at the bottom leaves the stream
+10-26 15:46:01.600 16901 16901 I LayoutSmoke: ok   a row that unfolds has an arrow
+10-26 15:46:01.600 16901 16901 I LayoutSmoke: ok   the arrow of a closed row points down
+10-26 15:46:01.600 16901 16901 I LayoutSmoke: ok   the arrow turns over while the row is open
+10-26 15:46:01.600 16901 16901 I LayoutSmoke: ok   the arrow points down again once the row is closed
+10-26 15:46:01.600 16901 16901 I LayoutSmoke: ok   a row that unfolds has an arrow on the layout row too
+10-26 15:46:01.600 16901 16901 I LayoutSmoke: ok   a row that does not unfold has no arrow
+10-26 15:46:01.600 16901 16901 I LayoutSmoke: ok   the choices of a row are exclusive
+10-26 15:46:01.600 16901 16901 I LayoutSmoke: ok   only one touch mode is marked at a time
+10-26 15:46:01.604 16901 16901 I LayoutSmoke: ok   choosing another mode leaves one marked
+10-26 15:46:01.609 16901 16901 I LayoutSmoke: ok   the experimental real touch mode can be chosen
+10-26 15:46:01.609 16901 16901 I LayoutSmoke: ok   the experimental mode is reported
+10-26 15:46:01.609 16901 16901 I LayoutSmoke: ok   the switch for the on-screen controls is its own row
+10-26 15:46:01.609 16901 16901 I LayoutSmoke: ok   the controls are shown to begin with
+10-26 15:46:01.609 16901 16901 I LayoutSmoke: ok   the switch turns the controls off
+10-26 15:46:01.609 16901 16901 I LayoutSmoke: ok   the switch turns the controls back on
+10-26 15:46:01.609 16901 16901 I LayoutSmoke: layout choices: [First layout, Second layout]
+10-26 15:46:01.609 16901 16901 I LayoutSmoke: ok   the layout list holds only layouts
+10-26 15:46:01.609 16901 16901 I LayoutSmoke: ok   the menu has an opacity slider
+10-26 15:46:01.611 16901 16901 I LayoutSmoke: ok   the opacity slider can be dragged
+10-26 15:46:01.611 16901 16901 I LayoutSmoke: opacity from the menu slider: 41
+10-26 15:46:01.611 16901 16901 I LayoutSmoke: ok   dragging the opacity slider reports a new value
+10-26 15:46:01.611 16901 16901 I LayoutSmoke: ok   a control is in the layout for the delete check
+10-26 15:46:01.611 16901 16901 I LayoutSmoke: ok   editing a control opens its drawer
+10-26 15:46:01.611 16901 16901 I LayoutSmoke: ok   the control is the selected one
+10-26 15:46:01.614 16901 16901 I LayoutSmoke: ok   deleting the edited control clears the selection
+10-26 15:46:01.614 16901 16901 I LayoutSmoke: ok   deleting the edited control closes its drawer
+10-26 15:46:01.616 16901 16901 I LayoutSmoke: ok   hiding the layout hides its controls
+10-26 15:46:01.616 16901 16901 I LayoutSmoke: ok   the controller says the layout is hidden
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: ok   a layout that was rebuilt while hidden is still hidden
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: after showing again: 26 of 26 controls are visible
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: ok   showing the layout again shows every control
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: ok   a control does not pass movement on unless it is told to
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: ok   a control can be told to pass movement on
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: ok   passing movement on survives being saved
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: ok   copying a control copies the setting
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: movements passed on: 2
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: ok   a held control passes its finger's movement on
+10-26 15:46:01.620 16901 16901 I LayoutSmoke: ok   a control without the setting passes nothing on
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a quick still tap with one finger is a click
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a tap that is held too long is not a click
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a tap that moved too far is not a click
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a finger that has already dragged does not also click
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   two fingers lifting within the wider limits is a click
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   two fingers are given more room than one
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   two fingers are given longer than one
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a finger lifting while another is still down is not a click
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a tap with two fingers is the right button
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   the right button is kept when the first finger lifts last
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a tap with one finger is the left button
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a touch right behind a tap starts dragging
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a tap long after the first one does not start dragging
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a touch with no tap before it does not start dragging
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: trackpad: two-finger tap limit 320ms within 32px, drag after a tap within 600ms
+10-26 15:46:01.621 16901 16901 I LayoutSmoke: ok   a control is in the layout for the typing check
+10-26 15:46:01.633 16901 16901 I LayoutSmoke: ok   the drawer has a field for the position
+10-26 15:46:01.633 16901 16901 I LayoutSmoke: ok   a half typed number is not acted on
+10-26 15:46:01.633 16901 16901 I LayoutSmoke: ok   a number typed so far is not acted on
+10-26 15:46:01.633 16901 16901 I LayoutSmoke: ok   nothing was acted on while typing
+10-26 15:46:01.633 16901 16901 I LayoutSmoke: ok   the field remembers what was typed
+10-26 15:46:01.633 16901 16901 I LayoutSmoke: ok   the field knows the entry is unfinished
+10-26 15:46:01.634 16901 16901 I LayoutSmoke: typed 1024: left was 35045, came out 1024
+10-26 15:46:01.634 16901 16901 I LayoutSmoke: ok   finishing the entry applies the number
+10-26 15:46:01.634 16901 16901 I LayoutSmoke: ok   the entry is no longer waiting
+10-26 15:46:01.634 16901 16901 I LayoutSmoke: ok   a newly typed number waits again
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: settings keys: 41 [category_basic_settings, list_resolution, list_fps, seekbar_bitrate_kbps, frame_pacing, checkbox_stretch_video, list_audio_config, checkbox_enable_audiofx, category_gamepad_settings, seekbar_deadzone, checkbox_multi_controller, checkbox_usb_driver, checkbox_usb_bind_all, checkbox_mouse_emulation, analog_scrolling, checkbox_vibrate_fallback, seekbar_vibrate_fallback_strength, checkbox_flip_face_buttons, checkbox_gamepad_touchpad_as_mouse, checkbox_gamepad_motion_sensors, checkbox_gamepad_motion_fallback, category_input_settings, checkbox_mouse_nav_buttons, checkbox_absolute_mouse_mode, checkbox_enable_sops, checkbox_host_audio, category_ui_settings, checkbox_enable_pip, list_languages, checkbox_small_icon_mode, category_advanced_settings, checkbox_unlock_fps, checkbox_reduce_refresh_rate, checkbox_disable_warnings, video_format, checkbox_enable_hdr, checkbox_full_range, checkbox_enable_perf_overlay, checkbox_enable_post_stream_toast, category_about, open_source_licenses]
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings no longer offer checkbox_touchscreen_trackpad
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings no longer offer checkbox_show_onscreen_controls
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings no longer offer checkbox_vibrate_osc
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings no longer offer checkbox_only_show_L3R3
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings no longer offer checkbox_show_guide_button
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings no longer offer seekbar_osc_opacity
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings no longer offer checkbox_show_universal_layout
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings still offer the video options
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings still offer the mouse options
+10-26 15:46:01.635 16901 16901 I LayoutSmoke: ok   the settings still offer the advanced options
+10-26 15:46:01.647 16901 16901 I LayoutSmoke: menu rows: [Show keyboard, Touch input   ·   Touchpad, Touchpad mode   ·   Trackpad, Sensitivity, 100, On-screen controls, Layout, Opacity, 100, Extras, Vibration]
+10-26 15:46:01.647 16901 16901 I LayoutSmoke: ok   the stream menu has a row for the extra options
+10-26 15:46:01.647 16901 16901 I LayoutSmoke: ok   the extra options come last
+10-26 15:46:01.647 16901 16901 I LayoutSmoke: ok   the extra options unfold
+10-26 15:46:01.647 16901 16901 I LayoutSmoke: ok   the extra options hold the vibration switch
+10-26 15:46:01.648 16901 16901 I LayoutSmoke: ok   the vibration switch can be pressed
+10-26 15:46:01.648 16901 16901 I LayoutSmoke: ok   the vibration switch turns vibration off
+10-26 15:46:01.648 16901 16901 I LayoutSmoke: ok   the vibration switch can be pressed again
+10-26 15:46:01.648 16901 16901 I LayoutSmoke: ok   the vibration switch turns vibration back on
+10-26 15:46:01.659 16901 16901 I LayoutSmoke: editor checkboxes: [Toggle (tap to press, tap again to release), Pass through to touch (hold and move to look around)]
+10-26 15:46:01.659 16901 16901 I LayoutSmoke: ok   the editor offers the toggle
+10-26 15:46:01.659 16901 16901 I LayoutSmoke: ok   the editor offers pass through
+10-26 15:46:01.659 16901 16901 I LayoutSmoke: ok   pass through sits under the toggle
+10-26 15:46:01.659 16901 16901 I LayoutSmoke: ok   pass through follows the toggle directly
+10-26 15:46:01.659 16901 16901 I LayoutSmoke: ok   the toggle is available while pass through is off
+10-26 15:46:01.659 16901 16901 I LayoutSmoke: ok   pass through can be turned on
+10-26 15:46:01.659 16901 16901 I LayoutSmoke: ok   the control now passes movement on
+10-26 15:46:01.659 16901 16901 I LayoutSmoke: ok   pass through is marked as on
+10-26 15:46:01.666 16901 16901 I LayoutSmoke: ok   the toggle is out of reach while pass through is on
+10-26 15:46:01.666 16901 16901 I LayoutSmoke: ok   the toggle is off while pass through is on
+10-26 15:46:01.673 16901 16901 I LayoutSmoke: ok   pass through wins over a toggle set beforehand
+10-26 15:46:01.679 16901 16901 I LayoutSmoke: ok   the toggle comes back once pass through is off
+10-26 15:46:01.679 16901 16901 I LayoutSmoke: ok   the layouts screen no longer offers the master switch
+10-26 15:46:01.679 16901 16901 I LayoutSmoke: ok   the layouts screen no longer offers the transparency slider
+10-26 15:46:01.679 16901 16901 I LayoutSmoke: ok   the layouts screen no longer labels the transparency
+10-26 15:46:01.682 16901 16901 I LayoutSmoke: ok   the layouts screen still builds
+10-26 15:46:01.682 16901 16901 I LayoutSmoke: ok   the layouts screen still has its grid
+10-26 15:46:01.682 16901 16901 I LayoutSmoke: pad events: [Pad: A, Pad: B, Pad: X, Pad: Y, Pad: D-pad Up, Pad: D-pad Down, Pad: D-pad Left, Pad: D-pad Right, Pad: LB, Pad: RB, Pad: LT, Pad: RT, Pad: Left stick click, Pad: Right stick click, Pad: Start, Pad: Back, Pad: Guide, Pad: Touchpad, Pad: Paddle 1, Pad: Paddle 2, Pad: Paddle 3, Pad: Paddle 4, Pad: Share / Capture]
+10-26 15:46:01.682 16901 16901 I LayoutSmoke: ok   the shoulder buttons are offered
+10-26 15:46:01.682 16901 16901 I LayoutSmoke: ok   the triggers are named like the other pad buttons
+10-26 15:46:01.682 16901 16901 I LayoutSmoke: ok   the triggers sit next to the shoulder buttons
+10-26 15:46:01.682 16901 16901 I LayoutSmoke: ok   no event is named the old way
+10-26 15:46:01.682 16901 16901 I LayoutSmoke: ok   a trigger event says which trigger it is
+10-26 15:46:01.682 16901 16901 I LayoutSmoke: ok   the layout has a right stick
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: stick axes: up=30718 down=-30718
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: ok   the on-screen right stick reports up as positive
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: ok   the on-screen right stick reports down as negative
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: stick thumb: up=45.0 down=255.0
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: ok   the thumb is drawn above the middle when the finger is above it
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: ok   the thumb is drawn below the middle when the finger is below it
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: ok   a flipped stick sends the opposite direction
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: ok   a flipped stick still draws the thumb under the finger
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: ok   a stick that is not flipped saves without the flip
+10-26 15:46:01.683 16901 16901 I LayoutSmoke: ok   the flip is saved with the stick
+10-26 15:46:01.692 16901 16901 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 0
+10-26 15:46:01.705 16901 16901 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 1
+10-26 15:46:01.706 16901 16901 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 1
+10-26 15:46:01.706 16901 16901 I LayoutSmoke: sensitivity for mode 1: 147
+10-26 15:46:01.706 16901 16901 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 1
+10-26 15:46:01.718 16901 16901 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 5
+10-26 15:46:01.720 16901 16901 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 5
+10-26 15:46:01.720 16901 16901 I LayoutSmoke: sensitivity for mode 5: 147
+10-26 15:46:01.720 16901 16901 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 5
+10-26 15:46:01.732 16901 16901 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 2
+10-26 15:46:01.733 16901 16901 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 2
+10-26 15:46:01.733 16901 16901 I LayoutSmoke: sensitivity for mode 2: 147
+10-26 15:46:01.733 16901 16901 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 2
+10-26 15:46:01.741 16901 16901 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 4
+10-26 15:46:01.751 16901 16901 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 3
+10-26 15:46:01.752 16901 16901 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 3
+10-26 15:46:01.752 16901 16901 I LayoutSmoke: sensitivity for mode 3: 147
+10-26 15:46:01.752 16901 16901 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 3
+10-26 15:46:01.761 16901 16901 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 6
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 6
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: sensitivity for mode 6: 147
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 6
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   nothing is followed at first
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   a finger on the background is followed
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   a finger on a control is not counted
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   two fingers on the background are two
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   the first finger is still the first
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   the second finger is the second
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   lifting one finger leaves one
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   the remaining finger is found by its id
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   a slot that is done holds no finger
+10-26 15:46:01.762 16901 16901 I LayoutSmoke: ok   a cancelled gesture follows nothing
+10-26 15:46:04.530 17563 17563 I LayoutSmoke: ok   the built-in layout exists
+10-26 15:46:04.530 17563 17563 I LayoutSmoke: ok   the built-in layout cannot be deleted
+10-26 15:46:04.531 17563 17563 I LayoutSmoke: ok   a layout can be created
+10-26 15:46:04.531 17563 17563 I LayoutSmoke: ok   a new layout becomes the selected one
+10-26 15:46:04.531 17563 17563 I LayoutSmoke: ok   a duplicate name is made unique
+10-26 15:46:04.532 17563 17563 I LayoutSmoke: ok   the selected layout can be changed
+10-26 15:46:04.533 17563 17563 I LayoutSmoke: ok   a layout can be deleted
+10-26 15:46:04.533 17563 17563 I LayoutSmoke: ok   deleting the selected layout selects another
+10-26 15:46:04.533 17563 17563 I LayoutSmoke: ok   the editor is open
+10-26 15:46:04.533 17563 17563 I LayoutSmoke: ok   the editor built a controller
+10-26 15:46:04.533 17563 17563 I LayoutSmoke: ok   the layout has controls
+10-26 15:46:04.533 17563 17563 I LayoutSmoke: ok   the drawer is hidden while nothing is selected
+10-26 15:46:04.533 17563 17563 I LayoutSmoke: ok   every control has a configuration
+10-26 15:46:04.585 17563 17563 I LayoutSmoke: ok   a tapped control becomes the selected one
+10-26 15:46:04.585 17563 17563 I LayoutSmoke: ok   the selected control is marked
+10-26 15:46:04.585 17563 17563 I LayoutSmoke: ok   the panel has rows for the selected control
+10-26 15:46:04.586 17563 17563 I LayoutSmoke: ok   a control can be duplicated
+10-26 15:46:04.586 17563 17563 I LayoutSmoke: ok   the duplicate is added
+10-26 15:46:04.586 17563 17563 I LayoutSmoke: duplicate: first=1 copy=1015 next=1016
+10-26 15:46:04.586 17563 17563 I LayoutSmoke: ok   the duplicate has its own ID
+10-26 15:46:04.586 17563 17563 I LayoutSmoke: controls sharing the duplicate's ID: 0
+10-26 15:46:04.586 17563 17563 I LayoutSmoke: ok   no other control shares the duplicate's ID
+10-26 15:46:04.586 17563 17563 I LayoutSmoke: ok   a size can be pasted onto another control
+10-26 15:46:04.587 17563 17563 I LayoutSmoke: ok   a control can be deleted
+10-26 15:46:04.588 17563 17563 I LayoutSmoke: ok   a button can be added
+10-26 15:46:04.588 17563 17563 I LayoutSmoke: ok   the added button has a button configuration
+10-26 15:46:04.588 17563 17563 I LayoutSmoke: ok   a stick can be added
+10-26 15:46:04.588 17563 17563 I LayoutSmoke: ok   the added stick has a stick configuration
+10-26 15:46:04.588 17563 17563 I LayoutSmoke: ok   two controls were added
+10-26 15:46:04.607 17563 17563 I LayoutSmoke: ok   the stick becomes the selected one
+10-26 15:46:04.607 17563 17563 I LayoutSmoke: ok   the panel has rows for a stick
+10-26 15:46:04.617 17563 17563 I LayoutSmoke: ok   the button becomes the selected one again
+10-26 15:46:04.617 17563 17563 I LayoutSmoke: ok   the layout can be marked as having unsaved changes
+10-26 15:46:04.617 17563 17563 I LayoutSmoke: ok   the unsaved marker can be cleared
+10-26 15:46:04.619 17563 17563 I LayoutSmoke: ok   the layout was saved
+10-26 15:46:04.619 17563 17563 I LayoutSmoke: ok   the saved layout records its size
+10-26 15:46:04.619 17563 17563 I LayoutSmoke: ok   every control was saved
+10-26 15:46:04.619 17563 17563 I LayoutSmoke: ok   the saved form carries element IDs
+10-26 15:46:04.619 17563 17563 I LayoutSmoke: ok   the saved form carries actions
+10-26 15:46:04.622 17563 17563 I LayoutSmoke: ok   the saved layout can be rebuilt
+10-26 15:46:04.644 17563 17563 I LayoutSmoke: ok   a tap on a control selects it
+10-26 15:46:04.644 17563 17563 I LayoutSmoke: ok   selecting a control shows the drawer
+10-26 15:46:04.645 17563 17563 I LayoutSmoke: ok   tapping empty space clears the selection
+10-26 15:46:04.645 17563 17563 I LayoutSmoke: ok   tapping empty space hides the drawer
+10-26 15:46:04.666 17563 17563 I LayoutSmoke: ok   a touch on empty space clears the selection
+10-26 15:46:04.666 17563 17563 I LayoutSmoke: ok   a touch on empty space hides the drawer
+10-26 15:46:04.686 17563 17563 I LayoutSmoke: ok   dragging a control moves it
+10-26 15:46:04.686 17563 17563 I LayoutSmoke: ok   dragging keeps the control at or after the origin
+10-26 15:46:04.686 17563 17563 I LayoutSmoke: ok   the control can be put back
+10-26 15:46:05.618 17563 17563 I LayoutSmoke: ok   holding a control reaches the editor as a hold
+10-26 15:46:05.618 17563 17563 I LayoutSmoke: ok   holding a control does not drag it
+10-26 15:46:05.618 17563 17563 I LayoutSmoke: ok   the floating settings button is on screen
+10-26 15:46:05.618 17563 17563 I LayoutSmoke: ok   the floating settings button is visible
+10-26 15:46:06.443 17563 17563 I LayoutSmoke: ok   the settings button opens the layout menu
+10-26 15:46:06.444 17563 17563 I LayoutSmoke: ok   the layout menu offers adding a button
+10-26 15:46:06.444 17563 17563 I LayoutSmoke: ok   the layout menu offers adding a stick
+10-26 15:46:06.444 17563 17563 I LayoutSmoke: ok   the layout menu offers adding a D-pad
+10-26 15:46:06.444 17563 17563 I LayoutSmoke: ok   the layout menu offers saving
+10-26 15:46:06.444 17563 17563 I LayoutSmoke: ok   the layout menu offers saving as
+10-26 15:46:06.444 17563 17563 I LayoutSmoke: ok   the layout menu offers leaving
+10-26 15:46:07.265 17563 17563 I LayoutSmoke: ok   choosing save as opens a dialog
+10-26 15:46:07.265 17563 17563 I LayoutSmoke: ok   the save as dialog asks for a name
+10-26 15:46:07.289 17563 17563 I LayoutSmoke: ok   the back gesture is handled through the registered callback
+10-26 15:46:07.289 17563 17563 I LayoutSmoke: ok   the back gesture asks about unsaved changes like the Exit entry does
+10-26 15:46:07.291 17563 17563 I LayoutSmoke: ok   the width slider is on screen
+10-26 15:46:07.291 17563 17563 I LayoutSmoke: ok   the height slider is on screen
+10-26 15:46:07.295 17563 17563 I LayoutSmoke: ok   dragging the width slider applies the width
+10-26 15:46:07.295 17563 17563 I LayoutSmoke: ok   dragging the width slider leaves the height alone
+10-26 15:46:07.296 17563 17563 I LayoutSmoke: ok   dragging the height slider applies the height
+10-26 15:46:07.296 17563 17563 I LayoutSmoke: ok   dragging the height slider keeps the dragged width
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   a rebuilt width row shows the size the control has
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   a rebuilt height row shows the size the control has
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   the layout has a stick
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   the middle of the stick does nothing while it is switched off
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   the middle of the stick presses its binding once switched on
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   moving the stick does not also press its middle button
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   a trigger event pulls the left trigger
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   a trigger event pulls the right trigger
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   releasing a trigger event lets the left trigger out
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   releasing a trigger event lets the right trigger out
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   a D-pad can be added
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   the added D-pad has a D-pad configuration
+10-26 15:46:07.321 17563 17563 I LayoutSmoke: ok   adding a D-pad adds one control
+10-26 15:46:07.343 17563 17563 I LayoutSmoke: ok   the D-pad becomes the selected one
+10-26 15:46:07.343 17563 17563 I LayoutSmoke: ok   the panel has rows for a D-pad
+10-26 15:46:07.345 17563 17563 I LayoutSmoke: ok   a corner radius survives being saved and loaded
+10-26 15:46:07.345 17563 17563 I LayoutSmoke: ok   the panel offers a corner radius slider
+10-26 15:46:07.345 17563 17563 I LayoutSmoke: ok   the corner radius reaches the control
+10-26 15:46:07.345 17563 17563 I LayoutSmoke: ok   a size can be copied
+10-26 15:46:07.366 17563 17563 I LayoutSmoke: ok   a pasted size brings the width
+10-26 15:46:07.366 17563 17563 I LayoutSmoke: ok   a pasted size brings the height
+10-26 15:46:07.366 17563 17563 I LayoutSmoke: ok   a pasted size brings the corner radius
+10-26 15:46:07.366 17563 17563 I LayoutSmoke: ok   a pasted size leaves the position alone
+10-26 15:46:07.367 17563 17563 I LayoutSmoke: ok   a held button looks pressed
+10-26 15:46:07.377 17563 17563 I LayoutSmoke: ok   a released button stops looking pressed
+10-26 15:46:07.377 17563 17563 I LayoutSmoke: ok   a released button is not left holding its action
+10-26 15:46:07.377 17563 17563 I LayoutSmoke: ok   a latched button stays lit after the finger is lifted
+10-26 15:46:07.377 17563 17563 I LayoutSmoke: ok   a latched button goes out on the next tap
+10-26 15:46:07.377 17563 17563 I LayoutSmoke: ok   the layout opacity is read from the settings
+10-26 15:46:07.378 17563 17563 I LayoutSmoke: ok   the layout opacity reaches every control
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   drawing honours the layout opacity
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the D-pad answers to the up button
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the D-pad answers to the down button
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the D-pad answers to the left button
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the D-pad answers to the right button
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   a diagonal between two arms presses two directions
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   a press on the up arm off to one side presses only up
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   a press on the left arm off to one side presses only left
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   a press outside the D-pad presses nothing
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the up zone reaches wider than the drawn button
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the left zone reaches taller than the drawn button
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the up button is drawn above the middle
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the down button is drawn below the middle
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the left button is drawn left of the middle
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the right button is drawn right of the middle
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   pressing near the top edge does not also press left or right
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   pressing near the left edge does not also press up or down
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   the middle of the D-pad presses nothing
+10-26 15:46:07.384 17563 17563 I LayoutSmoke: ok   there is a control that is not being edited
+10-26 15:46:07.406 17563 17563 I LayoutSmoke: ok   moving a control that is not being edited is an unsaved change
+10-26 15:46:07.428 17563 17563 I LayoutSmoke: ok   the drag moved the control on screen
+10-26 15:46:07.428 17563 17563 I LayoutSmoke: ok   a dragged control is written where it is on screen
+10-26 15:46:07.428 17563 17563 I LayoutSmoke: ok   a dragged control keeps its size when it is written
+10-26 15:46:07.428 17563 17563 I LayoutSmoke: ok   a control read back from a save is where it was saved
+10-26 15:46:07.431 17563 17563 I LayoutSmoke: ok   the saved profile holds the position the control was dragged to
+10-26 15:46:07.433 17563 17563 I LayoutSmoke: ok   the on-screen layout names player one
+10-26 15:46:07.433 17563 17563 I LayoutSmoke: ok   no on-screen layout leaves player one out
+10-26 15:46:07.442 17563 17563 I LayoutSmoke: ok   the built-in layout has a left trigger
+10-26 15:46:07.442 17563 17563 I LayoutSmoke: ok   the left trigger is an ordinary button
+10-26 15:46:07.442 17563 17563 I LayoutSmoke: ok   no control is of a trigger kind any more
+10-26 15:46:07.442 17563 17563 I LayoutSmoke: ok   a trigger pulls its axis with the action the layout gives it
+10-26 15:46:07.442 17563 17563 I LayoutSmoke: ok   a trigger lets its axis out again
+10-26 15:46:07.443 17563 17563 I LayoutSmoke: ok   a weak reading on its own is kept
+10-26 15:46:07.443 17563 17563 I LayoutSmoke: ok   a pushed axis is not flipped by another controller's drift
+10-26 15:46:07.443 17563 17563 I LayoutSmoke: ok   the stronger reading wins whichever way it points
+10-26 15:46:07.443 17563 17563 I LayoutSmoke: ok   combining by bits would have flipped the sign
+10-26 15:46:07.443 17563 17563 I LayoutSmoke: ok   a direction bound to a pad button says so
+10-26 15:46:07.443 17563 17563 I LayoutSmoke: ok   a pad binding is recognised again
+10-26 15:46:07.443 17563 17563 I LayoutSmoke: ok   a pad binding sends one gamepad event
+10-26 15:46:07.462 17563 17563 I LayoutSmoke: ok   a direction bound to a key counts as assigned
+10-26 15:46:07.462 17563 17563 I LayoutSmoke: ok   a key binding is recognised again
+10-26 15:46:07.462 17563 17563 I LayoutSmoke: ok   a key binding does not leave a pad button behind
+10-26 15:46:07.462 17563 17563 I LayoutSmoke: ok   a key binding sends one keyboard event
+10-26 15:46:07.462 17563 17563 I LayoutSmoke: ok   a key binding can be read back after being written
+10-26 15:46:07.462 17563 17563 I LayoutSmoke: ok   binding a pad button again clears the key
+10-26 15:46:07.463 17563 17563 I LayoutSmoke: ok   a control added to a faded layout is faded as well
+10-26 15:46:07.466 17563 17563 I LayoutSmoke: dpad at rest: up=10 down=9 left=9 right=9
+10-26 15:46:07.466 17563 17563 I LayoutSmoke: ok   the arms of a D-pad look the same when nothing is pressed
+10-26 15:46:07.468 17563 17563 I LayoutSmoke: dpad left pressed: up=10 down=9 left=12 right=9
+10-26 15:46:07.468 17563 17563 I LayoutSmoke: ok   pressing left lights the left arm
+10-26 15:46:07.468 17563 17563 I LayoutSmoke: ok   pressing left does not light the up arm
+10-26 15:46:07.468 17563 17563 I LayoutSmoke: ok   pressing left does not light the down arm
+10-26 15:46:07.468 17563 17563 I LayoutSmoke: ok   pressing left does not light the right arm
+10-26 15:46:07.468 17563 17563 I LayoutSmoke: ok   an untouched button is not pressed
+10-26 15:46:07.481 17563 17563 I LayoutSmoke: ok   one tap latches the toggle on
+10-26 15:46:07.481 17563 17563 I LayoutSmoke: ok   the second tap lets the toggle go
+10-26 15:46:07.496 17563 17563 I LayoutSmoke: toggle off differs from its untouched self in 0 pixels, first at -1,0
+10-26 15:46:07.496 17563 17563 I LayoutSmoke: ok   a toggle switched off looks like it did before it was pressed
+10-26 15:46:07.499 17563 17563 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/toggle-before.png
+10-26 15:46:07.501 17563 17563 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/toggle-after.png
+10-26 15:46:07.501 17563 17563 I LayoutSmoke: arm up: rgb=40,45,52 alpha=198 bounds=111.0,-7.6293945E-6 189.0,138.0
+10-26 15:46:07.502 17563 17563 I LayoutSmoke: arm down: rgb=35,39,45 alpha=202 bounds=111.0,162.0 189.0,300.0
+10-26 15:46:07.502 17563 17563 I LayoutSmoke: arm left: rgb=38,42,48 alpha=200 bounds=-7.6293945E-6,111.0 138.0,189.0
+10-26 15:46:07.502 17563 17563 I LayoutSmoke: arm right: rgb=38,42,48 alpha=200 bounds=162.0,111.0 300.0,189.0
+10-26 15:46:07.502 17563 17563 I LayoutSmoke: ok   every arm of a D-pad has the same transparency
+10-26 15:46:07.502 17563 17563 I LayoutSmoke: ok   every arm of a D-pad has the same shade
+10-26 15:46:07.509 17563 17563 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/dpad-at-rest.png
+10-26 15:46:07.513 17563 17563 I LayoutSmoke: glow at the edge: button=219 dpad arm=222
+10-26 15:46:07.513 17563 17563 I LayoutSmoke: ok   a pressed arm of a D-pad is lit like a pressed button
+10-26 15:46:07.513 17563 17563 I LayoutSmoke: alpha at the sharp corner of an arm: 0
+10-26 15:46:07.513 17563 17563 I LayoutSmoke: ok   the light of an arm does not stick out past its rounded corner
+10-26 15:46:07.522 17563 17563 I LayoutSmoke: wrote /storage/emulated/0/Android/data/io.github.alexander0ezhov.lunarstreamlight.debug/files/dpad-pressed.png
+10-26 15:46:07.522 17563 17563 I LayoutSmoke: ok   a control is in the layout for the leaving check
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   editing marks the layout as having unsaved changes
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   editing does not write the stored layout
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   answering don't save clears the unsaved marker
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   answering don't save leaves the stored layout as it was
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   a control is in the layout for the position check
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   the editor knows how big the layout area is
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   the drawer has a position slider for x
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   the drawer has a position slider for y
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: area=2510x1156 x slider max=2426 y slider max=1072
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   the x slider stops before the right edge
+10-26 15:46:07.544 17563 17563 I LayoutSmoke: ok   the y slider stops before the bottom edge
+10-26 15:46:07.545 17563 17563 I LayoutSmoke: ok   the row keeps a typed value the slider cannot show
+10-26 15:46:07.545 17563 17563 I LayoutSmoke: typed 9999,9999 placed at 2426,1072 within 2510x1156
+10-26 15:46:07.545 17563 17563 I LayoutSmoke: ok   a typed position keeps the control inside the layout
+10-26 15:46:07.545 17563 17563 I LayoutSmoke: ok   a typed position keeps a piece of the control on screen
+10-26 15:46:07.545 17563 17563 I LayoutSmoke: ok   a typed position is held back rather than thrown to zero
+10-26 15:46:07.545 17563 17563 I LayoutSmoke: ok   the piece left on screen is wide enough to press
+10-26 15:46:07.546 17563 17563 I LayoutSmoke: dragged to left=300 forced to 2426,1072 within 2510x1156
+10-26 15:46:07.546 17563 17563 I LayoutSmoke: ok   dragging a control to the right edge keeps a piece on screen
+10-26 15:46:07.546 17563 17563 I LayoutSmoke: ok   dragging a control to the bottom edge keeps a piece on screen
+10-26 15:46:07.546 17563 17563 I LayoutSmoke: ok   a control dragged to the limit can still be pressed
+10-26 15:46:07.568 17563 17563 I LayoutSmoke: ok   a control is in the layout for the actions check
+10-26 15:46:07.568 17563 17563 I LayoutSmoke: drawer buttons: [Pad: D-pad Up, Remove, Add event, Remove step, Add step, Pad: D-pad Down, Remove, Add event, Remove step, Add step, Pad: D-pad Left, Remove, Add event, Remove step, Add step, Pad: D-pad Right, Remove, Add event, Remove step, Add step, Copy size, Paste size, Duplicate, Delete]
+10-26 15:46:07.568 17563 17563 I LayoutSmoke: ok   the drawer offers duplicating a control
+10-26 15:46:07.568 17563 17563 I LayoutSmoke: ok   the drawer offers copying the size of a control
+10-26 15:46:07.568 17563 17563 I LayoutSmoke: ok   the drawer offers deleting a control
+10-26 15:46:07.568 17563 17563 I LayoutSmoke: ok   pasting is offered exactly when a size has been copied
+10-26 15:46:07.568 17563 17563 I LayoutSmoke: ok   pasting is offered once a size is copied
+10-26 15:46:07.589 17563 17563 I LayoutSmoke: ok   holding a control selects it instead of opening a menu
+10-26 15:46:07.589 17563 17563 I LayoutSmoke: ok   holding a control leaves no dialog behind
+10-26 15:46:07.589 17563 17563 I LayoutSmoke: ok   a control is in the layout for the drag check
+10-26 15:46:07.590 17563 17563 I LayoutSmoke: ok   no control is selected to begin with
+10-26 15:46:07.590 17563 17563 I LayoutSmoke: ok   the drawer is closed with nothing selected
+10-26 15:46:07.611 17563 17563 I LayoutSmoke: ok   dragging a control selects it
+10-26 15:46:07.611 17563 17563 I LayoutSmoke: ok   dragging a control opens its drawer
+10-26 15:46:07.635 17563 17563 I LayoutSmoke: actions in order: copy=20 paste=21 duplicate=22 delete=23
+10-26 15:46:07.635 17563 17563 I LayoutSmoke: ok   copying and pasting share a row
+10-26 15:46:07.635 17563 17563 I LayoutSmoke: ok   duplicating comes after copying and pasting
+10-26 15:46:07.635 17563 17563 I LayoutSmoke: ok   deleting is the last of the actions
+10-26 15:46:07.635 17563 17563 I LayoutSmoke: ok   nothing is out of reach once a size is copied
+10-26 15:46:07.657 17563 17563 I LayoutSmoke: out of reach: [Paste size]
+10-26 15:46:07.657 17563 17563 I LayoutSmoke: ok   pasting is out of reach before a size is copied
+10-26 15:46:07.657 17563 17563 I LayoutSmoke: ok   pasting is still shown, so the row does not move
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: 200x100 (100,50) 25x25 -> 400x400 (200,200) 50x50
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: ok   a moved control keeps its place across the screen
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: ok   a moved control keeps its place down the screen
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: ok   a moved control is not stretched
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: ok   a control on a wider screen doubles where it sat
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: ok   a control on a wider screen keeps its height
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: ok   a control on a wider screen is not stretched sideways
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: ok   a layout opened on its own screen is left alone
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: ok   a control is in the layout for the fitting check
+10-26 15:46:07.658 17563 17563 I LayoutSmoke: before fitting: config has 100,50 25x25
+10-26 15:46:07.662 17563 17563 I LayoutSmoke: layout says it was arranged on 200x100
+10-26 15:46:07.662 17563 17563 I LayoutSmoke: fitted from 200x100 to 2510x1156: 1255,578 289x289 expected 1255,578 289x289
+10-26 15:46:07.662 17563 17563 I LayoutSmoke: ok   a control keeps its share of the screen across
+10-26 15:46:07.662 17563 17563 I LayoutSmoke: ok   a control keeps its share of the screen down
+10-26 15:46:07.662 17563 17563 I LayoutSmoke: ok   a control is not stretched by the fitting
+10-26 15:46:07.662 17563 17563 I LayoutSmoke: ok   fitting a layout marks it as having unsaved changes
+10-26 15:46:07.662 17563 17563 I LayoutSmoke: ok   a fitted layout is remembered as fitted
+10-26 15:46:07.662 17563 17563 I LayoutSmoke: ok   fitting a layout twice changes nothing the second time
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   a layout can be written out and read back
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   the name of a layout survives being written out
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   a layout file says which screen it was arranged on
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   a control comes back where it was
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   a control comes back the size it was
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   a file that is not a layout is refused
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   a layout from a newer version of the app is refused
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   a control with no place is refused
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   a shared layout is given a file name a file system accepts
+10-26 15:46:07.663 17563 17563 I LayoutSmoke: ok   a file name cannot escape its folder
+10-26 15:46:07.664 17563 17563 I LayoutSmoke: ok   an imported layout is created
+10-26 15:46:07.664 17563 17563 I LayoutSmoke: imported control: 2156,337 160x160 saved screen 2510x1156
+10-26 15:46:07.664 17563 17563 I LayoutSmoke: ok   importing does not shrink a control
+10-26 15:46:07.664 17563 17563 I LayoutSmoke: ok   importing does not move a control
+10-26 15:46:07.664 17563 17563 I LayoutSmoke: ok   an imported layout remembers the screen it was arranged on
+10-26 15:46:07.664 17563 17563 I LayoutSmoke: ok   an imported layout is not marked as already fitted
+10-26 15:46:07.664 17563 17563 I LayoutSmoke: ok   importing the same layout twice makes a second layout
+10-26 15:46:07.669 17563 17563 I LayoutSmoke: ok   a layout can be exported and imported
+10-26 15:46:07.670 17563 17563 I LayoutSmoke: ok   the layout comes back with the same number of controls
+10-26 15:46:07.670 17563 17563 I LayoutSmoke: export and import compared 27 controls, 0 changed
+10-26 15:46:07.670 17563 17563 I LayoutSmoke: ok   every control of an exported layout comes back
+10-26 15:46:07.670 17563 17563 I LayoutSmoke: ok   no control moves or changes size in an export and an import
+10-26 15:46:07.670 17563 17563 I LayoutSmoke: ok   a layout can be written out for sharing
+10-26 15:46:07.670 17563 17563 I LayoutSmoke: ok   a layout can be written to a share file
+10-26 15:46:07.670 17563 17563 I LayoutSmoke: shared as content://io.github.alexander0ezhov.lunarstreamlight.debug.fileprovider/Smoke-layout.json
+10-26 15:46:07.671 17563 17563 I LayoutSmoke: ok   the shared layout is offered under its file name
+10-26 15:46:07.671 17563 17563 I LayoutSmoke: ok   the shared layout can be read back through its address
+10-26 15:46:07.671 17563 17563 I LayoutSmoke: ok   a shared layout address cannot reach outside its folder
+10-26 15:46:07.696 17563 17563 I LayoutSmoke: ok   the stream menu starts closed
+10-26 15:46:07.697 17563 17563 I LayoutSmoke: ok   the stream menu has a sheet over the screen
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: ok   the first press of back opens the stream menu
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: ok   the stream menu is open after back
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: stream menu rows: [Show keyboard, Touch input   ·   Touchpad, Touchpad mode   ·   Trackpad, Sensitivity, 100, On-screen controls, Layout   ·   First layout, Opacity, 100, Extras, Vibration]
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: ok   the stream menu offers the keyboard
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: ok   the stream menu offers the touch setting
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: ok   the stream menu offers the layout
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: exit button: android.widget.Button{b5d8de1 VFED..C.. ......I. 0,0-0,0} text=Exit stream expected=Exit stream tree=FrameLayout[LinearLayout[TextView(Stream menu), ScrollView[LinearLayout[TextView(Show keyboard), LinearLayout[LinearLayout[TextView(Touch input   ·   Touchpad), ImageView], RadioGroup[RadioButton(Off), RadioButton(Touchpad), RadioButton(Touch native (experimental)), RadioButton(Right stick), RadioButton(Left stick)]], LinearLayout[LinearLayout[TextView(Touchpad mode   ·   Trackpad), ImageView], RadioGroup[RadioButton(Trackpad), RadioButton(Direct cursor), RadioButton(No clicks)]], LinearLayout[TextView(Sensitivity), SeekBar, TextView(100)], LinearLayout[TextView(On-screen controls), Switch()], LinearLayout[LinearLayout[TextView(Layout   ·   First layout), ImageView], RadioGroup[RadioButton(First layout), RadioButton(Second layout)]], LinearLayout[TextView(Opacity), SeekBar, TextView(100)], LinearLayout[LinearLayout[TextView(Extras), ImageView], LinearLayout[LinearLayout[TextView(Vibration), Switch()]]]]], LinearLayout[Button(Exit stream)]]]
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: ok   the transparency row is under the layout row
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: touch choices: [Off, Touchpad, Touch native (experimental), Right stick, Left stick]
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: ok   the touch modes are offered in the order the user asked for
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: ok   the touchpad's own row appears with the touchpad
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: touchpad choices: [Trackpad, Direct cursor, No clicks]
+10-26 15:46:07.703 17563 17563 I LayoutSmoke: ok   the touchpad offers its three kinds in order
+10-26 15:46:07.710 17563 17563 I LayoutSmoke: ok   choosing the kind of touchpad keeps the menu open
+10-26 15:46:07.710 17563 17563 I LayoutSmoke: ok   the kind of touchpad is reported
+10-26 15:46:07.716 17563 17563 I LayoutSmoke: ok   choosing a layout keeps the menu open
+10-26 15:46:07.717 17563 17563 I LayoutSmoke: ok   the main list reports the touchpad
+10-26 15:46:07.717 17563 17563 I LayoutSmoke: ok   the menu names the native touch mode as the user asked
+10-26 15:46:07.717 17563 17563 I LayoutSmoke: ok   the native touch mode is called what the user asked for
+10-26 15:46:07.717 17563 17563 I LayoutSmoke: ok   the cursor-following touchpad is called what it is
+10-26 15:46:07.717 17563 17563 I LayoutSmoke: ok   the stream menu has a button to leave the stream
+10-26 15:46:07.717 17563 17563 I LayoutSmoke: ok   a press of back while the menu is open is used
+10-26 15:46:07.717 17563 17563 I LayoutSmoke: ok   a press of back while the menu is open leaves the stream
+10-26 15:46:07.717 17563 17563 I LayoutSmoke: ok   tapping outside the stream menu closes it
+10-26 15:46:07.717 17563 17563 I LayoutSmoke: ok   tapping outside the stream menu does not leave the stream
+10-26 15:46:07.723 17563 17563 I LayoutSmoke: ok   the touch setting unfolds
+10-26 15:46:07.727 17563 17563 I LayoutSmoke: ok   the touch setting offers turning the touchscreen off
+10-26 15:46:07.728 17563 17563 I LayoutSmoke: ok   choosing a touch mode reports it
+10-26 15:46:07.728 17563 17563 I LayoutSmoke: ok   choosing a touch mode keeps the menu open
+10-26 15:46:07.728 17563 17563 I LayoutSmoke: ok   the touch setting unfolds again
+10-26 15:46:07.733 17563 17563 I LayoutSmoke: ok   the touch setting offers the right stick
+10-26 15:46:07.733 17563 17563 I LayoutSmoke: ok   the right stick can be chosen
+10-26 15:46:07.733 17563 17563 I LayoutSmoke: ok   the layout row unfolds
+10-26 15:46:07.738 17563 17563 I LayoutSmoke: ok   a layout can be chosen
+10-26 15:46:07.738 17563 17563 I LayoutSmoke: ok   choosing a layout reports it
+10-26 15:46:07.738 17563 17563 I LayoutSmoke: ok   choosing a layout keeps the menu open
+10-26 15:46:07.738 17563 17563 I LayoutSmoke: ok   the keyboard row answers a press
+10-26 15:46:07.738 17563 17563 I LayoutSmoke: ok   the keyboard row asks for the keyboard
+10-26 15:46:07.738 17563 17563 I LayoutSmoke: ok   the keyboard row closes the menu
+10-26 15:46:07.743 17563 17563 I LayoutSmoke: ok   the button at the bottom leaves the stream
+10-26 15:46:07.743 17563 17563 I LayoutSmoke: ok   a row that unfolds has an arrow
+10-26 15:46:07.743 17563 17563 I LayoutSmoke: ok   the arrow of a closed row points down
+10-26 15:46:07.743 17563 17563 I LayoutSmoke: ok   the arrow turns over while the row is open
+10-26 15:46:07.743 17563 17563 I LayoutSmoke: ok   the arrow points down again once the row is closed
+10-26 15:46:07.743 17563 17563 I LayoutSmoke: ok   a row that unfolds has an arrow on the layout row too
+10-26 15:46:07.743 17563 17563 I LayoutSmoke: ok   a row that does not unfold has no arrow
+10-26 15:46:07.743 17563 17563 I LayoutSmoke: ok   the choices of a row are exclusive
+10-26 15:46:07.743 17563 17563 I LayoutSmoke: ok   only one touch mode is marked at a time
+10-26 15:46:07.747 17563 17563 I LayoutSmoke: ok   choosing another mode leaves one marked
+10-26 15:46:07.752 17563 17563 I LayoutSmoke: ok   the experimental real touch mode can be chosen
+10-26 15:46:07.752 17563 17563 I LayoutSmoke: ok   the experimental mode is reported
+10-26 15:46:07.752 17563 17563 I LayoutSmoke: ok   the switch for the on-screen controls is its own row
+10-26 15:46:07.752 17563 17563 I LayoutSmoke: ok   the controls are shown to begin with
+10-26 15:46:07.752 17563 17563 I LayoutSmoke: ok   the switch turns the controls off
+10-26 15:46:07.752 17563 17563 I LayoutSmoke: ok   the switch turns the controls back on
+10-26 15:46:07.752 17563 17563 I LayoutSmoke: layout choices: [First layout, Second layout]
+10-26 15:46:07.752 17563 17563 I LayoutSmoke: ok   the layout list holds only layouts
+10-26 15:46:07.752 17563 17563 I LayoutSmoke: ok   the menu has an opacity slider
+10-26 15:46:07.754 17563 17563 I LayoutSmoke: ok   the opacity slider can be dragged
+10-26 15:46:07.754 17563 17563 I LayoutSmoke: opacity from the menu slider: 41
+10-26 15:46:07.754 17563 17563 I LayoutSmoke: ok   dragging the opacity slider reports a new value
+10-26 15:46:07.754 17563 17563 I LayoutSmoke: ok   a control is in the layout for the delete check
+10-26 15:46:07.754 17563 17563 I LayoutSmoke: ok   editing a control opens its drawer
+10-26 15:46:07.754 17563 17563 I LayoutSmoke: ok   the control is the selected one
+10-26 15:46:07.757 17563 17563 I LayoutSmoke: ok   deleting the edited control clears the selection
+10-26 15:46:07.757 17563 17563 I LayoutSmoke: ok   deleting the edited control closes its drawer
+10-26 15:46:07.759 17563 17563 I LayoutSmoke: ok   hiding the layout hides its controls
+10-26 15:46:07.759 17563 17563 I LayoutSmoke: ok   the controller says the layout is hidden
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   a layout that was rebuilt while hidden is still hidden
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: after showing again: 26 of 26 controls are visible
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   showing the layout again shows every control
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   a control does not pass movement on unless it is told to
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   a control can be told to pass movement on
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   passing movement on survives being saved
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   copying a control copies the setting
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: movements passed on: 2
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   a held control passes its finger's movement on
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   a control without the setting passes nothing on
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   a quick still tap with one finger is a click
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   a tap that is held too long is not a click
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   a tap that moved too far is not a click
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   a finger that has already dragged does not also click
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   two fingers lifting within the wider limits is a click
+10-26 15:46:07.763 17563 17563 I LayoutSmoke: ok   two fingers are given more room than one
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: ok   two fingers are given longer than one
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: ok   a finger lifting while another is still down is not a click
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: ok   a tap with two fingers is the right button
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: ok   the right button is kept when the first finger lifts last
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: ok   a tap with one finger is the left button
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: ok   a touch right behind a tap starts dragging
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: ok   a tap long after the first one does not start dragging
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: ok   a touch with no tap before it does not start dragging
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: trackpad: two-finger tap limit 320ms within 32px, drag after a tap within 600ms
+10-26 15:46:07.764 17563 17563 I LayoutSmoke: ok   a control is in the layout for the typing check
+10-26 15:46:07.776 17563 17563 I LayoutSmoke: ok   the drawer has a field for the position
+10-26 15:46:07.776 17563 17563 I LayoutSmoke: ok   a half typed number is not acted on
+10-26 15:46:07.776 17563 17563 I LayoutSmoke: ok   a number typed so far is not acted on
+10-26 15:46:07.776 17563 17563 I LayoutSmoke: ok   nothing was acted on while typing
+10-26 15:46:07.776 17563 17563 I LayoutSmoke: ok   the field remembers what was typed
+10-26 15:46:07.776 17563 17563 I LayoutSmoke: ok   the field knows the entry is unfinished
+10-26 15:46:07.777 17563 17563 I LayoutSmoke: typed 1024: left was 35045, came out 1024
+10-26 15:46:07.777 17563 17563 I LayoutSmoke: ok   finishing the entry applies the number
+10-26 15:46:07.777 17563 17563 I LayoutSmoke: ok   the entry is no longer waiting
+10-26 15:46:07.777 17563 17563 I LayoutSmoke: ok   a newly typed number waits again
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: settings keys: 41 [category_basic_settings, list_resolution, list_fps, seekbar_bitrate_kbps, frame_pacing, checkbox_stretch_video, list_audio_config, checkbox_enable_audiofx, category_gamepad_settings, seekbar_deadzone, checkbox_multi_controller, checkbox_usb_driver, checkbox_usb_bind_all, checkbox_mouse_emulation, analog_scrolling, checkbox_vibrate_fallback, seekbar_vibrate_fallback_strength, checkbox_flip_face_buttons, checkbox_gamepad_touchpad_as_mouse, checkbox_gamepad_motion_sensors, checkbox_gamepad_motion_fallback, category_input_settings, checkbox_mouse_nav_buttons, checkbox_absolute_mouse_mode, checkbox_enable_sops, checkbox_host_audio, category_ui_settings, checkbox_enable_pip, list_languages, checkbox_small_icon_mode, category_advanced_settings, checkbox_unlock_fps, checkbox_reduce_refresh_rate, checkbox_disable_warnings, video_format, checkbox_enable_hdr, checkbox_full_range, checkbox_enable_perf_overlay, checkbox_enable_post_stream_toast, category_about, open_source_licenses]
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings no longer offer checkbox_touchscreen_trackpad
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings no longer offer checkbox_show_onscreen_controls
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings no longer offer checkbox_vibrate_osc
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings no longer offer checkbox_only_show_L3R3
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings no longer offer checkbox_show_guide_button
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings no longer offer seekbar_osc_opacity
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings no longer offer checkbox_show_universal_layout
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings still offer the video options
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings still offer the mouse options
+10-26 15:46:07.778 17563 17563 I LayoutSmoke: ok   the settings still offer the advanced options
+10-26 15:46:07.790 17563 17563 I LayoutSmoke: menu rows: [Show keyboard, Touch input   ·   Touchpad, Touchpad mode   ·   Trackpad, Sensitivity, 100, On-screen controls, Layout, Opacity, 100, Extras, Vibration]
+10-26 15:46:07.790 17563 17563 I LayoutSmoke: ok   the stream menu has a row for the extra options
+10-26 15:46:07.790 17563 17563 I LayoutSmoke: ok   the extra options come last
+10-26 15:46:07.790 17563 17563 I LayoutSmoke: ok   the extra options unfold
+10-26 15:46:07.790 17563 17563 I LayoutSmoke: ok   the extra options hold the vibration switch
+10-26 15:46:07.791 17563 17563 I LayoutSmoke: ok   the vibration switch can be pressed
+10-26 15:46:07.791 17563 17563 I LayoutSmoke: ok   the vibration switch turns vibration off
+10-26 15:46:07.791 17563 17563 I LayoutSmoke: ok   the vibration switch can be pressed again
+10-26 15:46:07.791 17563 17563 I LayoutSmoke: ok   the vibration switch turns vibration back on
+10-26 15:46:07.802 17563 17563 I LayoutSmoke: editor checkboxes: [Toggle (tap to press, tap again to release), Pass through to touch (hold and move to look around)]
+10-26 15:46:07.802 17563 17563 I LayoutSmoke: ok   the editor offers the toggle
+10-26 15:46:07.802 17563 17563 I LayoutSmoke: ok   the editor offers pass through
+10-26 15:46:07.802 17563 17563 I LayoutSmoke: ok   pass through sits under the toggle
+10-26 15:46:07.802 17563 17563 I LayoutSmoke: ok   pass through follows the toggle directly
+10-26 15:46:07.802 17563 17563 I LayoutSmoke: ok   the toggle is available while pass through is off
+10-26 15:46:07.802 17563 17563 I LayoutSmoke: ok   pass through can be turned on
+10-26 15:46:07.802 17563 17563 I LayoutSmoke: ok   the control now passes movement on
+10-26 15:46:07.802 17563 17563 I LayoutSmoke: ok   pass through is marked as on
+10-26 15:46:07.809 17563 17563 I LayoutSmoke: ok   the toggle is out of reach while pass through is on
+10-26 15:46:07.809 17563 17563 I LayoutSmoke: ok   the toggle is off while pass through is on
+10-26 15:46:07.815 17563 17563 I LayoutSmoke: ok   pass through wins over a toggle set beforehand
+10-26 15:46:07.821 17563 17563 I LayoutSmoke: ok   the toggle comes back once pass through is off
+10-26 15:46:07.821 17563 17563 I LayoutSmoke: ok   the layouts screen no longer offers the master switch
+10-26 15:46:07.821 17563 17563 I LayoutSmoke: ok   the layouts screen no longer offers the transparency slider
+10-26 15:46:07.821 17563 17563 I LayoutSmoke: ok   the layouts screen no longer labels the transparency
+10-26 15:46:07.823 17563 17563 I LayoutSmoke: ok   the layouts screen still builds
+10-26 15:46:07.823 17563 17563 I LayoutSmoke: ok   the layouts screen still has its grid
+10-26 15:46:07.823 17563 17563 I LayoutSmoke: pad events: [Pad: A, Pad: B, Pad: X, Pad: Y, Pad: D-pad Up, Pad: D-pad Down, Pad: D-pad Left, Pad: D-pad Right, Pad: LB, Pad: RB, Pad: LT, Pad: RT, Pad: Left stick click, Pad: Right stick click, Pad: Start, Pad: Back, Pad: Guide, Pad: Touchpad, Pad: Paddle 1, Pad: Paddle 2, Pad: Paddle 3, Pad: Paddle 4, Pad: Share / Capture]
+10-26 15:46:07.823 17563 17563 I LayoutSmoke: ok   the shoulder buttons are offered
+10-26 15:46:07.823 17563 17563 I LayoutSmoke: ok   the triggers are named like the other pad buttons
+10-26 15:46:07.823 17563 17563 I LayoutSmoke: ok   the triggers sit next to the shoulder buttons
+10-26 15:46:07.823 17563 17563 I LayoutSmoke: ok   no event is named the old way
+10-26 15:46:07.823 17563 17563 I LayoutSmoke: ok   a trigger event says which trigger it is
+10-26 15:46:07.823 17563 17563 I LayoutSmoke: ok   the layout has a right stick
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: stick axes: up=30718 down=-30718
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: ok   the on-screen right stick reports up as positive
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: ok   the on-screen right stick reports down as negative
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: stick thumb: up=45.0 down=255.0
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: ok   the thumb is drawn above the middle when the finger is above it
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: ok   the thumb is drawn below the middle when the finger is below it
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: ok   a flipped stick sends the opposite direction
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: ok   a flipped stick still draws the thumb under the finger
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: ok   a stick that is not flipped saves without the flip
+10-26 15:46:07.824 17563 17563 I LayoutSmoke: ok   the flip is saved with the stick
+10-26 15:46:07.833 17563 17563 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 0
+10-26 15:46:07.845 17563 17563 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 1
+10-26 15:46:07.846 17563 17563 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 1
+10-26 15:46:07.846 17563 17563 I LayoutSmoke: sensitivity for mode 1: 147
+10-26 15:46:07.846 17563 17563 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 1
+10-26 15:46:07.858 17563 17563 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 5
+10-26 15:46:07.859 17563 17563 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 5
+10-26 15:46:07.859 17563 17563 I LayoutSmoke: sensitivity for mode 5: 147
+10-26 15:46:07.859 17563 17563 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 5
+10-26 15:46:07.870 17563 17563 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 2
+10-26 15:46:07.871 17563 17563 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 2
+10-26 15:46:07.871 17563 17563 I LayoutSmoke: sensitivity for mode 2: 147
+10-26 15:46:07.871 17563 17563 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 2
+10-26 15:46:07.880 17563 17563 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 4
+10-26 15:46:07.889 17563 17563 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 3
+10-26 15:46:07.890 17563 17563 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 3
+10-26 15:46:07.890 17563 17563 I LayoutSmoke: sensitivity for mode 3: 147
+10-26 15:46:07.890 17563 17563 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 3
+10-26 15:46:07.899 17563 17563 I LayoutSmoke: ok   the sensitivity row is offered for touch mode 6
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   the sensitivity slider can be dragged, touch mode 6
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: sensitivity for mode 6: 147
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   the sensitivity is reported to the stream, touch mode 6
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   nothing is followed at first
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   a finger on the background is followed
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   a finger on a control is not counted
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   two fingers on the background are two
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   the first finger is still the first
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   the second finger is the second
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   lifting one finger leaves one
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   the remaining finger is found by its id
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   a slot that is done holds no finger
+10-26 15:46:07.900 17563 17563 I LayoutSmoke: ok   a cancelled gesture follows nothing

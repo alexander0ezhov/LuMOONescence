@@ -103,6 +103,14 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
     // Only 2 touches are supported
     private final TouchContext[] touchContextMap = new TouchContext[2];
+
+    /**
+     * The fingers the stream itself is following. A finger holding an on-screen control never
+     * reaches the stream, so it must not be counted here either: otherwise one finger on the
+     * background looks like two, and looking around turns into a two finger scroll.
+     */
+    private final com.limelight.binding.input.touch.TouchPointerSlots streamPointers =
+            new com.limelight.binding.input.touch.TouchPointerSlots(2);
     private long threeFingerDownTime = 0;
 
     private static final int REFERENCE_HORIZ_RES = 1280;
@@ -2501,12 +2509,15 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                 switch (event.getActionMasked())
                 {
                 case MotionEvent.ACTION_POINTER_DOWN:
-                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_DOWN: {
+                    int owned = streamPointers.record(actionIndex, event.getPointerId(actionIndex));
+
                     for (TouchContext touchContext : touchContextMap) {
-                        touchContext.setPointerCount(event.getPointerCount());
+                        touchContext.setPointerCount(owned);
                     }
                     context.touchDownEvent(eventX, eventY, event.getEventTime(), true);
                     break;
+                }
                 case MotionEvent.ACTION_POINTER_UP:
                 case MotionEvent.ACTION_UP:
                     if (event.getPointerCount() == 1 &&
@@ -2526,46 +2537,60 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                         context.touchUpEvent(eventX, eventY, event.getEventTime());
                     }
 
+                    int owned = streamPointers.forget(actionIndex);
+
                     for (TouchContext touchContext : touchContextMap) {
-                        touchContext.setPointerCount(event.getPointerCount() - 1);
+                        touchContext.setPointerCount(owned);
                     }
-                    if (actionIndex == 0 && event.getPointerCount() > 1 && !context.isCancelled()) {
+                    if (actionIndex == 0 && owned > 0 && !context.isCancelled()) {
                         // The original secondary touch now becomes primary
-                        context.touchDownEvent(
-                                (int)(event.getX(1) + xOffset),
-                                (int)(event.getY(1) + yOffset),
-                                event.getEventTime(), false);
+                        int remaining = event.findPointerIndex(streamPointers.idAt(1));
+
+                        if (remaining >= 0) {
+                            context.touchDownEvent(
+                                    (int)(event.getX(remaining) + xOffset),
+                                    (int)(event.getY(remaining) + yOffset),
+                                    event.getEventTime(), false);
+                        }
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
                     // ACTION_MOVE is special because it always has actionIndex == 0
                     // We'll call the move handlers for all indexes manually
 
+                    // A finger is followed by its own id, since the indexes under it shift
+                    // whenever another finger lifts
+                    int[] pointerIndexes = new int[touchContextMap.length];
+
+                    for (int slot = 0; slot < pointerIndexes.length; slot++) {
+                        pointerIndexes[slot] = event.findPointerIndex(streamPointers.idAt(slot));
+                    }
+
                     // First process the historical events
                     for (int i = 0; i < event.getHistorySize(); i++) {
-                        for (TouchContext aTouchContextMap : touchContextMap) {
-                            if (aTouchContextMap.getActionIndex() < event.getPointerCount())
-                            {
-                                aTouchContextMap.touchMoveEvent(
-                                        (int)(event.getHistoricalX(aTouchContextMap.getActionIndex(), i) + xOffset),
-                                        (int)(event.getHistoricalY(aTouchContextMap.getActionIndex(), i) + yOffset),
+                        for (int slot = 0; slot < touchContextMap.length; slot++) {
+                            if (pointerIndexes[slot] >= 0) {
+                                touchContextMap[slot].touchMoveEvent(
+                                        (int)(event.getHistoricalX(pointerIndexes[slot], i) + xOffset),
+                                        (int)(event.getHistoricalY(pointerIndexes[slot], i) + yOffset),
                                         event.getHistoricalEventTime(i));
                             }
                         }
                     }
 
                     // Now process the current values
-                    for (TouchContext aTouchContextMap : touchContextMap) {
-                        if (aTouchContextMap.getActionIndex() < event.getPointerCount())
-                        {
-                            aTouchContextMap.touchMoveEvent(
-                                    (int)(event.getX(aTouchContextMap.getActionIndex()) + xOffset),
-                                    (int)(event.getY(aTouchContextMap.getActionIndex()) + yOffset),
+                    for (int slot = 0; slot < touchContextMap.length; slot++) {
+                        if (pointerIndexes[slot] >= 0) {
+                            touchContextMap[slot].touchMoveEvent(
+                                    (int)(event.getX(pointerIndexes[slot]) + xOffset),
+                                    (int)(event.getY(pointerIndexes[slot]) + yOffset),
                                     event.getEventTime());
                         }
                     }
                     break;
                 case MotionEvent.ACTION_CANCEL:
+                    streamPointers.clear();
+
                     for (TouchContext aTouchContext : touchContextMap) {
                         aTouchContext.cancelTouch();
                         aTouchContext.setPointerCount(0);

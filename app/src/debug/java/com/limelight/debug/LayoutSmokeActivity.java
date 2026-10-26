@@ -669,6 +669,8 @@ public class LayoutSmokeActivity extends Activity {
         checkTriggerEventNames();
         checkStickAxisSigns();
         checkSensitivityRow();
+        checkOnlyTheStreamsOwnFingersAreCounted();
+        checkTheTouchStickSurvivesTheLayout();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -4214,6 +4216,77 @@ public class LayoutSmokeActivity extends Activity {
 
             drawer.hide();
         }
+    }
+
+
+    /**
+     * A finger holding an on-screen control is not counted by the touch input, so one finger on
+     * the background still looks around instead of turning into a two finger scroll.
+     */
+    private void checkOnlyTheStreamsOwnFingersAreCounted() {
+        com.limelight.binding.input.touch.TouchPointerSlots slots =
+                new com.limelight.binding.input.touch.TouchPointerSlots(2);
+
+        check("nothing is followed at first", slots.ownedCount() == 0);
+
+        // A finger lands on the background
+        check("a finger on the background is followed", slots.record(0, 3) == 1);
+
+        // ... and a second one on an on-screen control, which never reaches the stream
+        check("a finger on a control is not counted", slots.ownedCount() == 1);
+
+        // A second finger on the background is a real second finger
+        check("two fingers on the background are two", slots.record(1, 7) == 2);
+
+        check("the first finger is still the first", slots.idAt(0) == 3);
+        check("the second finger is the second", slots.idAt(1) == 7);
+
+        // The first one lifts, leaving one finger, which must not read as two
+        check("lifting one finger leaves one", slots.forget(0) == 1);
+
+        check("the remaining finger is found by its id", slots.idAt(1) == 7);
+        check("a slot that is done holds no finger", slots.idAt(0) == -1);
+
+        slots.clear();
+
+        check("a cancelled gesture follows nothing", slots.ownedCount() == 0);
+    }
+
+
+    /**
+     * A stick the touch input is pushing survives the on-screen layout sending its own state,
+     * which is what makes looking around work while another control is held or a stick is
+     * pushed.
+     */
+    private void checkTheTouchStickSurvivesTheLayout() {
+        com.limelight.binding.input.OscStickState sticks =
+                new com.limelight.binding.input.OscStickState();
+
+        // Nothing is pushing anything, so the layout speaks for every stick
+        check("a stick nothing is pushing comes from the layout",
+                sticks.mergeRightY((short) 700) == 700);
+
+        // The touch input pushes the right stick
+        sticks.setTouchRight((short) 100, (short) 2000);
+
+        check("a pushed stick is taken from the touch input",
+                sticks.mergeRightY((short) 0) == 2000);
+
+        // The layout reporting its own state, with the stick in the middle, does not move it
+        check("a stick pushed by the touch input survives a layout report",
+                sticks.mergeRightY((short) 0) == 2000);
+
+        // The other stick is still the layout's
+        check("the other stick still comes from the layout",
+                sticks.mergeLeftY((short) -400) == -400);
+
+        // Letting go hands the stick back to the layout
+        sticks.setTouchRight((short) 0, (short) 0);
+
+        check("a released stick gives the layout its stick back",
+                sticks.mergeRightY((short) 500) == 500);
+        check("a released stick is no longer the touch input's",
+                !sticks.isTouchRightActive());
     }
 
     private static boolean contains(String[] labels, String needle) {
