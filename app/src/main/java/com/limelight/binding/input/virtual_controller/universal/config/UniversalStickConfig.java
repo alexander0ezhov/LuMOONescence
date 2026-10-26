@@ -28,6 +28,7 @@ public class UniversalStickConfig extends UniversalElementConfig {
     private static final String KEY_AXIS_Y = "axisY";
     private static final String KEY_BUTTONS = "buttons";
     private static final String KEY_CENTER_BUTTON = "centerButton";
+    private static final String KEY_INVERT_Y = "invertY";
 
     private static final String[] DIRECTION_NAMES = new String[]{"Up", "Down", "Left", "Right"};
 
@@ -128,6 +129,22 @@ public class UniversalStickConfig extends UniversalElementConfig {
         return centerButtonEnabled && centerButton.isAssigned();
     }
 
+    /**
+     * Whether the vertical direction is turned around.
+     *
+     * The host takes upwards as positive, which is what the stick sends by default. A game that
+     * reads it the other way, or a player who wants the opposite, flips it here.
+     */
+    private boolean invertY;
+
+    public boolean isInvertY() {
+        return invertY;
+    }
+
+    public void setInvertY(boolean invertY) {
+        this.invertY = invertY;
+    }
+
     @Override
     protected JSONObject createOptionsJson() throws JSONException {
         JSONObject options = new JSONObject();
@@ -145,6 +162,7 @@ public class UniversalStickConfig extends UniversalElementConfig {
         center.put("enabled", centerButtonEnabled);
         center.put("binding", centerButton.toJson());
         options.put(KEY_CENTER_BUTTON, center);
+        options.put(KEY_INVERT_Y, invertY);
 
         return options;
     }
@@ -152,6 +170,7 @@ public class UniversalStickConfig extends UniversalElementConfig {
     @Override
     protected void readOptionsJson(JSONObject options) throws JSONException {
         mode = options.optInt(KEY_MODE, MODE_AXES);
+        invertY = options.optBoolean(KEY_INVERT_Y, false);
         axisX = options.optInt(KEY_AXIS_X, axisX);
         axisY = options.optInt(KEY_AXIS_Y, axisY);
 

@@ -316,9 +316,12 @@ public class RelativeTouchContext implements TouchContext {
                 int deltaX = eventX - lastTouchX;
                 int deltaY = eventY - lastTouchY;
 
-                // Scale the deltas based on the factors passed to our constructor
-                deltaX = (int) Math.round((double) Math.abs(deltaX) * xFactor);
-                deltaY = (int) Math.round((double) Math.abs(deltaY) * yFactor);
+                // Scale the deltas based on the factors passed to our constructor, and then by
+                // how sensitive the user asked the touchpad to be
+                double sensitivity = prefConfig.touchpadSensitivity / 100.0;
+
+                deltaX = (int) Math.round((double) Math.abs(deltaX) * xFactor * sensitivity);
+                deltaY = (int) Math.round((double) Math.abs(deltaY) * yFactor * sensitivity);
 
                 // Fix up the signs
                 if (eventX < lastTouchX) {

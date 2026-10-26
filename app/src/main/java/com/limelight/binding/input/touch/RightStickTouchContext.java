@@ -31,7 +31,7 @@ public class RightStickTouchContext implements TouchContext {
     private boolean cancelled;
 
     public RightStickTouchContext(ControllerHandler controllerHandler, int actionIndex,
-                                  View targetView) {
+                                  View targetView, int sensitivityPercent) {
         this.controllerHandler = controllerHandler;
         this.actionIndex = actionIndex;
 
@@ -44,7 +44,10 @@ public class RightStickTouchContext implements TouchContext {
                     targetView.getResources().getDisplayMetrics().heightPixels);
         }
 
-        this.fullTravel = Math.max(1f, shorter * FULL_TRAVEL_SHARE);
+        // A more sensitive stick reaches all the way over with less travel
+        float sensitivity = Math.max(0.2f, sensitivityPercent / 100f);
+
+        this.fullTravel = Math.max(1f, shorter * FULL_TRAVEL_SHARE / sensitivity);
     }
 
     @Override

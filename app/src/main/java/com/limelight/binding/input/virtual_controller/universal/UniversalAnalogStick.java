@@ -264,12 +264,12 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
      * @param y vertical position, -1..1 with the origin in the middle
      */
     protected void applyConfiguredMovement(float x, float y) {
-        // The touch inside the control grows downwards, while the host, the mouse and the
-        // directions of a stick all take upwards as positive. Turning the value around here is
-        // what keeps "push the finger up" from being sent as "pull down".
-        y = -y;
-
         UniversalStickConfig config = getStickConfig();
+
+        // A stick the user has flipped sends the opposite vertical direction
+        if (config.isInvertY()) {
+            y = -y;
+        }
 
         if (config.isAxesMode()) {
             applyHostAxis(config.getAxisX(), x);
@@ -290,14 +290,20 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
         }
 
         if (option.kind == UniversalHostAxis.KIND_MOUSE) {
-            // A vertical mouse axis reports its own sign, and the stick's Y already grows
-            // upwards like the mouse does.
+            // A vertical mouse axis grows downwards, which is the way the touch inside the
+            // control grows as well, so the value is passed on as it is
             controller.moveMouseByStick(this, option.target, value);
             return;
         }
 
+        // The host takes upwards as positive for a stick axis, while the touch inside the
+        // control grows downwards, so a vertical axis is turned around. Without this, pushing
+        // the finger up sends the stick down.
+        boolean vertical = option.target == UniversalHostAxis.TARGET_LEFT_Y
+                || option.target == UniversalHostAxis.TARGET_RIGHT_Y;
+
         UniversalVirtualController.ControllerInputContext inputContext = controller.getControllerInputContext();
-        short scaled = (short) (value * 0x7FFE);
+        short scaled = (short) ((vertical ? -value : value) * 0x7FFE);
 
         switch (option.target) {
             case UniversalHostAxis.TARGET_LEFT_X:
@@ -324,8 +330,10 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
     private void applyButtonMovement(UniversalStickConfig config, float x, float y) {
         setDirectionPressed(config, UniversalStickConfig.DIRECTION_LEFT, x <= -DIRECTION_THRESHOLD);
         setDirectionPressed(config, UniversalStickConfig.DIRECTION_RIGHT, x >= DIRECTION_THRESHOLD);
-        setDirectionPressed(config, UniversalStickConfig.DIRECTION_UP, y >= DIRECTION_THRESHOLD);
-        setDirectionPressed(config, UniversalStickConfig.DIRECTION_DOWN, y <= -DIRECTION_THRESHOLD);
+
+        // The thumb grows downwards, so a smaller y is a push upwards
+        setDirectionPressed(config, UniversalStickConfig.DIRECTION_UP, y <= -DIRECTION_THRESHOLD);
+        setDirectionPressed(config, UniversalStickConfig.DIRECTION_DOWN, y >= DIRECTION_THRESHOLD);
     }
 
     private void setDirectionPressed(UniversalStickConfig config, int direction, boolean pressed) {
@@ -509,17 +517,36 @@ public class UniversalAnalogStick extends UniversalVirtualControllerElement
         paint.setShader(null);
     }
 
+    /**
+     * Where the thumb is drawn, for the debug smoke test: it has to be the side of the middle
+     * the finger is on, or the stick looks like it moves the other way.
+     */
+    public float getThumbYForTesting() {
+        return position_stick_y;
+    }
+
     private void updatePosition(long eventTime) {
-        // get 100% way
-        float complete = radius_complete - radius_analog_stick;
+        // How far the thumb travels from the middle to the edge of its travel
+        float complete = Math.max(1f, radius_complete - radius_analog_stick);
 
-        // calculate relative way
-        float correlated_y = (float) (Math.sin(Math.PI / 2 - movement_angle) * (movement_radius));
-        float correlated_x = (float) (Math.cos(Math.PI / 2 - movement_angle) * (movement_radius));
+        // The thumb is placed from where the finger is, measured from the middle of the control.
+        // Reading the finger directly, rather than going through an angle, is what keeps the
+        // thumb on the same side as the finger: down is down.
+        float offsetX = relative_x;
+        float offsetY = relative_y;
 
-        // update positions
-        position_stick_x = getWidth() / 2 - correlated_x;
-        position_stick_y = getHeight() / 2 - correlated_y;
+        float distance = (float) Math.hypot(offsetX, offsetY);
+        if (distance > complete) {
+            float limit = complete / distance;
+            offsetX *= limit;
+            offsetY *= limit;
+        }
+
+        position_stick_x = getWidth() / 2 + offsetX;
+        position_stick_y = getHeight() / 2 + offsetY;
+
+        float correlated_x = -offsetX;
+        float correlated_y = offsetY;
 
         // Stay active even if we're back in the deadzone because we know the user is actively
         // giving analog stick input and we don't want to snap back into the deadzone.

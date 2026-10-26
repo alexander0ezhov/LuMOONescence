@@ -103,6 +103,43 @@ public class PreferenceConfiguration {
     public static final int TOUCH_MODE_LEFT_STICK = 6;
 
     /**
+     * How much a finger has to move for the touchpad to move the view, as a percentage of the
+     * normal amount. A larger value turns further for the same swipe.
+     */
+    public static final int SENSITIVITY_MIN = 20;
+    public static final int SENSITIVITY_MAX = 300;
+    public static final int SENSITIVITY_DEFAULT = 100;
+
+    private static final String TOUCHPAD_SENSITIVITY_PREF_STRING = "seekbar_touchpad_sensitivity";
+    private static final String STICK_SENSITIVITY_PREF_STRING = "seekbar_stick_sensitivity";
+
+    public static int getTouchpadSensitivity(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt(
+                TOUCHPAD_SENSITIVITY_PREF_STRING, SENSITIVITY_DEFAULT);
+    }
+
+    public static void setTouchpadSensitivity(Context context, int percent) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(TOUCHPAD_SENSITIVITY_PREF_STRING, clampSensitivity(percent))
+                .apply();
+    }
+
+    public static int getStickSensitivity(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt(
+                STICK_SENSITIVITY_PREF_STRING, SENSITIVITY_DEFAULT);
+    }
+
+    public static void setStickSensitivity(Context context, int percent) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(STICK_SENSITIVITY_PREF_STRING, clampSensitivity(percent))
+                .apply();
+    }
+
+    private static int clampSensitivity(int percent) {
+        return Math.max(SENSITIVITY_MIN, Math.min(SENSITIVITY_MAX, percent));
+    }
+
+    /**
      * Whether the touchscreen behaves as some kind of trackpad, which is what decides if the
      * choice of how it behaves is worth offering.
      */
@@ -175,6 +212,10 @@ public class PreferenceConfiguration {
     public int bitrate;
     public FormatOption videoFormat;
     public int deadzonePercentage;
+
+    /** How far the touchpad turns for a swipe, and how far the finger goes for a full stick. */
+    public int touchpadSensitivity = SENSITIVITY_DEFAULT;
+    public int stickSensitivity = SENSITIVITY_DEFAULT;
     public boolean stretchVideo, enableSops, playHostAudio, disableWarnings;
     public String language;
     public boolean smallIconMode, multiController, usbDriver, flipFaceButtons;
@@ -678,6 +719,11 @@ public class PreferenceConfiguration {
         config.analogStickForScrolling = getAnalogStickForScrollingValue(context);
 
         config.deadzonePercentage = prefs.getInt(DEADZONE_PREF_STRING, DEFAULT_DEADZONE);
+
+        config.touchpadSensitivity = prefs.getInt(TOUCHPAD_SENSITIVITY_PREF_STRING,
+                SENSITIVITY_DEFAULT);
+        config.stickSensitivity = prefs.getInt(STICK_SENSITIVITY_PREF_STRING,
+                SENSITIVITY_DEFAULT);
 
         config.language = prefs.getString(LANGUAGE_PREF_STRING, DEFAULT_LANGUAGE);
 

@@ -623,6 +623,28 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             }
 
             @Override
+            public int getSensitivity() {
+                return isStickTouchMode()
+                        ? PreferenceConfiguration.getStickSensitivity(Game.this)
+                        : PreferenceConfiguration.getTouchpadSensitivity(Game.this);
+            }
+
+            @Override
+            public void onSensitivityChanged(int percent) {
+                if (isStickTouchMode()) {
+                    PreferenceConfiguration.setStickSensitivity(Game.this, percent);
+                    prefConfig.stickSensitivity = percent;
+                }
+                else {
+                    PreferenceConfiguration.setTouchpadSensitivity(Game.this, percent);
+                    prefConfig.touchpadSensitivity = percent;
+                }
+
+                // The touch contexts take the value when they are made, so they are made again
+                setUpTouchContexts();
+            }
+
+            @Override
             public boolean isVibrationEnabled() {
                 return PreferenceConfiguration.isVibrationEnabled(Game.this);
             }
@@ -685,8 +707,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             case PreferenceConfiguration.TOUCH_MODE_TRACKPAD:
             case PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS: {
                 // The same scaling the trackpad itself uses, so the movement feels the same
-                double xFactor = REFERENCE_HORIZ_RES / (double) streamView.getWidth();
-                double yFactor = REFERENCE_VERT_RES / (double) streamView.getHeight();
+                double sensitivity = prefConfig.touchpadSensitivity / 100.0;
+                double xFactor = REFERENCE_HORIZ_RES / (double) streamView.getWidth() * sensitivity;
+                double yFactor = REFERENCE_VERT_RES / (double) streamView.getHeight() * sensitivity;
 
                 conn.sendMouseMove((short) Math.round(deltaX * xFactor),
                         (short) Math.round(deltaY * yFactor));
@@ -710,7 +733,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             case PreferenceConfiguration.TOUCH_MODE_LEFT_STICK: {
                 // The press is the centre of a stick, the same way the stick touch modes work
                 int shorter = Math.min(streamView.getWidth(), streamView.getHeight());
-                float travel = Math.max(1f, shorter * 0.18f);
+                float travel = Math.max(1f, shorter * 0.18f
+                        / Math.max(0.2f, prefConfig.stickSensitivity / 100f));
 
                 float offsetX = x - passThroughOriginX;
                 float offsetY = y - passThroughOriginY;
@@ -1831,6 +1855,15 @@ public class Game extends Activity implements SurfaceHolder.Callback,
      * It is a method rather than a loop in the setup because the stream menu can change the
      * setting while streaming, and the change has to take effect at once.
      */
+    /**
+     * Whether the touchscreen drives a stick, which is what the sensitivity setting applies to
+     * when it is not a touchpad.
+     */
+    private boolean isStickTouchMode() {
+        return prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK
+                || prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK;
+    }
+
     private void setUpTouchContexts() {
         for (int i = 0; i < touchContextMap.length; i++) {
             switch (prefConfig.touchMode) {
@@ -1839,11 +1872,13 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                     break;
 
                 case PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK:
-                    touchContextMap[i] = new RightStickTouchContext(controllerHandler, i, streamView);
+                    touchContextMap[i] = new RightStickTouchContext(controllerHandler, i, streamView,
+                            prefConfig.stickSensitivity);
                     break;
 
                 case PreferenceConfiguration.TOUCH_MODE_LEFT_STICK:
-                    touchContextMap[i] = new LeftStickTouchContext(controllerHandler, i, streamView);
+                    touchContextMap[i] = new LeftStickTouchContext(controllerHandler, i, streamView,
+                            prefConfig.stickSensitivity);
                     break;
 
                 case PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN:

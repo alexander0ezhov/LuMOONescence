@@ -618,6 +618,19 @@ public class UniversalElementEditorBuilder {
                     }
                 });
 
+        panel.addCheckBox(context.getString(R.string.editor_label_invert_y), config.isInvertY(),
+                new UniversalEditorPanel.OnCheckedListener() {
+                    @Override
+                    public void onCheckedChanged(boolean checked) {
+                        if (config.isInvertY() == checked) {
+                            return;
+                        }
+
+                        config.setInvertY(checked);
+                        callbacks.onElementChanged();
+                    }
+                });
+
         if (config.isAxesMode()) {
             buildAxisSpinner(context.getString(R.string.editor_label_axis_x), config.getAxisX(),
                     new AxisConsumer() {

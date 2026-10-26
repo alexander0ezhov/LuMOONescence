@@ -668,6 +668,7 @@ public class LayoutSmokeActivity extends Activity {
         checkLayoutsScreenIsTidy();
         checkTriggerEventNames();
         checkStickAxisSigns();
+        checkSensitivityRow();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -2809,6 +2810,7 @@ public class LayoutSmokeActivity extends Activity {
         final String[] chosenLayout = new String[]{null};
         final boolean[] keyboardAsked = new boolean[]{false};
         final boolean[] exited = new boolean[]{false};
+        final int[] sensitivity = new int[]{100};
         final boolean[] controlsShown = new boolean[]{true};
         final int[] opacity = new int[]{100};
         final boolean[] vibration = new boolean[]{true};
@@ -2875,6 +2877,16 @@ public class LayoutSmokeActivity extends Activity {
                     @Override
                     public void onLayoutOpacityChanged(int percent) {
                         opacity[0] = percent;
+                    }
+
+                    @Override
+                    public int getSensitivity() {
+                        return sensitivity[0];
+                    }
+
+                    @Override
+                    public void onSensitivityChanged(int percent) {
+                        sensitivity[0] = percent;
                     }
 
                     @Override
@@ -3677,6 +3689,7 @@ public class LayoutSmokeActivity extends Activity {
      */
     private void checkStreamMenuExtras() {
         final boolean[] vibration = new boolean[]{true};
+        final int[] sensitivity = new int[]{100};
         final java.util.List<UniversalLayoutDefinition> layouts = new java.util.ArrayList<>();
 
         FrameLayout area = new FrameLayout(this);
@@ -3729,6 +3742,16 @@ public class LayoutSmokeActivity extends Activity {
 
                     @Override
                     public void onLayoutOpacityChanged(int percent) {
+                    }
+
+                    @Override
+                    public int getSensitivity() {
+                        return sensitivity[0];
+                    }
+
+                    @Override
+                    public void onSensitivityChanged(int percent) {
+                        sensitivity[0] = percent;
                     }
 
                     @Override
@@ -4003,11 +4026,193 @@ public class LayoutSmokeActivity extends Activity {
 
             check("the on-screen right stick reports up as positive", up > 0);
             check("the on-screen right stick reports down as negative", down < 0);
+
+            // The thumb has to be drawn on the side the finger is on, or the stick looks
+            // inverted even when the value it sends is right
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_MOVE, 0.5f, 0.15f));
+
+            float thumbUp = ((UniversalAnalogStick) rs).getThumbYForTesting();
+
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_MOVE, 0.5f, 0.85f));
+
+            float thumbDown = ((UniversalAnalogStick) rs).getThumbYForTesting();
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+
+            android.util.Log.i("LayoutSmoke", "stick thumb: up=" + thumbUp + " down=" + thumbDown);
+
+            check("the thumb is drawn above the middle when the finger is above it",
+                    thumbUp < rs.getHeight() / 2f);
+            check("the thumb is drawn below the middle when the finger is below it",
+                    thumbDown > rs.getHeight() / 2f);
+
+            // A stick can be told to send the opposite direction, which is what a game that
+            // reads the sign the other way needs. The thumb keeps following the finger.
+            com.limelight.binding.input.virtual_controller.universal.config.UniversalStickConfig
+                    stickConfig = ((UniversalAnalogStick) rs).getStickConfig();
+
+            stickConfig.setInvertY(true);
+
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_DOWN, 0.5f, 0.5f));
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_MOVE, 0.5f, 0.15f));
+
+            short flippedUp = controller.getControllerInputContext().rightStickY;
+            float flippedThumb = ((UniversalAnalogStick) rs).getThumbYForTesting();
+
+            rs.onElementTouchEvent(motionEventFor(rs, MotionEvent.ACTION_UP, 0.5f, 0.5f));
+            stickConfig.setInvertY(false);
+
+            check("a flipped stick sends the opposite direction", flippedUp < 0);
+            check("a flipped stick still draws the thumb under the finger",
+                    flippedThumb < rs.getHeight() / 2f);
+
+            // And the setting survives being saved, through the whole element rather than the
+            // options on their own
+            String before;
+            String flipped;
+
+            try {
+                before = rs.getConfig().toJson().toString();
+
+                stickConfig.setInvertY(true);
+                flipped = rs.getConfig().toJson().toString();
+            } catch (org.json.JSONException e) {
+                before = "";
+                flipped = "";
+            } finally {
+                stickConfig.setInvertY(false);
+            }
+
+            check("a stick that is not flipped saves without the flip",
+                    !before.contains("\"invertY\":true"));
+            check("the flip is saved with the stick", flipped.contains("\"invertY\":true"));
         } finally {
             rs.releaseConfiguredActions();
             controller.setControllerMode(original);
             controller.getControllerInputContext().rightStickX = 0;
             controller.getControllerInputContext().rightStickY = 0;
+        }
+    }
+
+
+    /**
+     * The sensitivity row appears only where it means something, and what it reports is what the
+     * stream is told.
+     */
+    private void checkSensitivityRow() {
+        int[] modes = new int[]{
+                com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_OFF,
+                com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TRACKPAD,
+                com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS,
+                com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN,
+                com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS,
+                com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK,
+                com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_LEFT_STICK,
+        };
+
+        String label = getString(R.string.stream_menu_sensitivity);
+
+        for (int mode : modes) {
+            final int[] sensitivity = new int[]{100};
+            final int[] chosenMode = new int[]{mode};
+
+            FrameLayout area = new FrameLayout(this);
+            UniversalStreamDrawer drawer = new UniversalStreamDrawer(this, area,
+                    new UniversalStreamDrawer.Host() {
+                        @Override
+                        public void onExitStream() {
+                        }
+
+                        @Override
+                        public void onShowKeyboard() {
+                        }
+
+                        @Override
+                        public int getTouchMode() {
+                            return chosenMode[0];
+                        }
+
+                        @Override
+                        public void onTouchModeChanged(int newMode) {
+                            chosenMode[0] = newMode;
+                        }
+
+                        @Override
+                        public java.util.List<UniversalLayoutDefinition> getLayouts() {
+                            return new java.util.ArrayList<>();
+                        }
+
+                        @Override
+                        public String getSelectedLayoutId() {
+                            return "";
+                        }
+
+                        @Override
+                        public void onLayoutChosen(String layoutId) {
+                        }
+
+                        @Override
+                        public boolean isOnScreenControlsEnabled() {
+                            return true;
+                        }
+
+                        @Override
+                        public void onOnScreenControlsToggled(boolean enabled) {
+                        }
+
+                        @Override
+                        public int getLayoutOpacity() {
+                            return 100;
+                        }
+
+                        @Override
+                        public void onLayoutOpacityChanged(int percent) {
+                        }
+
+                        @Override
+                        public int getSensitivity() {
+                            return sensitivity[0];
+                        }
+
+                        @Override
+                        public void onSensitivityChanged(int percent) {
+                            sensitivity[0] = percent;
+                        }
+
+                        @Override
+                        public boolean isVibrationEnabled() {
+                            return true;
+                        }
+
+                        @Override
+                        public void onVibrationChanged(boolean enabled) {
+                        }
+                    });
+
+            drawer.show();
+
+            boolean shown = containsLabel(drawer.getRowTitlesForTesting(), label);
+            boolean wanted = mode != com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_OFF
+                    && mode != com.limelight.preferences.PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS;
+
+            check("the sensitivity row is offered for touch mode " + mode, shown == wanted);
+
+            if (shown) {
+                drawer.getView().measure(View.MeasureSpec.makeMeasureSpec(600, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(1800, View.MeasureSpec.EXACTLY));
+                drawer.getView().layout(0, 0, 600, 1800);
+
+                check("the sensitivity slider can be dragged, touch mode " + mode,
+                        drawer.dragSensitivityToForTesting(150));
+                android.util.Log.i("LayoutSmoke", "sensitivity for mode " + mode + ": "
+                        + sensitivity[0]);
+
+                // A drag lands on a pixel, so the value it reports is near the one asked for
+                check("the sensitivity is reported to the stream, touch mode " + mode,
+                        Math.abs(sensitivity[0] - 150) <= 3);
+            }
+
+            drawer.hide();
         }
     }
 
@@ -4298,6 +4503,15 @@ public class LayoutSmokeActivity extends Activity {
 
                     @Override
                     public void onLayoutOpacityChanged(int percent) {
+                    }
+
+                    @Override
+                    public int getSensitivity() {
+                        return 100;
+                    }
+
+                    @Override
+                    public void onSensitivityChanged(int percent) {
                     }
 
                     @Override

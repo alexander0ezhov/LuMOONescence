@@ -249,6 +249,7 @@
     <string name="stream_menu_touch_left_stick">Left stick</string>
     <string name="stream_menu_touch_events">Touch native (experimental)</string>
     <string name="stream_menu_opacity">Opacity</string>
+    <string name="stream_menu_sensitivity">Sensitivity</string>
     <string name="stream_menu_touchpad_mode">Touchpad mode</string>
     <string name="stream_menu_touchpad_standard">Trackpad</string>
     <string name="stream_menu_touchpad_direct">Direct cursor</string>
@@ -290,6 +291,7 @@
     <string name="editor_label_control_mode">Control mode</string>
     <string name="editor_mode_axes">Axes</string>
     <string name="editor_mode_buttons">Buttons</string>
+    <string name="editor_label_invert_y">Invert up and down (for a game that reads it the other way)</string>
     <string name="editor_label_axis_x">Axis X</string>
     <string name="editor_label_axis_y">Axis Y</string>
     <string name="editor_label_direction_up">Button: up</string>

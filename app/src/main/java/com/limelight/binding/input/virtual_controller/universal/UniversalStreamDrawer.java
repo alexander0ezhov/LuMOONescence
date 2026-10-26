@@ -76,6 +76,14 @@ public class UniversalStreamDrawer {
         void onLayoutOpacityChanged(int percent);
 
         /**
+         * How far the touchscreen turns the view, or how short a push fills a stick, as a
+         * percentage of the normal amount.
+         */
+        int getSensitivity();
+
+        void onSensitivityChanged(int percent);
+
+        /**
          * Whether the phone buzzes when the game rumbles.
          */
         boolean isVibrationEnabled();
@@ -185,6 +193,11 @@ public class UniversalStreamDrawer {
         // does, so the row appears with it
         if (PreferenceConfiguration.isTouchpadMode(host.getTouchMode())) {
             content.addView(buildTouchpadModeRow(), matchWidth());
+        }
+
+        // How sensitive the touch is applies to a touchpad and to a stick, and to nothing else
+        if (showsSensitivity()) {
+            content.addView(buildSensitivityRow(), matchWidth());
         }
 
         content.addView(buildControlsRow(), matchWidth());
@@ -375,6 +388,77 @@ public class UniversalStreamDrawer {
 
                 if (fromUser) {
                     host.onLayoutOpacityChanged(percent);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        LinearLayout.LayoutParams sliderParams = new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        sliderParams.setMarginStart(dp(10));
+
+        row.addView(title, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        row.addView(slider, sliderParams);
+        row.addView(value);
+
+        return row;
+    }
+
+    /**
+     * Whether the sensitivity setting means anything for what the touchscreen is doing now.
+     */
+    private boolean showsSensitivity() {
+        int mode = host.getTouchMode();
+
+        return PreferenceConfiguration.isTouchpadMode(mode)
+                || mode == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK
+                || mode == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK;
+    }
+
+    /**
+     * How far a swipe turns the view, or how short a push fills a stick.
+     */
+    private View buildSensitivityRow() {
+        LinearLayout row = new LinearLayout(activity);
+
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(16), dp(12), dp(16), dp(12));
+        row.setBackground(rowBackground());
+
+        TextView title = new TextView(activity);
+        title.setText(R.string.stream_menu_sensitivity);
+        title.setTextColor(0xFFE8EAF0);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+        final TextView value = new TextView(activity);
+        value.setTextColor(0xFFE8EAF0);
+        value.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        value.setText(String.valueOf(host.getSensitivity()));
+        value.setMinWidth(dp(38));
+        value.setGravity(Gravity.END);
+
+        final SeekBar slider = new SeekBar(activity);
+        slider.setMax(PreferenceConfiguration.SENSITIVITY_MAX - PreferenceConfiguration.SENSITIVITY_MIN);
+        slider.setProgress(Math.max(0, Math.min(slider.getMax(),
+                host.getSensitivity() - PreferenceConfiguration.SENSITIVITY_MIN)));
+        slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int percent = PreferenceConfiguration.SENSITIVITY_MIN + progress;
+
+                value.setText(String.valueOf(percent));
+
+                if (fromUser) {
+                    host.onSensitivityChanged(percent);
                 }
             }
 
@@ -859,20 +943,32 @@ public class UniversalStreamDrawer {
     }
 
     /**
+     * Drags the sensitivity slider the way a finger does, for the debug smoke test.
+     */
+    public boolean dragSensitivityToForTesting(int percent) {
+        SeekBar slider = getSliderForTesting(getString(R.string.stream_menu_sensitivity));
+
+        return dragSliderForTesting(slider, percent,
+                PreferenceConfiguration.SENSITIVITY_MIN, PreferenceConfiguration.SENSITIVITY_MAX);
+    }
+
+    /**
      * Drags the opacity slider the way a finger does, for the debug smoke test.
      *
      * Setting the progress of a slider reports a change that came from the code rather than
      * from the user, which is deliberately not passed on, so a check has to touch it.
      */
     public boolean dragOpacityToForTesting(int percent) {
-        SeekBar slider = findOpacitySlider(content);
+        return dragSliderForTesting(findOpacitySlider(content), percent, OPACITY_MIN, 100);
+    }
 
+    private boolean dragSliderForTesting(SeekBar slider, int percent, int min, int max) {
         if (slider == null || slider.getWidth() <= 0) {
             return false;
         }
 
-        int wanted = Math.max(OPACITY_MIN, Math.min(100, percent));
-        float x = slider.getWidth() * (wanted - OPACITY_MIN) / (float)(100 - OPACITY_MIN);
+        int wanted = Math.max(min, Math.min(max, percent));
+        float x = slider.getWidth() * (wanted - min) / (float)(max - min);
         float y = slider.getHeight() / 2f;
         long now = android.os.SystemClock.uptimeMillis();
 
@@ -923,6 +1019,27 @@ public class UniversalStreamDrawer {
 
         row.performClick();
         return true;
+    }
+
+    /**
+     * The slider of the row with this label, for the debug smoke test.
+     */
+    public SeekBar getSliderForTesting(String label) {
+        View title = findText(content, label);
+
+        if (!(title instanceof TextView) || !(((TextView) title).getParent() instanceof ViewGroup)) {
+            return null;
+        }
+
+        ViewGroup row = (ViewGroup) ((TextView) title).getParent();
+
+        for (int i = 0; i < row.getChildCount(); i++) {
+            if (row.getChildAt(i) instanceof SeekBar) {
+                return (SeekBar) row.getChildAt(i);
+            }
+        }
+
+        return null;
     }
 
     /**
