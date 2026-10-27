@@ -1,10 +1,10 @@
-LunarStreamLight - open source licenses
+LuMOONescence - open source licenses
 ================================
 
 This app is a modified fork of Moonlight for Android (https://moonlight-stream.org), which is
 free software under the GNU General Public License version 3. You may use, study, share and
 change it. The complete source of this build is published at
-https://github.com/alexander0ezhov/moonlight-android
+https://github.com/alexander0ezhov/LuMOONescence
 
 Original work: Copyright (C) Cameron Gutman and Moonlight contributors.
 "The name Moonlight and its logo belong to the Moonlight project." This app is not an official

@@ -1,4 +1,4 @@
-# LunarStreamLight (fork of Moonlight for Android)
+# LuMOONescence (fork of Moonlight for Android)
 
 Клиент для стриминга игр с ПК на Android. Это **форк** [Moonlight for Android](https://github.com/moonlight-stream/moonlight-android)
 с доработанным экранным управлением.

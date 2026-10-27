@@ -33,4 +33,4 @@ The complete license texts are shown in the app under
 ## Source code
 
 The complete corresponding source of every published build is available at
-https://github.com/alexander0ezhov/moonlight-android under the tag matching the build.
+https://github.com/alexander0ezhov/LuMOONescence under the tag matching the build.
