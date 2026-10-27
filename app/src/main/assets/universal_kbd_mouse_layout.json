@@ -1,0 +1,762 @@
+{
+  "format": "moonlight-universal-layout",
+  "version": 1,
+  "name": "",
+  "screen": {
+    "width": 2510,
+    "height": 1156
+  },
+  "elements": [
+    {
+      "name": "D-pad",
+      "geometry": {
+        "left": 321,
+        "top": 162,
+        "width": 400,
+        "height": 400
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "directions": [
+          {
+            "steps": [
+              {
+                "delayMs": 0,
+                "events": [
+                  {
+                    "kind": 0,
+                    "code": 32817
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "steps": [
+              {
+                "delayMs": 0,
+                "events": [
+                  {
+                    "kind": 0,
+                    "code": 32819
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "steps": [
+              {
+                "delayMs": 0,
+                "events": [
+                  {
+                    "kind": 0,
+                    "code": 32820
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "steps": [
+              {
+                "delayMs": 0,
+                "events": [
+                  {
+                    "kind": 0,
+                    "code": 32818
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "type": "dpad",
+      "elementId": 1
+    },
+    {
+      "name": "Space",
+      "geometry": {
+        "left": 2136,
+        "top": 657,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32800
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 6
+    },
+    {
+      "name": "C",
+      "geometry": {
+        "left": 2287,
+        "top": 510,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32835
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 7
+    },
+    {
+      "name": "F",
+      "geometry": {
+        "left": 1981,
+        "top": 506,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32838
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 8
+    },
+    {
+      "name": "E",
+      "geometry": {
+        "left": 2134,
+        "top": 356,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32837
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 9
+    },
+    {
+      "name": "MB2",
+      "geometry": {
+        "left": 1773,
+        "top": 349,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": true,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 1,
+                  "code": 3
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 2
+    },
+    {
+      "name": "MB1",
+      "geometry": {
+        "left": 1666,
+        "top": 507,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": true,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 1,
+                  "code": 1
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 3
+    },
+    {
+      "name": "T",
+      "geometry": {
+        "left": 2133,
+        "top": 507,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32852
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 4
+    },
+    {
+      "name": "Left stick",
+      "geometry": {
+        "left": 356,
+        "top": 690,
+        "width": 340,
+        "height": 340
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "mode": 1,
+        "axisX": 1,
+        "axisY": 2,
+        "buttons": [
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": [
+                {
+                  "delayMs": 0,
+                  "events": [
+                    {
+                      "kind": 0,
+                      "code": 32855
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": [
+                {
+                  "delayMs": 0,
+                  "events": [
+                    {
+                      "kind": 0,
+                      "code": 32851
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": [
+                {
+                  "delayMs": 0,
+                  "events": [
+                    {
+                      "kind": 0,
+                      "code": 32833
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": [
+                {
+                  "delayMs": 0,
+                  "events": [
+                    {
+                      "kind": 0,
+                      "code": 32836
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "centerButton": {
+          "enabled": false,
+          "binding": {
+            "buttonCode": 0,
+            "sequence": {
+              "steps": []
+            }
+          }
+        },
+        "invertY": false
+      },
+      "type": "stick",
+      "elementId": 12
+    },
+    {
+      "name": "Esc",
+      "geometry": {
+        "left": 97,
+        "top": 16,
+        "width": 192,
+        "height": 112
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32795
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 10
+    },
+    {
+      "name": "Enter",
+      "geometry": {
+        "left": 300,
+        "top": 16,
+        "width": 192,
+        "height": 112
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32781
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 11
+    },
+    {
+      "name": "alt+f4",
+      "geometry": {
+        "left": 1970,
+        "top": 16,
+        "width": 202,
+        "height": 106
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32932
+                },
+                {
+                  "kind": 0,
+                  "code": 32883
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1000
+    },
+    {
+      "name": "#",
+      "geometry": {
+        "left": 1853,
+        "top": 506,
+        "width": 108,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 1,
+                  "code": 1
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": true
+      },
+      "type": "button",
+      "elementId": 1001
+    },
+    {
+      "name": "RS",
+      "geometry": {
+        "left": 2300,
+        "top": 789,
+        "width": 146,
+        "height": 144
+      },
+      "borderRadius": 38,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 1,
+                  "code": 2
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1002
+    },
+    {
+      "name": "LS",
+      "geometry": {
+        "left": 2154,
+        "top": 878,
+        "width": 146,
+        "height": 144
+      },
+      "borderRadius": 38,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32928
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1003
+    },
+    {
+      "name": "MB1",
+      "geometry": {
+        "left": 765,
+        "top": 642,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 1,
+                  "code": 1
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1005
+    },
+    {
+      "name": "alt+tab",
+      "geometry": {
+        "left": 2217,
+        "top": 16,
+        "width": 202,
+        "height": 106
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32932
+                },
+                {
+                  "kind": 0,
+                  "code": 32777
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1006
+    },
+    {
+      "name": "#",
+      "geometry": {
+        "left": 1960,
+        "top": 348,
+        "width": 108,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 1,
+                  "code": 3
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": true
+      },
+      "type": "button",
+      "elementId": 1007
+    },
+    {
+      "name": "R",
+      "geometry": {
+        "left": 2287,
+        "top": 357,
+        "width": 160,
+        "height": 160
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32850
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1008
+    },
+    {
+      "name": "MB2",
+      "geometry": {
+        "left": 640,
+        "top": 479,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 1,
+                  "code": 3
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1011
+    },
+    {
+      "name": "Z",
+      "geometry": {
+        "left": 65,
+        "top": 648,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32858
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1013
+    },
+    {
+      "name": "Q",
+      "geometry": {
+        "left": 196,
+        "top": 471,
+        "width": 192,
+        "height": 144
+      },
+      "borderRadius": 22,
+      "passThrough": false,
+      "options": {
+        "sequence": {
+          "steps": [
+            {
+              "delayMs": 0,
+              "events": [
+                {
+                  "kind": 0,
+                  "code": 32849
+                }
+              ]
+            }
+          ]
+        },
+        "toggle": false
+      },
+      "type": "button",
+      "elementId": 1014
+    }
+  ]
+}

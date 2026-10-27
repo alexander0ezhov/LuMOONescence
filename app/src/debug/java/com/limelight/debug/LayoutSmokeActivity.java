@@ -106,7 +106,10 @@ public class LayoutSmokeActivity extends Activity {
         if (getIntent().getBooleanExtra("reseedLayouts", false)) {
             for (UniversalLayoutDefinition shipped :
                     new java.util.ArrayList<>(UniversalLayoutStore.getInstance(this).getLayouts())) {
-                if ("Keyboard".equals(shipped.getName()) || "Shooter".equals(shipped.getName())) {
+                if ("PC Keyboard".equals(shipped.getName())
+                        || "Default (kbd+mouse)".equals(shipped.getName())
+                        || "Keyboard".equals(shipped.getName())
+                        || "Shooter".equals(shipped.getName())) {
                     UniversalLayoutStore.getInstance(this).deleteLayout(shipped.getId());
                 }
             }
@@ -4331,16 +4334,16 @@ public class LayoutSmokeActivity extends Activity {
         UniversalLayoutDefinition shooter = null;
 
         for (UniversalLayoutDefinition layout : store.getLayouts()) {
-            if ("Keyboard".equals(layout.getName())) {
+            if ("PC Keyboard".equals(layout.getName())) {
                 keyboard = layout;
             }
-            else if ("Shooter".equals(layout.getName())) {
+            else if ("Default (kbd+mouse)".equals(layout.getName())) {
                 shooter = layout;
             }
         }
 
-        check("the keyboard layout is offered", keyboard != null);
-        check("the shooter layout is offered", shooter != null);
+        check("the PC keyboard layout is offered", keyboard != null);
+        check("the key and mouse layout is offered", shooter != null);
 
         if (keyboard == null || shooter == null) {
             return;
@@ -4350,25 +4353,29 @@ public class LayoutSmokeActivity extends Activity {
         java.util.List<String> shooterKeys = elementNamesIn(shooter.getId());
 
         android.util.Log.i("LayoutSmoke", "keyboard layout has " + keys.size() + " controls: " + keys);
-        android.util.Log.i("LayoutSmoke", "shooter layout has " + shooterKeys.size()
+        android.util.Log.i("LayoutSmoke", "keys layout has " + shooterKeys.size()
                 + " controls: " + shooterKeys);
 
-        // The keyboard: letters, a space bar and the mouse under the thumb
+        // The keyboard: the keys of a PC keyboard, and the mouse under the thumb
         check("the keyboard has a space bar", keys.contains("Space"));
         check("the keyboard has its letters", keys.containsAll(
                 java.util.Arrays.asList("q", "w", "e", "r", "t", "y", "u", "i", "o", "p")));
+        check("the keyboard has its function row",
+                keys.contains("F1") && keys.contains("F12"));
+        check("the keyboard has the grave key", keys.contains("`"));
         check("the keyboard has the mouse buttons",
                 keys.contains("LMB") && keys.contains("RMB") && keys.contains("MMB"));
+        check("the keyboard has its modifiers",
+                keys.contains("Shift") && keys.contains("Ctrl") && keys.contains("Win"));
 
-        // The shooter: walking on keys, shooting on the mouse button, the menu row as Esc
-        check("the shooter walks on keys", shooterKeys.containsAll(
-                java.util.Arrays.asList("W", "A", "S", "D")));
-        check("the shooter shoots with the mouse", shooterKeys.contains("LMB"));
-        check("the shooter has its number row",
-                shooterKeys.containsAll(java.util.Arrays.asList("1", "2", "3", "4")));
-        check("the shooter has Esc and Enter",
+        // The key and mouse layout: the keys a shooter expects, and the mouse buttons
+        check("the key and mouse layout has its keys", shooterKeys.containsAll(
+                java.util.Arrays.asList("Space", "E", "F", "C", "Q", "R")));
+        check("the key and mouse layout shoots with the mouse",
+                shooterKeys.contains("MB1") && shooterKeys.contains("MB2"));
+        check("the key and mouse layout has Esc and Enter",
                 shooterKeys.contains("Esc") && shooterKeys.contains("Enter"));
-        check("the shooter sprints with Shift", shooterKeys.contains("Shift"));
+        check("the key and mouse layout keeps a stick", shooterKeys.contains("Left stick"));
 
         // Seeding again changes nothing
         int before = store.getLayouts().size();

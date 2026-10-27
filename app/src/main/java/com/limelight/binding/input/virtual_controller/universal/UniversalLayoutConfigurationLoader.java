@@ -831,6 +831,14 @@ public class UniversalLayoutConfigurationLoader {
         }
     }
 
+    /**
+     * Reads one of the arrangements the app ships with, for the layouts that are not the built-in
+     * one.
+     */
+    public static String readShippedAsset(Context context, String name) throws java.io.IOException {
+        return readAsset(context, name);
+    }
+
     private static String readAsset(Context context, String name) throws java.io.IOException {
         java.io.InputStream in = context.getAssets().open(name);
 

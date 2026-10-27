@@ -32,6 +32,12 @@ public class UniversalLayoutStore {
      */
     public static final String DEFAULT_LAYOUT_ID = "default";
 
+    /**
+     * What the built-in layout is called. It says what it is for, since the app brings more
+     * than one arrangement.
+     */
+    public static final String DEFAULT_LAYOUT_NAME = "Default (Controller)";
+
     private static UniversalLayoutStore instance;
 
     private final Context context;
@@ -95,11 +101,20 @@ public class UniversalLayoutStore {
      * @return whether it had to be added
      */
     private boolean ensureDefaultLayout() {
-        if (getLayout(DEFAULT_LAYOUT_ID) != null) {
+        UniversalLayoutDefinition existing = getLayout(DEFAULT_LAYOUT_ID);
+
+        if (existing != null) {
+            // The built-in layout used to be called just "Default", before the app brought more
+            // than one arrangement and the name had to say which one it is
+            if ("Default".equals(existing.getName())) {
+                existing.setName(DEFAULT_LAYOUT_NAME);
+                persist();
+            }
+
             return false;
         }
 
-        layouts.add(new UniversalLayoutDefinition(DEFAULT_LAYOUT_ID, "Default",
+        layouts.add(new UniversalLayoutDefinition(DEFAULT_LAYOUT_ID, DEFAULT_LAYOUT_NAME,
                 UniversalLayoutDefinition.DEFAULT_IMAGE_PATH, System.currentTimeMillis()));
         sortLayouts();
         return true;
