@@ -413,6 +413,20 @@ public class UniversalElementEditorBuilder {
     }
 
     private void addEvent(final ActionStep step, final Callbacks callbacks) {
+        chooseEventKind(new EventConsumer() {
+            @Override
+            public void accept(InputEvent event) {
+                step.addEvent(event);
+                callbacks.onElementChanged();
+                onRebuildRequested.run();
+            }
+        }, callbacks);
+    }
+
+    /**
+     * Asks which kind of input is wanted, then which one of that kind, and hands it over.
+     */
+    private void chooseEventKind(final EventConsumer consumer, final Callbacks callbacks) {
         final String[] kinds = new String[]{
                 context.getString(R.string.editor_device_keyboard),
                 context.getString(R.string.editor_device_mouse),
@@ -425,86 +439,52 @@ public class UniversalElementEditorBuilder {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
-                            case 0:
-                                pickKeyboardKey(step, callbacks);
-                                break;
+                            case 0: {
+                                List<InputEvent> catalog = InputEventNames.keyboardCatalog();
 
-                            case 1:
+                                pickFromList(context.getString(R.string.editor_pick_key),
+                                        describeAll(catalog), catalog, consumer, callbacks);
+                                break;
+                            }
+
+                            case 1: {
+                                List<InputEvent> catalog = InputEventNames.mouseCatalog();
+
                                 pickFromList(context.getString(R.string.editor_pick_button),
-                                        describeAll(InputEventNames.mouseCatalog()),
-                                        InputEventNames.mouseCatalog(),
-                                        new EventConsumer() {
-                                            @Override
-                                            public void accept(InputEvent event) {
-                                                step.addEvent(event);
-                                                callbacks.onElementChanged();
-                                                onRebuildRequested.run();
-                                            }
-                                        }, callbacks);
+                                        describeAll(catalog), catalog, consumer, callbacks);
                                 break;
+                            }
 
-                            default:
-                                pickGamepadButton(step, callbacks);
+                            case 2: {
+                                pickGamepadButton(consumer, callbacks);
                                 break;
+                            }
                         }
                     }
                 })
                 .show();
     }
 
+    /**
+     * Replaces one event of a step.
+     *
+     * The kind is chosen first, exactly as when an event is added: an event that is a key today
+     * may need to become a mouse button or a pad button, and only offering the kind it already
+     * is would leave the user with a list they cannot leave.
+     */
     private void editEvent(final ActionStep step, final int eventIndex, final Callbacks callbacks) {
-        final InputEvent existing = step.getEvents().get(eventIndex);
-
-        if (existing.isKeyboard()) {
-            List<InputEvent> catalog = InputEventNames.keyboardCatalog();
-            pickFromList(context.getString(R.string.editor_pick_key), describeAll(catalog), catalog,
-                    new EventConsumer() {
-                        @Override
-                        public void accept(InputEvent event) {
-                            step.getEvents().set(eventIndex, event);
-                            callbacks.onElementChanged();
-                        }
-                    }, callbacks);
-            return;
-        }
-
-        if (existing.isMouse()) {
-            List<InputEvent> catalog = InputEventNames.mouseCatalog();
-            pickFromList(context.getString(R.string.editor_pick_button), describeAll(catalog), catalog,
-                    new EventConsumer() {
-                        @Override
-                        public void accept(InputEvent event) {
-                            step.getEvents().set(eventIndex, event);
-                            callbacks.onElementChanged();
-                        }
-                    }, callbacks);
-            return;
-        }
-
-        pickGamepadButton(new EventConsumer() {
+        chooseEventKind(new EventConsumer() {
             @Override
             public void accept(InputEvent event) {
                 step.getEvents().set(eventIndex, event);
                 callbacks.onElementChanged();
+                onRebuildRequested.run();
             }
         }, callbacks);
     }
 
     private interface EventConsumer {
         void accept(InputEvent event);
-    }
-
-    private void pickKeyboardKey(final ActionStep step, final Callbacks callbacks) {
-        List<InputEvent> catalog = InputEventNames.keyboardCatalog();
-        pickFromList(context.getString(R.string.editor_pick_key), describeAll(catalog), catalog,
-                new EventConsumer() {
-                    @Override
-                    public void accept(InputEvent event) {
-                        step.addEvent(event);
-                        callbacks.onElementChanged();
-                        onRebuildRequested.run();
-                    }
-                }, callbacks);
     }
 
     private void pickGamepadButton(final ActionStep step, final Callbacks callbacks) {

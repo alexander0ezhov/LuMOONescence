@@ -112,7 +112,7 @@ public class LayoutSmokeActivity extends Activity {
             }
 
             android.preference.PreferenceManager.getDefaultSharedPreferences(this)
-                    .edit().remove("shipped_extra_layouts_seeded").apply();
+                    .edit().remove("shipped_extra_layouts_version").apply();
 
             com.limelight.binding.input.virtual_controller.universal.UniversalShippedLayouts
                     .seedIfNeeded(this);
@@ -699,6 +699,8 @@ public class LayoutSmokeActivity extends Activity {
         checkOnlyTheStreamsOwnFingersAreCounted();
         checkTheTouchStickSurvivesTheLayout();
         checkShippedExtraLayouts();
+        checkLabelSizes();
+        checkImportIsBounded();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -4390,6 +4392,89 @@ public class LayoutSmokeActivity extends Activity {
         }
 
         return names;
+    }
+
+
+    /**
+     * A wide, low key such as the space bar must not be drawn in giant letters, and every key of
+     * one size carries the same size of letter.
+     */
+    private void checkLabelSizes() {
+        UniversalVirtualController controller = universalController;
+
+        UniversalDigitalButton square = new UniversalDigitalButton(controller, 5001, 0, this);
+        UniversalDigitalButton wide = new UniversalDigitalButton(controller, 5002, 0, this);
+
+        square.getConfig().setName("Space");
+        wide.getConfig().setName("Space");
+
+        // One is as tall as it is wide, the other is the space bar
+        square.measure(View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY));
+        square.layout(0, 0, 120, 120);
+
+        wide.measure(View.MeasureSpec.makeMeasureSpec(600, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY));
+        wide.layout(0, 0, 600, 120);
+
+        // A short label never has to be shrunk, so it shows the size the control asks for
+        float squareSize = square.labelSizeForTesting("W");
+        float wideSize = wide.labelSizeForTesting("Space");
+
+        android.util.Log.i("LayoutSmoke", "label size: square=" + squareSize + " wide=" + wideSize);
+
+        // The space bar is six times as wide, and its letters are the same size as the ones on
+        // a square key of the same height
+        check("a wide key is not drawn in larger letters than a square one",
+                wideSize <= squareSize + 0.5f);
+        check("a wide key still has readable letters", wideSize > 10f);
+        check("the letters fit inside the key", wideSize <= 120 * 0.62f);
+
+        // And a long label is shrunk rather than run past the edge
+        float longLabel = square.labelSizeForTesting("some long name that will not fit");
+
+        check("a long name is shrunk to fit", longLabel < squareSize);
+
+        // A label that is too wide for its control is shrunk as well, which is why the space bar
+        // on a square key would come out smaller than the key's own size
+        check("a label too wide for its control is shrunk",
+                square.labelSizeForTesting("Space") < squareSize);
+    }
+
+    /**
+     * A layout file with an absurd number of controls is refused instead of being built.
+     */
+    private void checkImportIsBounded() {
+        StringBuilder elements = new StringBuilder("[");
+
+        for (int i = 0; i < com.limelight.binding.input.virtual_controller.universal
+                .UniversalLayoutExchange.MAX_ELEMENTS + 5; i++) {
+            if (i > 0) {
+                elements.append(",");
+            }
+
+            elements.append("{\"type\":\"button\",\"elementId\":").append(1000 + i)
+                    .append(",\"name\":\"b\",\"geometry\":{\"left\":0,\"top\":0,"
+                            + "\"width\":10,\"height\":10}}");
+        }
+
+        elements.append("]");
+
+        String file = "{\"format\":\"moonlight-universal-layout\",\"version\":1,"
+                + "\"name\":\"Hostile\",\"screen\":{\"width\":1920,\"height\":1080},"
+                + "\"elements\":" + elements + "}";
+
+        boolean refused;
+
+        try {
+            com.limelight.binding.input.virtual_controller.universal.UniversalLayoutExchange
+                    .fromJson(file);
+            refused = false;
+        } catch (org.json.JSONException e) {
+            refused = true;
+        }
+
+        check("a layout file with too many controls is refused", refused);
     }
 
     private static boolean contains(String[] labels, String needle) {

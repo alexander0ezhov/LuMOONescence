@@ -27,6 +27,20 @@ Notice for Apache License 2.0 components:
   http://www.apache.org/licenses/LICENSE-2.0
 
 
+No warranty
+-----------
+LuMOONescence is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Sections 15 and 16 of the licence below are the full text of that disclaimer.
+
+It is an independent project. It is not made, endorsed, sponsored or supported by NVIDIA
+Corporation or by the Moonlight project. GameStream is a feature of NVIDIA's software, and
+Moonlight, its name and its logo belong to the Moonlight project.
+
+Stream only what you have the right to stream, and follow the terms that come with your games
+and with your own computer. What is sent to the host, and what is done with it, is up to you.
+
+
 ================================================================================
 GNU GENERAL PUBLIC LICENSE v3 - this application
 ================================================================================

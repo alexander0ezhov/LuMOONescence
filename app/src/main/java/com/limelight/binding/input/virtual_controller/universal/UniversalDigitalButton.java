@@ -160,7 +160,6 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
         drawButtonShape(canvas, stroke, stroke, getWidth() - stroke, getHeight() - stroke,
                 radius, isPressed());
 
-        paint.setTextSize(getPercent(getWidth(), 25));
         paint.setTextAlign(Paint.Align.CENTER);
 
         if (icon != -1) {
@@ -181,25 +180,71 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
     /**
      * Draws the label in the middle of the button, shrunk until it fits, so a long name stays
      * readable instead of running past the edge.
+     *
+     * The size comes from the shorter side of the control rather than from its width: a wide but
+     * low key, such as the space bar, would otherwise be drawn in letters several times the
+     * height of the key itself. Every key of one size therefore carries the same size of letter,
+     * and the label is centred in the control both ways.
      */
     private void drawFittedLabel(Canvas canvas, String label, boolean active) {
-        float size = getPercent(getWidth(), 25);
-        float available = getWidth() * 0.82f;
+        float size = labelSize(label);
 
         paint.setStyle(Paint.Style.FILL);
         paint.setStrokeWidth(0);
         paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(size);
 
         paint.setTextSize(size);
 
+        // Centred both ways: the baseline sits half a line below the middle
+        float baseline = getHeight() / 2f - (paint.ascent() + paint.descent()) / 2f;
+
+        paint.setColor(active ? 0xFFEAF9FF : 0xFFEDEFF3);
+        canvas.drawText(label, getWidth() / 2f, baseline, paint);
+    }
+
+    /**
+     * How large the label is, as a share of the shorter side of the control.
+     */
+    private static final float LABEL_SIZE_SHARE = 0.34f;
+
+    /**
+     * The size the label of this control is drawn at, before it is shrunk to fit.
+     *
+     * It is read from the shorter side, so every control of one size carries the same size of
+     * letter whatever its width. Used by the debug smoke test, which checks exactly that.
+     */
+    public float labelSizeForTesting(String label) {
+        return labelSize(label);
+    }
+
+    /**
+     * The size a label is drawn at: a share of the shorter side, shrunk only as far as it has to
+     * be so the text stays inside the control.
+     */
+    private float labelSize(String label) {
+        float shorter = Math.max(1f, Math.min(getWidth(), getHeight()));
+        float size = shorter * LABEL_SIZE_SHARE;
+
+        paint.setTextSize(size);
+
+        // Nothing may run past the sides
+        float available = getWidth() * 0.82f;
         float measured = paint.measureText(label);
         if (measured > available && measured > 0) {
             size = size * available / measured;
             paint.setTextSize(size);
         }
 
-        paint.setColor(active ? 0xFFEAF9FF : 0xFFEDEFF3);
-        canvas.drawText(label, getPercent(getWidth(), 50), getPercent(getHeight(), 63), paint);
+        // ... nor be taller than the control
+        float textHeight = paint.descent() - paint.ascent();
+        float availableHeight = getHeight() * 0.62f;
+        if (textHeight > availableHeight && textHeight > 0) {
+            size = size * availableHeight / textHeight;
+            paint.setTextSize(size);
+        }
+
+        return size;
     }
 
     private void onClickCallback() {

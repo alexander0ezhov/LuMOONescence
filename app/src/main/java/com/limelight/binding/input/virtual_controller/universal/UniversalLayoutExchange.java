@@ -92,6 +92,12 @@ public final class UniversalLayoutExchange {
      * What the file says about the screen it was arranged on is kept and handed on instead, and
      * the layout is fitted when it is opened, where the size of the real area is known.
      */
+    /**
+     * The most controls one layout may hold. The fuller of the two shipped keyboards has about
+     * a hundred, so this leaves plenty of room.
+     */
+    public static final int MAX_ELEMENTS = 300;
+
     public static Imported fromJson(String text) throws JSONException {
         JSONObject json = new JSONObject(text);
 
@@ -107,6 +113,13 @@ public final class UniversalLayoutExchange {
         JSONArray elements = json.optJSONArray(KEY_ELEMENTS);
         if (elements == null) {
             throw new JSONException("no controls in the file");
+        }
+
+        // A layout is a set of controls a person put on a screen, so there is no honest reason
+        // for a file to have thousands of them. Refusing the file outright is what keeps a
+        // hostile or broken one from building thousands of views and stalling the stream.
+        if (elements.length() > MAX_ELEMENTS) {
+            throw new JSONException("the file has too many controls");
         }
 
         JSONObject screen = json.optJSONObject(KEY_SCREEN);
