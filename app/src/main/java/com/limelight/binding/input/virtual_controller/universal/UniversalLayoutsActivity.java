@@ -48,6 +48,9 @@ public class UniversalLayoutsActivity extends Activity {
         // under it. Every normal activity in this app does this.
         UiHelper.notifyNewRootView(this);
 
+        // The layouts this build brings are added once, before the list is built
+        UniversalShippedLayouts.seedIfNeeded(this);
+
         layoutStore = UniversalLayoutStore.getInstance(this);
 
         findViewById(R.id.layoutsImportButton).setOnClickListener(new View.OnClickListener() {

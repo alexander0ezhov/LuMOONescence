@@ -100,6 +100,33 @@ public class LayoutSmokeActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Starting this activity with --ez reseedLayouts true replaces the layouts this build
+        // brings with fresh copies, which is how their arrangement is looked at while it is
+        // being worked on
+        if (getIntent().getBooleanExtra("reseedLayouts", false)) {
+            for (UniversalLayoutDefinition shipped :
+                    new java.util.ArrayList<>(UniversalLayoutStore.getInstance(this).getLayouts())) {
+                if ("Keyboard".equals(shipped.getName()) || "Shooter".equals(shipped.getName())) {
+                    UniversalLayoutStore.getInstance(this).deleteLayout(shipped.getId());
+                }
+            }
+
+            android.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                    .edit().remove("shipped_extra_layouts_seeded").apply();
+
+            com.limelight.binding.input.virtual_controller.universal.UniversalShippedLayouts
+                    .seedIfNeeded(this);
+        }
+
+        // Copies left behind by a run that was interrupted are cleared first, so the list of
+        // layouts does not fill up with them
+        for (UniversalLayoutDefinition stale :
+                new java.util.ArrayList<>(UniversalLayoutStore.getInstance(this).getLayouts())) {
+            if ("Smoke test copy".equals(stale.getName())) {
+                UniversalLayoutStore.getInstance(this).deleteLayout(stale.getId());
+            }
+        }
+
         // The editor is opened on a copy of the shipped arrangement, so the checks that delete,
         // duplicate and drag controls never touch a layout the user made. The copy has to be a
         // layout the store knows about, because the editor closes on one it cannot find.
@@ -671,6 +698,7 @@ public class LayoutSmokeActivity extends Activity {
         checkSensitivityRow();
         checkOnlyTheStreamsOwnFingersAreCounted();
         checkTheTouchStickSurvivesTheLayout();
+        checkShippedExtraLayouts();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -4287,6 +4315,81 @@ public class LayoutSmokeActivity extends Activity {
                 sticks.mergeRightY((short) 500) == 500);
         check("a released stick is no longer the touch input's",
                 !sticks.isTouchRightActive());
+    }
+
+
+    /**
+     * The two layouts this build brings are in the list, carry the keys they are meant to, and
+     * are not added twice.
+     */
+    private void checkShippedExtraLayouts() {
+        UniversalLayoutStore store = UniversalLayoutStore.getInstance(this);
+
+        UniversalLayoutDefinition keyboard = null;
+        UniversalLayoutDefinition shooter = null;
+
+        for (UniversalLayoutDefinition layout : store.getLayouts()) {
+            if ("Keyboard".equals(layout.getName())) {
+                keyboard = layout;
+            }
+            else if ("Shooter".equals(layout.getName())) {
+                shooter = layout;
+            }
+        }
+
+        check("the keyboard layout is offered", keyboard != null);
+        check("the shooter layout is offered", shooter != null);
+
+        if (keyboard == null || shooter == null) {
+            return;
+        }
+
+        java.util.List<String> keys = elementNamesIn(keyboard.getId());
+        java.util.List<String> shooterKeys = elementNamesIn(shooter.getId());
+
+        android.util.Log.i("LayoutSmoke", "keyboard layout has " + keys.size() + " controls: " + keys);
+        android.util.Log.i("LayoutSmoke", "shooter layout has " + shooterKeys.size()
+                + " controls: " + shooterKeys);
+
+        // The keyboard: letters, a space bar and the mouse under the thumb
+        check("the keyboard has a space bar", keys.contains("Space"));
+        check("the keyboard has its letters", keys.containsAll(
+                java.util.Arrays.asList("q", "w", "e", "r", "t", "y", "u", "i", "o", "p")));
+        check("the keyboard has the mouse buttons",
+                keys.contains("LMB") && keys.contains("RMB") && keys.contains("MMB"));
+
+        // The shooter: walking on keys, shooting on the mouse button, the menu row as Esc
+        check("the shooter walks on keys", shooterKeys.containsAll(
+                java.util.Arrays.asList("W", "A", "S", "D")));
+        check("the shooter shoots with the mouse", shooterKeys.contains("LMB"));
+        check("the shooter has its number row",
+                shooterKeys.containsAll(java.util.Arrays.asList("1", "2", "3", "4")));
+        check("the shooter has Esc and Enter",
+                shooterKeys.contains("Esc") && shooterKeys.contains("Enter"));
+        check("the shooter sprints with Shift", shooterKeys.contains("Shift"));
+
+        // Seeding again changes nothing
+        int before = store.getLayouts().size();
+        com.limelight.binding.input.virtual_controller.universal.UniversalShippedLayouts
+                .seedIfNeeded(this);
+
+        check("the layouts are only added once", store.getLayouts().size() == before);
+    }
+
+    private java.util.List<String> elementNamesIn(String layoutId) {
+        java.util.List<String> names = new java.util.ArrayList<>();
+
+        try {
+            org.json.JSONArray elements = new org.json.JSONArray(readStoredElements(layoutId));
+
+            for (int i = 0; i < elements.length(); i++) {
+                names.add(elements.getJSONObject(i).optString("name", ""));
+            }
+        } catch (org.json.JSONException e) {
+            android.util.Log.e("LayoutSmoke", "could not read the layout " + layoutId, e);
+        }
+
+        return names;
     }
 
     private static boolean contains(String[] labels, String needle) {

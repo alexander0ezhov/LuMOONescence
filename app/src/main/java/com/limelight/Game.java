@@ -520,6 +520,10 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             universalVirtualController.refreshLayout();
         }
 
+        // The layouts this build brings are added once, before the menu lists them
+        com.limelight.binding.input.virtual_controller.universal.UniversalShippedLayouts
+                .seedIfNeeded(this);
+
         // The menu of the stream is added last, so it is above the on-screen controls
         setUpStreamDrawer();
 
