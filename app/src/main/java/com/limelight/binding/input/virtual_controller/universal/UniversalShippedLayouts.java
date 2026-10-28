@@ -22,7 +22,7 @@ public final class UniversalShippedLayouts {
      * layouts this build brings, which is how they are improved without the user having to make
      * them again.
      */
-    private static final int VERSION = 7;
+    private static final int VERSION = 8;
 
     private static final String VERSION_PREF_STRING = "shipped_extra_layouts_version";
 

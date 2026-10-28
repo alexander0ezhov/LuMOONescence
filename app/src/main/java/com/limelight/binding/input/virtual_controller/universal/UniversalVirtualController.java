@@ -108,11 +108,6 @@ public class UniversalVirtualController {
         @Override
         public void run() {
             sendControllerInputContextInternal();
-
-            // Repeat any on-screen keys that are still held down, since a dropped
-            // key down packet would leave the key stuck on the host until it is
-            // pressed again.
-            sendHeldKeysInternal();
         }
     };
 
@@ -310,7 +305,31 @@ public class UniversalVirtualController {
     }
 
     public void hide() {
+        releaseHeldKeys();
         setVisible(false);
+    }
+
+    /**
+     * Lets go of every key the layout is still holding.
+     *
+     * A layout is hidden when the stream menu opens, when the screen is turned off and when the
+     * layout is rebuilt, and a key that stays down through any of those would type its letter
+     * again every time the host asks what is held.
+     */
+    private void releaseHeldKeys() {
+        for (int i = 0; i < inputContext.keyboardKeyCodes.length; i++) {
+            if (inputContext.keyboardKeysDown[i] && inputContext.keyboardKeyCodes[i] != 0) {
+                short keyCode = inputContext.keyboardKeyCodes[i];
+
+                inputContext.keyboardKeysDown[i] = false;
+                inputContext.keyboardKeyCodes[i] = 0;
+
+                if (controllerHandler != null) {
+                    controllerHandler.reportOscKeyboardState(keyCode,
+                            KeyboardPacket.KEY_UP, getKeyModifier(keyCode), (byte) 0);
+                }
+            }
+        }
     }
 
     public void show() {
@@ -845,16 +864,6 @@ public class UniversalVirtualController {
      * are never sent here, because repeating them could unstick a key press that arrived
      * later, while repeating key down events is harmless.
      */
-    private void sendHeldKeysInternal() {
-        for (int i = 0; i < inputContext.keyboardKeyCodes.length; i++) {
-            if (inputContext.keyboardKeysDown[i]) {
-                _DBG("KEYBOARD " + Integer.toHexString(inputContext.keyboardKeyCodes[i] & 0xFFFF) + " DOWN");
-                controllerHandler.reportOscKeyboardState(inputContext.keyboardKeyCodes[i],
-                        KeyboardPacket.KEY_DOWN, getKeyModifier(inputContext.keyboardKeyCodes[i]), (byte) 0);
-            }
-        }
-    }
-
     private void sendControllerInputContextInternal() {
         _DBG("INPUT_MAP + " + inputContext.inputMap);
         _DBG("LEFT_TRIGGER " + inputContext.leftTrigger);
@@ -931,7 +940,14 @@ public class UniversalVirtualController {
         }
 
         if (keyIndex == -1) {
-            // The key was never tracked (a key up event with no matching key down event)
+            // The key was never tracked, or its place was already given away. A release is still
+            // passed on, because a key the host believes is down stays down until it hears about
+            // the release: that is what makes a control type the same letter over and over.
+            if (!pressed) {
+                controllerHandler.reportOscKeyboardState(keyCode,
+                        KeyboardPacket.KEY_UP, getKeyModifier(keyCode), (byte) 0);
+            }
+
             return;
         }
 

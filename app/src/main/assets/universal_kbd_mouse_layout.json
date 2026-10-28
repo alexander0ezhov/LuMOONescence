@@ -251,7 +251,7 @@
       "elementId": 3
     },
     {
-      "name": "T",
+      "name": "MB3",
       "geometry": {
         "left": 2133,
         "top": 507,
@@ -267,8 +267,8 @@
               "delayMs": 0,
               "events": [
                 {
-                  "kind": 0,
-                  "code": 32852
+                  "kind": 1,
+                  "code": 2
                 }
               ]
             }
@@ -494,7 +494,7 @@
       "elementId": 1001
     },
     {
-      "name": "RS",
+      "name": "T",
       "geometry": {
         "left": 2300,
         "top": 789,
@@ -510,8 +510,8 @@
               "delayMs": 0,
               "events": [
                 {
-                  "kind": 1,
-                  "code": 2
+                  "kind": 0,
+                  "code": 32852
                 }
               ]
             }
@@ -523,7 +523,7 @@
       "elementId": 1002
     },
     {
-      "name": "LS",
+      "name": "LShift",
       "geometry": {
         "left": 2154,
         "top": 878,

@@ -1,14 +1,15 @@
-# NOTICE
+# Notices and third-party licenses
 
-This is a modified fork of **Moonlight for Android** by Cameron Gutman and the Moonlight
+This project is a modified fork of **Moonlight for Android** by Cameron Gutman and the Moonlight
 contributors (https://github.com/moonlight-stream/moonlight-android), distributed under the
 **GNU General Public License v3**. The full license text is in [LICENSE.txt](LICENSE.txt).
 
-Original work: Copyright (C) Cameron Gutman and Moonlight contributors.
-Modifications in this fork: Copyright (C) the fork's authors.
+- Original work: Copyright (C) Cameron Gutman and Moonlight contributors.
+- Modifications in this fork: Copyright (C) the authors of LuMOONescence.
 
 The name "Moonlight" and its logo belong to the Moonlight project. This fork is not an official
-Moonlight build and does not use the Moonlight name or logo as its own identity.
+Moonlight build and does not use the Moonlight name or logo as its own identity. "GameStream" is a
+feature of NVIDIA's software, and NVIDIA is not affiliated with this project.
 
 ## Third-party components
 
@@ -30,7 +31,20 @@ Apache License 2.0 requires that the notices below are kept:
 The complete license texts are shown in the app under
 **Settings → About → Open source licenses**.
 
+## Services the app talks to
+
+By default the app uses the public infrastructure of the Moonlight project:
+
+- `stun.moonlight-stream.org:3478` — a STUN server, used to find the external address for streaming
+  over the internet;
+- `android.conntest.moonlight-stream.org` — the network test run when a host is being added.
+
+There is no legal restriction on using them: they are open public services. They are, however,
+somebody else's machines, and they can be rate limited, changed or switched off without notice. Both
+addresses are kept in two places — `ComputerManagerService` (STUN) and `ServerHelper` (the network
+test) — so they can be pointed somewhere else without hunting through the code.
+
 ## Source code
 
-The complete corresponding source of every published build is available at
-https://github.com/alexander0ezhov/LuMOONescence under the tag matching the build.
+The complete corresponding source of every published build is available in this repository, at the
+tag that matches the build: https://github.com/alexander0ezhov/LuMOONescence

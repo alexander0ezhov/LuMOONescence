@@ -420,7 +420,9 @@ public class UniversalDigitalButton extends UniversalVirtualControllerElement
             return;
         }
 
-        sequencePlayer.release();
+        // Lifting the finger lets go of what is held, and a sequence with steps still to come
+        // plays them out rather than being cut short
+        sequencePlayer.finish();
     }
 
     private void updateToggledAppearance() {

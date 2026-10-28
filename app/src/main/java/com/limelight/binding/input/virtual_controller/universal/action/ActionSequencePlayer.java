@@ -50,6 +50,13 @@ public class ActionSequencePlayer {
     private final List<InputEvent> pressedEvents = new ArrayList<>();
     private int generation;
 
+    /**
+     * Set when the finger has been lifted while steps are still to come. A sequence is a short
+     * piece of input the user put together, so letting go of the control plays the rest of it
+     * rather than cutting it short at the step that happened to be running.
+     */
+    private boolean playingOut;
+
     public ActionSequencePlayer(HostInput host) {
         this.host = host;
 
@@ -82,8 +89,37 @@ public class ActionSequencePlayer {
         releasePressed();
 
         activeSequence = sequence;
+        playingOut = false;
+
         playFrom(0, generation);
     }
+
+    /**
+     * Ends the press, letting go of what is held and playing whatever is still to come.
+     *
+     * A sequence of one step ends here, which is what makes a plain button a plain button. A
+     * sequence with steps after the running one keeps going, because a tap that only ever sent
+     * the first step of it would make the rest of it unreachable without holding the control for
+     * as long as the delays add up to.
+     */
+    public void finish() {
+        if (activeSequence == null || !hasStepsAfterRunning()) {
+            release();
+            return;
+        }
+
+        playingOut = true;
+        releasePressed();
+    }
+
+    private boolean hasStepsAfterRunning() {
+        return pendingStepIndex >= 0;
+    }
+
+    /**
+     * The step the run is waiting to play next, or -1 when nothing is waiting.
+     */
+    private int pendingStepIndex = -1;
 
     /**
      * Releases everything the last press sent, in reverse order.
@@ -95,6 +131,8 @@ public class ActionSequencePlayer {
 
         releasePressed();
         activeSequence = null;
+        playingOut = false;
+        pendingStepIndex = -1;
     }
 
     /**
@@ -112,6 +150,7 @@ public class ActionSequencePlayer {
         }
 
         if (stepIndex >= activeSequence.getSteps().size()) {
+            pendingStepIndex = -1;
             return;
         }
 
@@ -125,13 +164,36 @@ public class ActionSequencePlayer {
             }
         }
 
+        final long delay = Math.max(0, step.getDelayMs());
+
         if (stepIndex + 1 < activeSequence.getSteps().size()) {
+            pendingStepIndex = stepIndex + 1;
+
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     playFrom(stepIndex + 1, runGeneration);
                 }
-            }, Math.max(0, step.getDelayMs()));
+            }, delay);
+        }
+        else if (playingOut) {
+            // Nothing is left to play, so what this step pressed is let go once its own delay is
+            // over, which is what ends a sequence that was tapped rather than held
+            pendingStepIndex = stepIndex;
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (runGeneration != generation) {
+                        return;
+                    }
+
+                    playingOut = false;
+                    pendingStepIndex = -1;
+                    releasePressed();
+                    activeSequence = null;
+                }
+            }, delay);
         }
     }
 

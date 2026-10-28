@@ -704,6 +704,7 @@ public class LayoutSmokeActivity extends Activity {
         checkShippedExtraLayouts();
         checkLabelSizes();
         checkImportIsBounded();
+        checkDelayedSequence();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -4482,6 +4483,145 @@ public class LayoutSmokeActivity extends Activity {
         }
 
         check("a layout file with too many controls is refused", refused);
+    }
+
+
+    /**
+     * A sequence with a delay between its steps plays the second step while the control is still
+     * held. The player runs on a looper of its own here, so the check does not have to wait on
+     * the main thread it is running on.
+     */
+    private void checkDelayedSequence() {
+        final java.util.List<String> sent =
+                java.util.Collections.synchronizedList(new java.util.ArrayList<String>());
+
+        final com.limelight.binding.input.virtual_controller.universal.action.ActionSequence sequence =
+                new com.limelight.binding.input.virtual_controller.universal.action.ActionSequence();
+
+        sequence.addStep(new com.limelight.binding.input.virtual_controller.universal.action.ActionStep(
+                        new com.limelight.binding.input.virtual_controller.universal.action.InputEvent(
+                                com.limelight.binding.input.virtual_controller.universal.action.InputEvent.KIND_KEYBOARD,
+                                65))
+                .withDelay(150));
+
+        sequence.addStep(new com.limelight.binding.input.virtual_controller.universal.action.ActionStep(
+                new com.limelight.binding.input.virtual_controller.universal.action.InputEvent(
+                        com.limelight.binding.input.virtual_controller.universal.action.InputEvent.KIND_KEYBOARD,
+                        66)));
+
+        Thread worker = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                android.os.Looper.prepare();
+
+                com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer player =
+                        new com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer(
+                                new com.limelight.binding.input.virtual_controller.universal.action
+                                        .ActionSequencePlayer.HostInput() {
+                                    @Override
+                                    public void setGamepadButtons(int flagsToAdd, int flagsToRemove) {
+                                    }
+
+                                    @Override
+                                    public void setTrigger(int trigger, int value) {
+                                    }
+
+                                    @Override
+                                    public void sendMouseButton(int button, boolean down) {
+                                    }
+
+                                    @Override
+                                    public void sendKeyboardKey(short keyCode, boolean down) {
+                                        sent.add("key " + keyCode + " down=" + down);
+                                    }
+                                });
+
+                player.press(sequence);
+
+                new android.os.Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        android.os.Looper.myLooper().quitSafely();
+                    }
+                }, 400);
+
+                android.os.Looper.loop();
+            }
+        });
+
+        worker.start();
+
+        try {
+            worker.join(3000);
+        } catch (InterruptedException e) {
+            check("a delayed sequence can be waited for", false);
+            return;
+        }
+
+        android.util.Log.i("LayoutSmoke", "delayed sequence sent: " + sent);
+
+        check("a sequence sends its first step", sent.contains("key 65 down=true"));
+        check("a sequence with a delay sends its second step", sent.contains("key 66 down=true"));
+
+        // A tap ends the press at once, and the rest of the sequence still plays
+        final java.util.List<String> tapped =
+                java.util.Collections.synchronizedList(new java.util.ArrayList<String>());
+
+        Thread tapWorker = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                android.os.Looper.prepare();
+
+                com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer player =
+                        new com.limelight.binding.input.virtual_controller.universal.action.ActionSequencePlayer(
+                                new com.limelight.binding.input.virtual_controller.universal.action
+                                        .ActionSequencePlayer.HostInput() {
+                                    @Override
+                                    public void setGamepadButtons(int flagsToAdd, int flagsToRemove) {
+                                    }
+
+                                    @Override
+                                    public void setTrigger(int trigger, int value) {
+                                    }
+
+                                    @Override
+                                    public void sendMouseButton(int button, boolean down) {
+                                    }
+
+                                    @Override
+                                    public void sendKeyboardKey(short keyCode, boolean down) {
+                                        tapped.add("key " + keyCode + " down=" + down);
+                                    }
+                                });
+
+                player.press(sequence);
+                player.finish();
+
+                new android.os.Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        android.os.Looper.myLooper().quitSafely();
+                    }
+                }, 400);
+
+                android.os.Looper.loop();
+            }
+        });
+
+        tapWorker.start();
+
+        try {
+            tapWorker.join(3000);
+        } catch (InterruptedException e) {
+            check("a tapped sequence can be waited for", false);
+            return;
+        }
+
+        android.util.Log.i("LayoutSmoke", "tapped sequence sent: " + tapped);
+
+        check("a tap lets go of the first step at once", tapped.contains("key 65 down=false"));
+        check("a tap still plays the step after the delay", tapped.contains("key 66 down=true"));
+        check("a tap lets go of the last step", tapped.contains("key 66 down=false"));
     }
 
     private static boolean contains(String[] labels, String needle) {

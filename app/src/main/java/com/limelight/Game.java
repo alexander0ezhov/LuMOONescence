@@ -880,6 +880,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             // is carried over to the controls as they are made. Asking for it again is what
             // brings them back after a clean screen.
             universalVirtualController.show();
+
+            // A rebuilt layout is added above everything, so the menu is put back on top of it
+            bringStreamDrawerToFront();
             return;
         }
 
