@@ -511,16 +511,22 @@ public class LayoutSmokeActivity extends Activity {
 
                 if (menu != null) {
                     String[] labels = listItemLabels(menu);
-                    check("the layout menu offers adding a button", contains(labels, "button"));
-                    check("the layout menu offers adding a stick", contains(labels, "stick"));
-                    check("the layout menu offers adding a D-pad", contains(labels, "d-pad"));
-                    check("the layout menu offers saving", contains(labels, "save"));
-                    check("the layout menu offers saving as", contains(labels, "save as"));
-                    check("the layout menu offers leaving", contains(labels, "exit"));
+                    check("the layout menu offers adding a button",
+                            contains(labels, getString(R.string.menu_add_button)));
+                    check("the layout menu offers adding a stick",
+                            contains(labels, getString(R.string.menu_add_stick)));
+                    check("the layout menu offers adding a D-pad",
+                            contains(labels, getString(R.string.menu_add_dpad)));
+                    check("the layout menu offers saving",
+                            contains(labels, getString(R.string.menu_save)));
+                    check("the layout menu offers saving as",
+                            contains(labels, getString(R.string.menu_save_as)));
+                    check("the layout menu offers leaving",
+                            contains(labels, getString(R.string.menu_exit)));
 
                     // "Save as" must actually put a dialog on screen, which it did not while
                     // the dialog was built without being shown
-                    clickMenuItem("save as");
+                    clickMenuItem(getString(R.string.menu_save_as));
                 }
 
                 postDelayed(new Runnable() {
@@ -554,7 +560,8 @@ public class LayoutSmokeActivity extends Activity {
 
         android.widget.ListView list = menu.getListView();
         for (int i = 0; i < list.getAdapter().getCount(); i++) {
-            if (String.valueOf(list.getAdapter().getItem(i)).toLowerCase().contains(label)) {
+            if (String.valueOf(list.getAdapter().getItem(i)).toLowerCase()
+                    .contains(label.toLowerCase())) {
                 menu.getListView().performItemClick(list.getChildAt(i), i,
                         list.getAdapter().getItemId(i));
                 return;
@@ -3027,9 +3034,9 @@ public class LayoutSmokeActivity extends Activity {
         check("the menu names the native touch mode as the user asked",
                 touchChoices.contains(getString(R.string.stream_menu_touch_events)));
         check("the native touch mode is called what the user asked for",
-                "Touch native (experimental)".equals(getString(R.string.stream_menu_touch_events)));
+                "Touch native (experimental)".equals(english(R.string.stream_menu_touch_events)));
         check("the cursor-following touchpad is called what it is",
-                "Direct cursor".equals(getString(R.string.stream_menu_touchpad_direct)));
+                "Direct cursor".equals(english(R.string.stream_menu_touchpad_direct)));
 
         check("the stream menu has a button to leave the stream",
                 exit != null && getString(R.string.stream_menu_exit).contentEquals(exit.getText()));
@@ -4624,9 +4631,22 @@ public class LayoutSmokeActivity extends Activity {
         check("a tap lets go of the last step", tapped.contains("key 66 down=false"));
     }
 
+    /**
+     * The English text of a string, whatever language the device is set to, so a check about the
+     * wording of the app does not depend on the phone it runs on.
+     */
+    private String english(int stringId) {
+        android.content.res.Configuration configuration =
+                new android.content.res.Configuration(getResources().getConfiguration());
+        configuration.setLocale(java.util.Locale.US);
+
+        return createConfigurationContext(configuration).getResources().getString(stringId);
+    }
+
     private static boolean contains(String[] labels, String needle) {
         for (String label : labels) {
-            if (label.contains(needle)) {
+            // The labels come back in lower case, and a translated label starts with a capital
+            if (label.toLowerCase().contains(needle.toLowerCase())) {
                 return true;
             }
         }

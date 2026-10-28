@@ -959,7 +959,8 @@ public class UniversalStreamDrawer {
      * from the user, which is deliberately not passed on, so a check has to touch it.
      */
     public boolean dragOpacityToForTesting(int percent) {
-        return dragSliderForTesting(findOpacitySlider(content), percent, OPACITY_MIN, 100);
+        return dragSliderForTesting(getSliderForTesting(getString(R.string.stream_menu_opacity)),
+                percent, OPACITY_MIN, 100);
     }
 
     private boolean dragSliderForTesting(SeekBar slider, int percent, int min, int max) {
@@ -968,43 +969,44 @@ public class UniversalStreamDrawer {
         }
 
         int wanted = Math.max(min, Math.min(max, percent));
-        float x = slider.getWidth() * (wanted - min) / (float)(max - min);
+        int wantedProgress = Math.max(0, Math.min(slider.getMax(), wanted - min));
+
+        // The track of a slider starts and ends half a thumb in from its edges, so a touch aimed
+        // at a value has to be placed inside that, or it lands near the value instead of on it
+        int thumb = slider.getThumb() == null ? 0 : slider.getThumb().getBounds().width();
+        float track = Math.max(1, slider.getWidth() - thumb);
+
+        float x = thumb / 2f + track * wantedProgress / (float) Math.max(1, slider.getMax());
         float y = slider.getHeight() / 2f;
         long now = android.os.SystemClock.uptimeMillis();
 
-        MotionEvent down = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, x, y, 0);
-        MotionEvent move = MotionEvent.obtain(now, now, MotionEvent.ACTION_MOVE, x, y, 0);
-        MotionEvent up = MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, x, y, 0);
+        // A slider that sits in a scrolling area only follows the finger once it has moved far
+        // enough to count as a drag, and a jump is not the same as a drag, so the finger is walked
+        // onto the value in small steps
+        float startX = Math.max(0, x - 60);
+        long time = now;
 
+        MotionEvent down = MotionEvent.obtain(time, time, MotionEvent.ACTION_DOWN, startX, y, 0);
         slider.dispatchTouchEvent(down);
-        slider.dispatchTouchEvent(move);
-        slider.dispatchTouchEvent(up);
-
         down.recycle();
-        move.recycle();
+
+        int steps = 8;
+
+        for (int step = 1; step <= steps; step++) {
+            float stepX = startX + (x - startX) * step / (float) steps;
+
+            time = now + 16L * step;
+
+            MotionEvent move = MotionEvent.obtain(time, time, MotionEvent.ACTION_MOVE, stepX, y, 0);
+            slider.dispatchTouchEvent(move);
+            move.recycle();
+        }
+
+        MotionEvent up = MotionEvent.obtain(time, time, MotionEvent.ACTION_UP, x, y, 0);
+        slider.dispatchTouchEvent(up);
         up.recycle();
 
         return true;
-    }
-
-    private SeekBar findOpacitySlider(ViewGroup group) {
-        for (int i = 0; i < group.getChildCount(); i++) {
-            View child = group.getChildAt(i);
-
-            if (child instanceof SeekBar) {
-                return (SeekBar) child;
-            }
-
-            if (child instanceof ViewGroup) {
-                SeekBar found = findOpacitySlider((ViewGroup) child);
-
-                if (found != null) {
-                    return found;
-                }
-            }
-        }
-
-        return null;
     }
 
     /**
