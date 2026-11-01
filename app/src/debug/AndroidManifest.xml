@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Debug only overrides.
+
+    The layout editor and its companion screens are internal to the app, so they are not
+    exported in a release build. Marking them exported here lets a developer open them
+    directly with `adb shell am start` on a debug build, which is the only way to reach
+    them when the device forbids injecting input events. The manifest merger combines this
+    with the declaration in the main manifest, so nothing else about them changes.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <activity
+            android:name=".binding.input.virtual_controller.universal.UniversalLayoutsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".binding.input.virtual_controller.universal.UniversalLayoutEditorActivity"
+            android:exported="true" />
+        <activity
+            android:name=".binding.input.virtual_controller.universal.UniversalLayoutImagePickerActivity"
+            android:exported="true" />
+        <activity
+            android:name=".debug.LayoutSmokeActivity"
+            android:exported="true"
+            android:label="Layout smoke test" />
+        <activity
+            android:name=".debug.DialogCheckActivity"
+            android:exported="true"
+            android:label="Layout dialog check" />
+        <activity
+            android:name=".debug.StylePreviewActivity"
+            android:exported="true"
+            android:label="Control style preview" />
+        <!-- Exported in debug builds so the licenses screen can be opened on its own and
+             looked at, since touch cannot be injected on every device. -->
+        <!-- Exported in debug builds so the settings screen can be opened on its own and looked
+             at, since touch cannot be injected on every device. -->
+        <activity
+            android:name="com.limelight.preferences.StreamSettings"
+            tools:replace="android:exported"
+            android:exported="true" />
+
+        <activity
+            android:name="com.limelight.OpenSourceLicensesActivity"
+            tools:replace="android:exported"
+            android:exported="true" />
+    </application>
+
+</manifest>

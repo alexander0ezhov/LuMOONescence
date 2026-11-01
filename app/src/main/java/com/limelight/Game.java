@@ -8,11 +8,17 @@ import com.limelight.binding.input.KeyboardTranslator;
 import com.limelight.binding.input.capture.InputCaptureManager;
 import com.limelight.binding.input.capture.InputCaptureProvider;
 import com.limelight.binding.input.touch.AbsoluteTouchContext;
+import com.limelight.binding.input.touch.OffTouchContext;
+import com.limelight.binding.input.touch.LeftStickTouchContext;
+import com.limelight.binding.input.touch.RightStickTouchContext;
 import com.limelight.binding.input.touch.RelativeTouchContext;
 import com.limelight.binding.input.driver.UsbDriverService;
 import com.limelight.binding.input.evdev.EvdevListener;
 import com.limelight.binding.input.touch.TouchContext;
-import com.limelight.binding.input.virtual_controller.VirtualController;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutDefinition;
+import com.limelight.binding.input.virtual_controller.universal.UniversalLayoutStore;
+import com.limelight.binding.input.virtual_controller.universal.UniversalStreamDrawer;
+import com.limelight.binding.input.virtual_controller.universal.UniversalVirtualController;
 import com.limelight.binding.video.CrashListener;
 import com.limelight.binding.video.MediaCodecDecoderRenderer;
 import com.limelight.binding.video.MediaCodecHelper;
@@ -85,6 +91,7 @@ import java.lang.reflect.Method;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -96,6 +103,14 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
     // Only 2 touches are supported
     private final TouchContext[] touchContextMap = new TouchContext[2];
+
+    /**
+     * The fingers the stream itself is following. A finger holding an on-screen control never
+     * reaches the stream, so it must not be counted here either: otherwise one finger on the
+     * background looks like two, and looking around turns into a two finger scroll.
+     */
+    private final com.limelight.binding.input.touch.TouchPointerSlots streamPointers =
+            new com.limelight.binding.input.touch.TouchPointerSlots(2);
     private long threeFingerDownTime = 0;
 
     private static final int REFERENCE_HORIZ_RES = 1280;
@@ -111,7 +126,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
     private ControllerHandler controllerHandler;
     private KeyboardTranslator keyboardTranslator;
-    private VirtualController virtualController;
+    private UniversalVirtualController universalVirtualController;
 
     private PreferenceConfiguration prefConfig;
     private SharedPreferences tombstonePrefs;
@@ -431,8 +446,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             // of gamepads removed and replugged at runtime.
             gamepadMask = 1;
         }
-        if (prefConfig.onscreenController) {
-            // If we're using OSC, always set at least gamepad 1.
+        if (prefConfig.universalLayout) {
+            // If we're using an on-screen layout, always set at least gamepad 1.
             gamepadMask |= 1;
         }
 
@@ -493,25 +508,24 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         inputManager.registerInputDeviceListener(keyboardTranslator, null);
 
         // Initialize touch contexts
-        for (int i = 0; i < touchContextMap.length; i++) {
-            if (!prefConfig.touchscreenTrackpad) {
-                touchContextMap[i] = new AbsoluteTouchContext(conn, i, streamView);
-            }
-            else {
-                touchContextMap[i] = new RelativeTouchContext(conn, i,
-                        REFERENCE_HORIZ_RES, REFERENCE_VERT_RES,
-                        streamView, prefConfig);
-            }
+        setUpTouchContexts();
+
+        UniversalLayoutDefinition universalLayoutDefinition =
+                prefConfig.universalLayout ? UniversalLayoutStore.getInstance(this).getSelectedLayout() : null;
+        if (universalLayoutDefinition != null) {
+            // create the customizable on-screen layout. It is shown as soon as it is
+            // created, so no explicit show() call is needed here.
+            universalVirtualController = createUniversalController(
+                    universalLayoutDefinition.getId());
+            universalVirtualController.refreshLayout();
         }
 
-        if (prefConfig.onscreenController) {
-            // create virtual onscreen controller
-            virtualController = new VirtualController(controllerHandler,
-                    (FrameLayout)streamView.getParent(),
-                    this);
-            virtualController.refreshLayout();
-            virtualController.show();
-        }
+        // The layouts this build brings are added once, before the menu lists them
+        com.limelight.binding.input.virtual_controller.universal.UniversalShippedLayouts
+                .seedIfNeeded(this);
+
+        // The menu of the stream is added last, so it is above the on-screen controls
+        setUpStreamDrawer();
 
         if (prefConfig.usbDriver) {
             // Start the USB driver
@@ -535,6 +549,364 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         streamView.getHolder().addCallback(this);
     }
 
+    /**
+     * The menu that slides in from the right, which the back button opens.
+     */
+    private UniversalStreamDrawer streamDrawer;
+
+    /**
+     * Puts the menu back above the on-screen controls, which are added to the same layout again
+     * whenever the layout is rebuilt.
+     */
+    private void bringStreamDrawerToFront() {
+        if (streamDrawer != null) {
+            streamDrawer.bringToFront();
+        }
+    }
+
+    private void setUpStreamDrawer() {
+        FrameLayout area = (FrameLayout) streamView.getParent();
+
+        if (area == null) {
+            return;
+        }
+
+        streamDrawer = new UniversalStreamDrawer(this, area, new UniversalStreamDrawer.Host() {
+            @Override
+            public void onExitStream() {
+                finish();
+            }
+
+            @Override
+            public void onShowKeyboard() {
+                // The stream has no text field for a keyboard to belong to, so asking for it
+                // politely does nothing. This is the call the three finger tap already uses to
+                // bring it up.
+                //
+                // It waits for the menu to finish sliding away, because the keyboard is shown
+                // against the window and a window that is still being redrawn ignores the
+                // request
+                getWindow().getDecorView().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toggleKeyboard();
+                    }
+                }, 250);
+            }
+
+            @Override
+            public int getTouchMode() {
+                return prefConfig.touchMode;
+            }
+
+            @Override
+            public void onTouchModeChanged(int mode) {
+                applyTouchMode(mode);
+            }
+
+            @Override
+            public List<UniversalLayoutDefinition> getLayouts() {
+                return UniversalLayoutStore.getInstance(Game.this).getLayouts();
+            }
+
+            @Override
+            public String getSelectedLayoutId() {
+                return UniversalLayoutStore.getInstance(Game.this).getSelectedLayoutId();
+            }
+
+            @Override
+            public void onLayoutChosen(String layoutId) {
+                chooseUniversalLayout(layoutId);
+            }
+
+            @Override
+            public boolean isOnScreenControlsEnabled() {
+                return universalVirtualController != null && universalVirtualController.isVisible();
+            }
+
+            @Override
+            public void onOnScreenControlsToggled(boolean enabled) {
+                setOnScreenControlsEnabled(enabled);
+            }
+
+            @Override
+            public int getLayoutOpacity() {
+                return PreferenceConfiguration.getUniversalLayoutOpacity(Game.this);
+            }
+
+            @Override
+            public int getSensitivity() {
+                return isStickTouchMode()
+                        ? PreferenceConfiguration.getStickSensitivity(Game.this)
+                        : PreferenceConfiguration.getTouchpadSensitivity(Game.this);
+            }
+
+            @Override
+            public void onSensitivityChanged(int percent) {
+                if (isStickTouchMode()) {
+                    PreferenceConfiguration.setStickSensitivity(Game.this, percent);
+                    prefConfig.stickSensitivity = percent;
+                }
+                else {
+                    PreferenceConfiguration.setTouchpadSensitivity(Game.this, percent);
+                    prefConfig.touchpadSensitivity = percent;
+                }
+
+                // The touch contexts take the value when they are made, so they are made again
+                setUpTouchContexts();
+            }
+
+            @Override
+            public boolean isVibrationEnabled() {
+                return PreferenceConfiguration.isVibrationEnabled(Game.this);
+            }
+
+            @Override
+            public void onVibrationChanged(boolean enabled) {
+                PreferenceConfiguration.setVibrationEnabled(Game.this, enabled);
+
+                // The handler keeps the configuration it was made with, so it is told too
+                prefConfig.vibrateOsc = enabled;
+            }
+
+            @Override
+            public void onLayoutOpacityChanged(int percent) {
+                PreferenceConfiguration.setUniversalLayoutOpacity(Game.this, percent);
+
+                if (universalVirtualController != null) {
+                    universalVirtualController.applyElementOpacity();
+                }
+            }
+        });
+    }
+
+    // Where a pass-through press started, and where it was last seen
+    private boolean passThroughActive;
+    private int passThroughOriginX;
+    private int passThroughOriginY;
+    private int passThroughLastX;
+    private int passThroughLastY;
+
+    /**
+     * A pressed control's finger moved, so the selected touch input is given the movement.
+     *
+     * This is what lets one finger both hold a control and look around: the control keeps its
+     * press, and whichever touch input is selected does what it would have done had the control
+     * not been in the way.
+     *
+     * @param x the finger's place in the layout area
+     */
+    private void onPassThroughMoved(int x, int y) {
+        if (!passThroughActive) {
+            passThroughActive = true;
+            passThroughOriginX = x;
+            passThroughOriginY = y;
+            passThroughLastX = x;
+            passThroughLastY = y;
+
+            // The first movement only sets the starting point, so pressing a control does not
+            // itself move the view
+            return;
+        }
+
+        int deltaX = x - passThroughLastX;
+        int deltaY = y - passThroughLastY;
+
+        passThroughLastX = x;
+        passThroughLastY = y;
+
+        switch (prefConfig.touchMode) {
+            case PreferenceConfiguration.TOUCH_MODE_TRACKPAD:
+            case PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS: {
+                // The same scaling the trackpad itself uses, so the movement feels the same
+                double sensitivity = prefConfig.touchpadSensitivity / 100.0;
+                double xFactor = REFERENCE_HORIZ_RES / (double) streamView.getWidth() * sensitivity;
+                double yFactor = REFERENCE_VERT_RES / (double) streamView.getHeight() * sensitivity;
+
+                conn.sendMouseMove((short) Math.round(deltaX * xFactor),
+                        (short) Math.round(deltaY * yFactor));
+                break;
+            }
+
+            case PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN: {
+                // The pointer follows the finger, measured against the video rather than the
+                // whole screen
+                int placedX = x - (int) streamView.getX();
+                int placedY = y - (int) streamView.getY();
+
+                conn.sendMousePosition(
+                        (short) Math.max(0, Math.min(placedX, streamView.getWidth())),
+                        (short) Math.max(0, Math.min(placedY, streamView.getHeight())),
+                        (short) streamView.getWidth(), (short) streamView.getHeight());
+                break;
+            }
+
+            case PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK:
+            case PreferenceConfiguration.TOUCH_MODE_LEFT_STICK: {
+                // The press is the centre of a stick, the same way the stick touch modes work
+                int shorter = Math.min(streamView.getWidth(), streamView.getHeight());
+                float travel = Math.max(1f, shorter * 0.18f
+                        / Math.max(0.2f, prefConfig.stickSensitivity / 100f));
+
+                float offsetX = x - passThroughOriginX;
+                float offsetY = y - passThroughOriginY;
+                float distance = (float) Math.hypot(offsetX, offsetY);
+                float reach = distance <= 0 ? 0 : Math.min(1f, distance / travel);
+
+                short axisX = distance <= 0 ? (short) 0
+                        : (short) Math.round(offsetX / distance * reach * 32767);
+
+                // Screen coordinates grow downwards, the stick reports upwards as positive
+                short axisY = distance <= 0 ? (short) 0
+                        : (short) Math.round(-offsetY / distance * reach * 32767);
+
+                // Only the stick is reported, so the control that passes the movement on keeps
+                // its own press while the same finger turns the view
+                if (prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK) {
+                    controllerHandler.reportOscRightStick(axisX, axisY);
+                }
+                else {
+                    controllerHandler.reportOscLeftStick(axisX, axisY);
+                }
+                break;
+            }
+
+            default:
+                // Off, and real touch: a touch the host expects to begin with a press of its own
+                // cannot be continued from underneath a control
+                break;
+        }
+    }
+
+    /**
+     * The pass-through press ended, so anything it left behind is let go.
+     */
+    private void onPassThroughEnded() {
+        if (!passThroughActive) {
+            return;
+        }
+
+        passThroughActive = false;
+
+        if (prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK) {
+            controllerHandler.reportOscRightStick((short) 0, (short) 0);
+        }
+        else if (prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK) {
+            controllerHandler.reportOscLeftStick((short) 0, (short) 0);
+        }
+    }
+
+    /**
+     * Connects a layout to the stream, including where a pressed control's movement goes.
+     */
+    private UniversalVirtualController createUniversalController(String layoutId) {
+        FrameLayout area = (FrameLayout) streamView.getParent();
+
+        UniversalVirtualController controller = new UniversalVirtualController(controllerHandler,
+                area, this, layoutId);
+
+        controller.setPassThroughListener(new UniversalVirtualController.PassThroughListener() {
+            @Override
+            public void onPassThroughMoved(int x, int y) {
+                Game.this.onPassThroughMoved(x, y);
+            }
+
+            @Override
+            public void onPassThroughEnded() {
+                Game.this.onPassThroughEnded();
+            }
+        });
+
+        return controller;
+    }
+
+    /**
+     * Shows or hides the on-screen controls, now and for the next stream.
+     *
+     * It is the same setting the layouts screen has, so the two cannot disagree about whether
+     * the controls are used.
+     */
+    private void setOnScreenControlsEnabled(boolean enabled) {
+        prefConfig.universalLayout = enabled;
+        PreferenceConfiguration.setUniversalLayoutEnabled(this, enabled);
+
+        if (!enabled) {
+            if (universalVirtualController != null) {
+                universalVirtualController.hide();
+            }
+
+            return;
+        }
+
+        if (universalVirtualController != null) {
+            universalVirtualController.show();
+            bringStreamDrawerToFront();
+            return;
+        }
+
+        // The switch was turned on in a stream that started without any controls, so the layout
+        // is created now rather than at the next connection
+        UniversalLayoutDefinition layout =
+                UniversalLayoutStore.getInstance(this).getSelectedLayout();
+
+        if (layout == null) {
+            return;
+        }
+
+        FrameLayout area = (FrameLayout) streamView.getParent();
+
+        if (area == null) {
+            return;
+        }
+
+        universalVirtualController = createUniversalController(layout.getId());
+        universalVirtualController.refreshLayout();
+        bringStreamDrawerToFront();
+    }
+
+    /**
+     * Shows another layout, now if the on-screen layout is running and at the next stream if it
+     * is not.
+     */
+    private void chooseUniversalLayout(String layoutId) {
+        UniversalLayoutStore.getInstance(this).setSelectedLayoutId(layoutId);
+
+        if (universalVirtualController != null) {
+            prefConfig.universalLayout = true;
+            PreferenceConfiguration.setUniversalLayoutEnabled(this, true);
+            universalVirtualController.loadLayout(layoutId);
+
+            // A layout that was hidden stays hidden through a rebuild, because the visibility
+            // is carried over to the controls as they are made. Asking for it again is what
+            // brings them back after a clean screen.
+            universalVirtualController.show();
+
+            // A rebuilt layout is added above everything, so the menu is put back on top of it
+            bringStreamDrawerToFront();
+            return;
+        }
+
+        // The layout feature is switched off, so there is nothing on screen to replace. The
+        // choice is kept rather than shown, so the switch in the layouts screen still means
+        // what it says.
+        UniversalLayoutDefinition chosen =
+                UniversalLayoutStore.getInstance(this).getLayout(layoutId);
+
+        Toast.makeText(this, getString(R.string.stream_menu_layout_next_time,
+                chosen == null ? layoutId : chosen.getName()), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Back opens the stream menu rather than ending the stream outright. A press while the
+        // menu is open leaves the stream, which is what the button at the bottom of it does.
+        if (streamDrawer != null && streamDrawer.handleBack()) {
+            return;
+        }
+
+        super.onBackPressed();
+    }
+
     private void setPreferredOrientationForCurrentDisplay() {
         Display display = getWindowManager().getDefaultDisplay();
 
@@ -542,8 +914,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         if (PreferenceConfiguration.isSquarishScreen(display)) {
             int desiredOrientation = Configuration.ORIENTATION_UNDEFINED;
 
-            // OSC doesn't properly support portrait displays, so don't use it in portrait mode by default
-            if (prefConfig.onscreenController) {
+            // On-screen layouts don't properly support portrait displays, so don't use them in portrait mode by default
+            if (prefConfig.universalLayout) {
                 desiredOrientation = Configuration.ORIENTATION_LANDSCAPE;
             }
 
@@ -581,9 +953,9 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         // Set requested orientation for possible new screen size
         setPreferredOrientationForCurrentDisplay();
 
-        if (virtualController != null) {
-            // Refresh layout of OSC for possible new screen size
-            virtualController.refreshLayout();
+        if (universalVirtualController != null) {
+            // Refresh the universal layout for the possible new screen size
+            universalVirtualController.refreshLayout();
         }
 
         // Hide on-screen overlays in PiP mode
@@ -591,8 +963,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             if (isInPictureInPictureMode()) {
                 isHidingOverlays = true;
 
-                if (virtualController != null) {
-                    virtualController.hide();
+                if (universalVirtualController != null) {
+                    universalVirtualController.hide();
                 }
 
                 performanceOverlayView.setVisibility(View.GONE);
@@ -609,8 +981,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
                 // Restore overlays to previous state when leaving PiP
 
-                if (virtualController != null) {
-                    virtualController.show();
+                if (universalVirtualController != null) {
+                    universalVirtualController.show();
                 }
 
                 if (prefConfig.enablePerfOverlay) {
@@ -1036,6 +1408,11 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     protected void onDestroy() {
         super.onDestroy();
 
+        if (universalVirtualController != null) {
+            universalVirtualController.destroy();
+            universalVirtualController = null;
+        }
+
         if (controllerHandler != null) {
             controllerHandler.destroy();
         }
@@ -1082,8 +1459,8 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         SpinnerDialog.closeDialogs(this);
         Dialog.closeDialogs();
 
-        if (virtualController != null) {
-            virtualController.hide();
+        if (universalVirtualController != null) {
+            universalVirtualController.hide();
         }
 
         if (conn != null) {
@@ -1487,6 +1864,67 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         return true;
     }
 
+    /**
+     * Builds the touch handlers for what the touchscreen is set to do.
+     *
+     * It is a method rather than a loop in the setup because the stream menu can change the
+     * setting while streaming, and the change has to take effect at once.
+     */
+    /**
+     * Whether the touchscreen drives a stick, which is what the sensitivity setting applies to
+     * when it is not a touchpad.
+     */
+    private boolean isStickTouchMode() {
+        return prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK
+                || prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK;
+    }
+
+    private void setUpTouchContexts() {
+        for (int i = 0; i < touchContextMap.length; i++) {
+            switch (prefConfig.touchMode) {
+                case PreferenceConfiguration.TOUCH_MODE_OFF:
+                    touchContextMap[i] = new OffTouchContext(i);
+                    break;
+
+                case PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK:
+                    touchContextMap[i] = new RightStickTouchContext(controllerHandler, i, streamView,
+                            prefConfig.stickSensitivity);
+                    break;
+
+                case PreferenceConfiguration.TOUCH_MODE_LEFT_STICK:
+                    touchContextMap[i] = new LeftStickTouchContext(controllerHandler, i, streamView,
+                            prefConfig.stickSensitivity);
+                    break;
+
+                case PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN:
+                    touchContextMap[i] = new AbsoluteTouchContext(conn, i, streamView);
+                    break;
+
+                case PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS:
+                    touchContextMap[i] = new RelativeTouchContext(conn, i,
+                            REFERENCE_HORIZ_RES, REFERENCE_VERT_RES,
+                            streamView, prefConfig, false);
+                    break;
+
+                default:
+                    touchContextMap[i] = new RelativeTouchContext(conn, i,
+                            REFERENCE_HORIZ_RES, REFERENCE_VERT_RES,
+                            streamView, prefConfig);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Changes what the touchscreen does, now and for the next stream.
+     */
+    public void applyTouchMode(int mode) {
+        prefConfig.touchMode = mode;
+        PreferenceConfiguration.setTouchMode(this, mode);
+
+        setUpTouchContexts();
+    }
+
     private TouchContext getTouchContext(int actionIndex)
     {
         if (actionIndex < touchContextMap.length) {
@@ -1780,6 +2218,23 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         }
     }
 
+    /**
+     * Returns true while the user is moving or resizing the controls of an on-screen
+     * layout. Touch input must not reach the stream in that state, otherwise the
+     * touches that manipulate the controls would also be sent to the host.
+     */
+    private boolean isOnScreenLayoutBeingConfigured() {
+        if (universalVirtualController != null) {
+            UniversalVirtualController.ControllerMode mode = universalVirtualController.getControllerMode();
+            if (mode == UniversalVirtualController.ControllerMode.MoveButtons ||
+                    mode == UniversalVirtualController.ControllerMode.ResizeButtons) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // Returns true if the event was consumed
     // NB: View is only present if called from a view callback
     private boolean handleMotionEvent(View view, MotionEvent event) {
@@ -1993,17 +2448,24 @@ public class Game extends Activity implements SurfaceHolder.Callback,
             // This case is for fingers
             else
             {
-                if (virtualController != null &&
-                        (virtualController.getControllerMode() == VirtualController.ControllerMode.MoveButtons ||
-                         virtualController.getControllerMode() == VirtualController.ControllerMode.ResizeButtons)) {
-                    // Ignore presses when the virtual controller is being configured
+                if (isOnScreenLayoutBeingConfigured()) {
+                    // Ignore presses when an on-screen layout is being configured
                     return true;
                 }
 
                 // If this is the parent view, we'll offset our coordinates to appear as if they
                 // are relative to the StreamView like our StreamView touch events are.
                 float xOffset, yOffset;
-                if (view != streamView && !prefConfig.touchscreenTrackpad) {
+
+                // A touch that reaches the game through the covering view is measured against
+                // that view, while the video lives in a smaller view of its own that is centred
+                // in it. Placing the pointer means measuring against the video, so the touch is
+                // moved by however far along that view sits. Trackpad and stick input only care
+                // about movement, so they need no offset at all.
+                boolean placedByPosition = prefConfig.touchMode ==
+                        PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN;
+
+                if (view != streamView && placedByPosition) {
                     xOffset = -streamView.getX();
                     yOffset = -streamView.getY();
                 }
@@ -2032,14 +2494,19 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                     return true;
                 }
 
-                // TODO: Re-enable native touch when have a better solution for handling
-                // cancelled touches from Android gestures and 3 finger taps to activate
-                // the software keyboard.
-                /*if (!prefConfig.touchscreenTrackpad && trySendTouchEvent(view, event)) {
-                    // If this host supports touch events and absolute touch is enabled,
-                    // send it directly as a touch event.
-                    return true;
-                }*/
+                // Real touch events, which the host receives as touch rather than as a mouse.
+                // This is what makes a game that reads touch input itself work. It is offered
+                // as an experiment because it does nothing unless the host takes touch, and
+                // because Android cancels touches of its own that cannot be passed on.
+                if (prefConfig.touchMode == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS) {
+                    if (trySendTouchEvent(view, event)) {
+                        return true;
+                    }
+
+                    // The host does not take touch, so there is nothing this mode can do with
+                    // the press
+                    return false;
+                }
 
                 TouchContext context = getTouchContext(actionIndex);
                 if (context == null) {
@@ -2049,12 +2516,15 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                 switch (event.getActionMasked())
                 {
                 case MotionEvent.ACTION_POINTER_DOWN:
-                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_DOWN: {
+                    int owned = streamPointers.record(actionIndex, event.getPointerId(actionIndex));
+
                     for (TouchContext touchContext : touchContextMap) {
-                        touchContext.setPointerCount(event.getPointerCount());
+                        touchContext.setPointerCount(owned);
                     }
                     context.touchDownEvent(eventX, eventY, event.getEventTime(), true);
                     break;
+                }
                 case MotionEvent.ACTION_POINTER_UP:
                 case MotionEvent.ACTION_UP:
                     if (event.getPointerCount() == 1 &&
@@ -2074,46 +2544,60 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                         context.touchUpEvent(eventX, eventY, event.getEventTime());
                     }
 
+                    int owned = streamPointers.forget(actionIndex);
+
                     for (TouchContext touchContext : touchContextMap) {
-                        touchContext.setPointerCount(event.getPointerCount() - 1);
+                        touchContext.setPointerCount(owned);
                     }
-                    if (actionIndex == 0 && event.getPointerCount() > 1 && !context.isCancelled()) {
+                    if (actionIndex == 0 && owned > 0 && !context.isCancelled()) {
                         // The original secondary touch now becomes primary
-                        context.touchDownEvent(
-                                (int)(event.getX(1) + xOffset),
-                                (int)(event.getY(1) + yOffset),
-                                event.getEventTime(), false);
+                        int remaining = event.findPointerIndex(streamPointers.idAt(1));
+
+                        if (remaining >= 0) {
+                            context.touchDownEvent(
+                                    (int)(event.getX(remaining) + xOffset),
+                                    (int)(event.getY(remaining) + yOffset),
+                                    event.getEventTime(), false);
+                        }
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
                     // ACTION_MOVE is special because it always has actionIndex == 0
                     // We'll call the move handlers for all indexes manually
 
+                    // A finger is followed by its own id, since the indexes under it shift
+                    // whenever another finger lifts
+                    int[] pointerIndexes = new int[touchContextMap.length];
+
+                    for (int slot = 0; slot < pointerIndexes.length; slot++) {
+                        pointerIndexes[slot] = event.findPointerIndex(streamPointers.idAt(slot));
+                    }
+
                     // First process the historical events
                     for (int i = 0; i < event.getHistorySize(); i++) {
-                        for (TouchContext aTouchContextMap : touchContextMap) {
-                            if (aTouchContextMap.getActionIndex() < event.getPointerCount())
-                            {
-                                aTouchContextMap.touchMoveEvent(
-                                        (int)(event.getHistoricalX(aTouchContextMap.getActionIndex(), i) + xOffset),
-                                        (int)(event.getHistoricalY(aTouchContextMap.getActionIndex(), i) + yOffset),
+                        for (int slot = 0; slot < touchContextMap.length; slot++) {
+                            if (pointerIndexes[slot] >= 0) {
+                                touchContextMap[slot].touchMoveEvent(
+                                        (int)(event.getHistoricalX(pointerIndexes[slot], i) + xOffset),
+                                        (int)(event.getHistoricalY(pointerIndexes[slot], i) + yOffset),
                                         event.getHistoricalEventTime(i));
                             }
                         }
                     }
 
                     // Now process the current values
-                    for (TouchContext aTouchContextMap : touchContextMap) {
-                        if (aTouchContextMap.getActionIndex() < event.getPointerCount())
-                        {
-                            aTouchContextMap.touchMoveEvent(
-                                    (int)(event.getX(aTouchContextMap.getActionIndex()) + xOffset),
-                                    (int)(event.getY(aTouchContextMap.getActionIndex()) + yOffset),
+                    for (int slot = 0; slot < touchContextMap.length; slot++) {
+                        if (pointerIndexes[slot] >= 0) {
+                            touchContextMap[slot].touchMoveEvent(
+                                    (int)(event.getX(pointerIndexes[slot]) + xOffset),
+                                    (int)(event.getY(pointerIndexes[slot]) + yOffset),
                                     event.getEventTime());
                         }
                     }
                     break;
                 case MotionEvent.ACTION_CANCEL:
+                    streamPointers.clear();
+
                     for (TouchContext aTouchContext : touchContextMap) {
                         aTouchContext.cancelTouch();
                         aTouchContext.setPointerCount(0);

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The layout editor is full screen, exactly like the stream: the controls are placed in the
+    same coordinates they will have while playing, so what is arranged here is what appears
+    there.
+
+    Nothing is docked. The editing panel floats above the arrangement and its header is the
+    handle to drag it by, which is what keeps it from covering the controls being worked on.
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutEditorFrame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF000000">
+
+    <!-- The controls, laid out over the whole screen exactly as over the stream -->
+    <FrameLayout
+        android:id="@+id/layoutEditorOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!--
+        The editing panel. It is sized and positioned in code so it can be dragged, and its
+        header is the handle to drag it by. The rows are added into the scrolling area below
+        the header, which is never cleared.
+    -->
+    <LinearLayout
+        android:id="@+id/layoutEditorPanel"
+        android:layout_width="@dimen/layout_editor_panel_width"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:background="#E61C1C22">
+
+        <LinearLayout
+            android:id="@+id/layoutEditorPanelHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="44dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#F028282E"
+            android:paddingStart="12dp"
+            android:paddingEnd="4dp">
+
+            <TextView
+                android:id="@+id/layoutEditorPanelTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:paddingEnd="4dp"
+                android:textColor="#E0E0E6"
+                android:textSize="16sp"/>
+
+            <ImageButton
+                android:id="@+id/layoutEditorPanelClose"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@drawable/ic_close"
+                android:scaleType="fitCenter"
+                android:padding="12dp"
+                android:contentDescription="@string/menu_dont_save"
+                style="?android:attr/borderlessButtonStyle"/>
+
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/layoutEditorPanelScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:id="@+id/layoutEditorPanelContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <!--
+        The general settings button. It belongs to the editor rather than to the layout, and it
+        can be dragged anywhere so it does not sit on top of what is being arranged. It stays
+        on top of the drawer, so it is always reachable.
+    -->
+    <ImageButton
+        android:id="@+id/layoutEditorSettingsButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_settings"
+        android:scaleType="fitCenter"
+        android:padding="12dp"
+        android:alpha="0.85"
+        android:background="#88000000"
+        android:contentDescription="@string/title_layout_settings"
+        style="?android:attr/borderlessButtonStyle"/>
+
+</RelativeLayout>

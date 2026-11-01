@@ -5,6 +5,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Reading the device's images is only needed to let the user pick artwork for an
+         on-screen layout. Android 13 split the read permission per media type, so both
+         forms are declared and the picker asks for the one that applies. -->
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAPTURE_KEYBOARD" />
     <uses-permission android:name="com.android.providers.tv.permission.READ_EPG_DATA"/>
@@ -56,6 +65,20 @@
         android:localeConfig="@xml/locales_config"
         android:enableOnBackInvokedCallback="false"
         android:theme="@style/AppTheme">
+
+        <!--
+            A shared layout is handed out from the app's own cache, which needs a provider to
+            give the receiving app a readable address. No storage permission is involved.
+        -->
+        <provider
+            android:name=".binding.input.virtual_controller.universal.UniversalLayoutShareProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <provider
             android:name=".PosterContentProvider"
@@ -179,9 +202,43 @@
             android:label="Usb Driver Service" />
 
         <activity
+            android:name=".OpenSourceLicensesActivity"
+            android:label="@string/title_open_source_licenses"
+            android:exported="false" />
+        <activity
             android:name=".HelpActivity"
             android:resizeableActivity="true"
             android:enableOnBackInvokedCallback="true"
+            android:configChanges="mcc|mnc|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection">
+            <meta-data android:name="WindowManagerPreference:FreeformWindowSize" android:value="system-default" />
+            <meta-data android:name="WindowManagerPreference:FreeformWindowOrientation" android:value="landscape" />
+        </activity>
+
+        <activity
+            android:name=".binding.input.virtual_controller.universal.UniversalLayoutsActivity"
+            android:resizeableActivity="true"
+            android:enableOnBackInvokedCallback="true"
+            android:label="@string/title_universal_layouts"
+            android:configChanges="mcc|mnc|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection">
+            <meta-data android:name="WindowManagerPreference:FreeformWindowSize" android:value="system-default" />
+            <meta-data android:name="WindowManagerPreference:FreeformWindowOrientation" android:value="landscape" />
+        </activity>
+        <activity
+            android:name=".binding.input.virtual_controller.universal.UniversalLayoutEditorActivity"
+            android:resizeableActivity="true"
+            android:enableOnBackInvokedCallback="true"
+            android:label="@string/title_edit_controls"
+            android:screenOrientation="userLandscape"
+            android:theme="@style/StreamTheme"
+            android:configChanges="mcc|mnc|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection">
+            <meta-data android:name="WindowManagerPreference:FreeformWindowSize" android:value="system-default" />
+            <meta-data android:name="WindowManagerPreference:FreeformWindowOrientation" android:value="landscape" />
+        </activity>
+        <activity
+            android:name=".binding.input.virtual_controller.universal.UniversalLayoutImagePickerActivity"
+            android:resizeableActivity="true"
+            android:enableOnBackInvokedCallback="true"
+            android:label="@string/title_pick_image"
             android:configChanges="mcc|mnc|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection">
             <meta-data android:name="WindowManagerPreference:FreeformWindowSize" android:value="system-default" />
             <meta-data android:name="WindowManagerPreference:FreeformWindowOrientation" android:value="landscape" />

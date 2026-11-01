@@ -41,6 +41,7 @@ import com.limelight.binding.input.driver.UsbDriverListener;
 import com.limelight.binding.input.driver.UsbDriverService;
 import com.limelight.nvstream.NvConnection;
 import com.limelight.nvstream.input.ControllerPacket;
+import com.limelight.nvstream.input.KeyboardPacket;
 import com.limelight.nvstream.input.MouseButtonPacket;
 import com.limelight.nvstream.jni.MoonBridge;
 import com.limelight.preferences.PreferenceConfiguration;
@@ -397,11 +398,6 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
                     }
                 }
             }
-        }
-
-        if (PreferenceConfiguration.readPreferences(context).onscreenController) {
-            LimeLog.info("Counting OSC gamepad");
-            mask |= 1;
         }
 
         LimeLog.info("Enumerated "+count+" gamepads");
@@ -1074,14 +1070,52 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         }
     }
 
+    /**
+     * Combines two controllers' readings of one axis or trigger into the one the host is told
+     * about, which is the stronger of the two.
+     *
+     * This must not be done with a bitwise OR: the values are signed, so OR-ing a strong
+     * positive value with even a tiny negative one sets the sign bit and turns the result into
+     * a large negative value. A drifting second device would then flip a pushed stick around
+     * for a moment, which is what made a character briefly run the other way.
+     */
+    public static short combineAxisValue(short current, short other) {
+        return Math.abs(other) > Math.abs(current) ? other : current;
+    }
+
+    /**
+     * The same for a trigger, which the host takes as a byte.
+     *
+     * A trigger is unsigned here, so the stronger pull is the larger value and not the one
+     * with the larger signed magnitude: a fully pulled trigger is 0xFF, which as a signed byte
+     * is minus one.
+     */
+    public static byte combineAxisValue(byte current, byte other) {
+        return (current & 0xFF) >= (other & 0xFF) ? current : other;
+    }
+
     private short getActiveControllerMask() {
         if (prefConfig.multiController) {
-            return (short)(currentControllers | initialControllers | (prefConfig.onscreenController ? 1 : 0));
+            return (short)(currentControllers | initialControllers
+                    | onScreenPlayerMask(prefConfig.universalLayout));
         }
         else {
             // Only Player 1 is active with multi-controller disabled
             return 1;
         }
+    }
+
+    /**
+     * The player-one bit when an on-screen layout is in use.
+     *
+     * The host learns which players have a gamepad from the mask carried by every input
+     * packet, so a layout that is not in this mask is ignored no matter how much input it
+     * sends. Both on-screen layouts count: the built-in one and the universal one, which is
+     * a separate setting and used to be left out, leaving the universal layout unable to
+     * register its gamepad until the built-in one was enabled as well.
+     */
+    public static int onScreenPlayerMask(boolean universalLayout) {
+        return universalLayout ? 1 : 0;
     }
 
     private static boolean areBatteryCapacitiesEqual(float first, float second) {
@@ -1227,12 +1261,12 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
                     context.controllerNumber == controllerNumber &&
                     context.mouseEmulationActive == originalContext.mouseEmulationActive) {
                 inputMap |= context.inputMap;
-                leftTrigger |= maxByMagnitude(leftTrigger, context.leftTrigger);
-                rightTrigger |= maxByMagnitude(rightTrigger, context.rightTrigger);
-                leftStickX |= maxByMagnitude(leftStickX, context.leftStickX);
-                leftStickY |= maxByMagnitude(leftStickY, context.leftStickY);
-                rightStickX |= maxByMagnitude(rightStickX, context.rightStickX);
-                rightStickY |= maxByMagnitude(rightStickY, context.rightStickY);
+                leftTrigger = combineAxisValue(leftTrigger, context.leftTrigger);
+                rightTrigger = combineAxisValue(rightTrigger, context.rightTrigger);
+                leftStickX = combineAxisValue(leftStickX, context.leftStickX);
+                leftStickY = combineAxisValue(leftStickY, context.leftStickY);
+                rightStickX = combineAxisValue(rightStickX, context.rightStickX);
+                rightStickY = combineAxisValue(rightStickY, context.rightStickY);
             }
         }
         for (int i = 0; i < usbDeviceContexts.size(); i++) {
@@ -1241,22 +1275,22 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
                     context.controllerNumber == controllerNumber &&
                     context.mouseEmulationActive == originalContext.mouseEmulationActive) {
                 inputMap |= context.inputMap;
-                leftTrigger |= maxByMagnitude(leftTrigger, context.leftTrigger);
-                rightTrigger |= maxByMagnitude(rightTrigger, context.rightTrigger);
-                leftStickX |= maxByMagnitude(leftStickX, context.leftStickX);
-                leftStickY |= maxByMagnitude(leftStickY, context.leftStickY);
-                rightStickX |= maxByMagnitude(rightStickX, context.rightStickX);
-                rightStickY |= maxByMagnitude(rightStickY, context.rightStickY);
+                leftTrigger = combineAxisValue(leftTrigger, context.leftTrigger);
+                rightTrigger = combineAxisValue(rightTrigger, context.rightTrigger);
+                leftStickX = combineAxisValue(leftStickX, context.leftStickX);
+                leftStickY = combineAxisValue(leftStickY, context.leftStickY);
+                rightStickX = combineAxisValue(rightStickX, context.rightStickX);
+                rightStickY = combineAxisValue(rightStickY, context.rightStickY);
             }
         }
         if (defaultContext.controllerNumber == controllerNumber) {
             inputMap |= defaultContext.inputMap;
-            leftTrigger |= maxByMagnitude(leftTrigger, defaultContext.leftTrigger);
-            rightTrigger |= maxByMagnitude(rightTrigger, defaultContext.rightTrigger);
-            leftStickX |= maxByMagnitude(leftStickX, defaultContext.leftStickX);
-            leftStickY |= maxByMagnitude(leftStickY, defaultContext.leftStickY);
-            rightStickX |= maxByMagnitude(rightStickX, defaultContext.rightStickX);
-            rightStickY |= maxByMagnitude(rightStickY, defaultContext.rightStickY);
+            leftTrigger = combineAxisValue(leftTrigger, defaultContext.leftTrigger);
+            rightTrigger = combineAxisValue(rightTrigger, defaultContext.rightTrigger);
+            leftStickX = combineAxisValue(leftStickX, defaultContext.leftStickX);
+            leftStickY = combineAxisValue(leftStickY, defaultContext.leftStickY);
+            rightStickX = combineAxisValue(rightStickX, defaultContext.rightStickX);
+            rightStickY = combineAxisValue(rightStickY, defaultContext.rightStickY);
         }
 
         if (originalContext.mouseEmulationActive) {
@@ -2101,7 +2135,11 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
             // If we didn't find a matching device, it must be the on-screen
             // controls that triggered the rumble. Vibrate the device if
             // the user has requested that behavior.
-            if (!foundMatchingDevice && prefConfig.onscreenController && !prefConfig.onlyL3R3 && prefConfig.vibrateOsc) {
+            // Either on-screen layout counts: the built-in one and the universal one. If a
+            // control of either is what asked for the rumble, the phone buzzes.
+            boolean onScreenControls = prefConfig.universalLayout;
+
+            if (!foundMatchingDevice && onScreenControls && prefConfig.vibrateOsc) {
                 rumbleSingleVibrator(deviceVibrator, lowFreqMotor, highFreqMotor);
             }
             else if (foundMatchingDevice && !vibrated && prefConfig.vibrateFallbackToDevice) {
@@ -2784,22 +2822,112 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         return true;
     }
 
+    /**
+     * What the touch input is putting on the sticks.
+     *
+     * It is kept apart from the state of the on-screen layout, because the layout sends its
+     * whole state on every press: a stick pushed by a finger has to survive that, and the
+     * layout's own sticks have to survive the touch input letting go. Two sources, one packet.
+     */
+    private final OscStickState oscSticks = new OscStickState();
+
     public void reportOscState(int buttonFlags,
                                short leftStickX, short leftStickY,
                                short rightStickX, short rightStickY,
                                byte leftTrigger, byte rightTrigger) {
-        defaultContext.leftStickX = leftStickX;
-        defaultContext.leftStickY = leftStickY;
+        applyOscState(buttonFlags, leftStickX, leftStickY, rightStickX, rightStickY,
+                leftTrigger, rightTrigger);
 
-        defaultContext.rightStickX = rightStickX;
-        defaultContext.rightStickY = rightStickY;
+        sendControllerInputPacket(defaultContext);
+    }
+
+    /**
+     * Puts the two sources of a packet together.
+     *
+     * A stick the touch input is pushing keeps its value: the on-screen layout sends its whole
+     * state on every press, and without this it would put that stick back to the middle as soon
+     * as another control was touched.
+     */
+    private void applyOscState(int buttonFlags,
+                               short leftStickX, short leftStickY,
+                               short rightStickX, short rightStickY,
+                               byte leftTrigger, byte rightTrigger) {
+        defaultContext.leftStickX = oscSticks.mergeLeftX(leftStickX);
+        defaultContext.leftStickY = oscSticks.mergeLeftY(leftStickY);
+
+        defaultContext.rightStickX = oscSticks.mergeRightX(rightStickX);
+        defaultContext.rightStickY = oscSticks.mergeRightY(rightStickY);
 
         defaultContext.leftTrigger = leftTrigger;
         defaultContext.rightTrigger = rightTrigger;
 
         defaultContext.inputMap = buttonFlags;
+    }
+
+    /**
+     * Reports one stick on its own.
+     *
+     * Everything else the on-screen layout is sending is left as it is, which is what makes a
+     * touch that drives a stick usable together with a control that is being held: reporting a
+     * whole packet would clear the buttons that control has pressed.
+     */
+    public void reportOscRightStick(short x, short y) {
+        oscSticks.setTouchRight(x, y);
+
+        defaultContext.rightStickX = x;
+        defaultContext.rightStickY = y;
 
         sendControllerInputPacket(defaultContext);
+    }
+
+    public void reportOscLeftStick(short x, short y) {
+        oscSticks.setTouchLeft(x, y);
+
+        defaultContext.leftStickX = x;
+        defaultContext.leftStickY = y;
+
+        sendControllerInputPacket(defaultContext);
+    }
+
+
+    /**
+     * Sends a keyboard event originating from the on-screen controller (OSC).
+     *
+     * @param keyCode GFE keycode, as produced by KeyboardTranslator.translate(int, int)
+     * @param keyDirection KeyboardPacket.KEY_DOWN or KeyboardPacket.KEY_UP
+     * @param modifier bitmask of KeyboardPacket.MODIFIER_* values
+     * @param flags MoonBridge.SS_KBE_FLAG_* values
+     */
+    public void reportOscKeyboardState(short keyCode, byte keyDirection, byte modifier, byte flags) {
+        if (keyCode == 0) {
+            return;
+        }
+
+        conn.sendKeyboardInput(keyCode, keyDirection, modifier, flags);
+    }
+
+    /**
+     * Sends a mouse button event originating from the on-screen controller (OSC). The
+     * on-screen elements can bind mouse buttons, not just gamepad and keyboard inputs.
+     *
+     * @param mouseButton MouseButtonPacket.BUTTON_*
+     * @param down true for a press, false for a release
+     */
+    public void reportOscMouseButton(byte mouseButton, boolean down) {
+        if (down) {
+            conn.sendMouseButtonDown(mouseButton);
+        }
+        else {
+            conn.sendMouseButtonUp(mouseButton);
+        }
+    }
+
+    /**
+     * Moves the mouse pointer by a relative amount, driven by an on-screen stick that is
+     * configured to control the pointer.
+     */
+    public void reportOscMouseMove(short deltaX, short deltaY) {
+        conn.sendMouseMove(deltaX, deltaY);
     }
 
     @Override

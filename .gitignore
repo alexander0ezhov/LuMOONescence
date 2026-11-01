@@ -42,3 +42,14 @@ app/.externalNativeBuild/
 
 # NDK stuff
 .cxx/
+
+# Local diagnostics: device logs, screenshots and scratch scripts from debugging sessions.
+# They are working files, not part of the project, and a device log carries the addresses and
+# timestamps of wherever the phone was.
+build-diagnostics/
+
+# Signing material: keep it out of the repository
+*.jks
+*.keystore
+keystore.properties
+signing.properties

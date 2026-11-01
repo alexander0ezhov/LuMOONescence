@@ -17,7 +17,6 @@
     <string name="pcview_menu_header_unknown">Refreshing</string>
     <string name="pcview_menu_app_list">View All Apps</string>
     <string name="pcview_menu_pair_pc">Pair with PC</string>
-    <string name="pcview_menu_unpair_pc">Unpair</string>
     <string name="pcview_menu_send_wol">Send Wake-On-LAN request</string>
     <string name="pcview_menu_delete_pc">Delete PC</string>
     <string name="pcview_menu_test_network">Test Network Connection</string>
@@ -26,12 +25,12 @@
 
     <!-- Network test strings -->
     <string name="nettest_title_waiting">Testing Network Connection</string>
-    <string name="nettest_text_waiting">Moonlight is testing your network connection to determine if any required ports are blocked.\n\nThis may take a few seconds…</string>
+    <string name="nettest_text_waiting">LuMOONescence is testing your network connection to determine if any required ports are blocked.\n\nThis may take a few seconds…</string>
     <string name="nettest_title_done">Network Test Complete</string>
-    <string name="nettest_text_success">Your network does not appear to be blocking Moonlight. If you still have trouble connecting, check your PC\'s firewall settings.\n\nIf you are trying to stream over the Internet, install the Moonlight Internet Hosting Tool on your PC and run the included Internet Streaming Tester to check your PC\'s Internet connection.</string>
-    <string name="nettest_text_inconclusive">The network test could not be performed because none of Moonlight\'s connection testing servers were reachable. Check your Internet connection or try again later.</string>
-    <string name="nettest_text_failure">Your device\'s current network connection seems to be blocking Moonlight. Streaming over the Internet may not work while connected to this network.\n\nThe following network ports were blocked:\n</string>
-    <string name="nettest_text_blocked">Your device\'s current network connection is blocking Moonlight. Streaming over the Internet may not work while connected to this network.</string>
+    <string name="nettest_text_success">Your network does not appear to be blocking LuMOONescence. If you still have trouble connecting, check your PC\'s firewall settings.\n\nIf you are trying to stream over the Internet, install the LuMOONescence Internet Hosting Tool on your PC and run the included Internet Streaming Tester to check your PC\'s Internet connection.</string>
+    <string name="nettest_text_inconclusive">The network test could not be performed because none of LuMOONescence\'s connection testing servers were reachable. Check your Internet connection or try again later.</string>
+    <string name="nettest_text_failure">Your device\'s current network connection seems to be blocking LuMOONescence. Streaming over the Internet may not work while connected to this network.\n\nThe following network ports were blocked:\n</string>
+    <string name="nettest_text_blocked">Your device\'s current network connection is blocking LuMOONescence. Streaming over the Internet may not work while connected to this network.</string>
 
     <!-- Pair messages -->
     <string name="pairing">Pairing…</string>
@@ -47,7 +46,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">Computer is online</string>
     <string name="wol_no_mac">Unable to wake PC because there is no stored MAC address</string>
-    <string name="wol_waking_pc">Waking PC…</string>
     <string name="wol_waking_msg">It may take a few seconds for your PC to wake up.
 	    If it doesn\'t, make sure it\'s configured properly for Wake-On-LAN.
     </string>
@@ -67,7 +65,7 @@
 	    Using remote desktop software can also cause this error. Try rebooting your machine or reinstalling GFE.
     </string>
     <string name="title_decoding_error">Video Decoder Crashed</string>
-    <string name="message_decoding_error">Moonlight has crashed due to an incompatibility with this device\'s video decoder. Try adjusting the streaming settings if the crashes continue.</string>
+    <string name="message_decoding_error">LuMOONescence has crashed due to an incompatibility with this device\'s video decoder. Try adjusting the streaming settings if the crashes continue.</string>
     <string name="title_decoding_reset">Video Settings Reset</string>
     <string name="message_decoding_reset">Your device\'s video decoder continues to crash at your selected streaming settings. Your streaming settings have been reset to default.</string>
     <string name="error_usb_prohibited">USB access is prohibited by your device administrator. Check your Knox or MDM settings.</string>
@@ -119,20 +117,15 @@
     <string name="applist_menu_resume">Resume Session</string>
     <string name="applist_menu_quit">Quit Session</string>
     <string name="applist_menu_quit_and_start">Quit Current Game and Start</string>
-    <string name="applist_menu_cancel">Cancel</string>
     <string name="applist_menu_details">View Details</string>
     <string name="applist_menu_scut">Create Shortcut</string>
-    <string name="applist_menu_tv_channel">Add to Channel</string>
     <string name="applist_menu_hide_app">Hide App</string>
     <string name="applist_refresh_title">App List</string>
     <string name="applist_refresh_msg">Refreshing apps…</string>
-    <string name="applist_refresh_error_title">Error</string>
-    <string name="applist_refresh_error_msg">Failed to get app list</string>
     <string name="applist_quit_app">Quitting</string>
     <string name="applist_quit_success">Successfully quit</string>
     <string name="applist_quit_fail">Failed to quit</string>
     <string name="applist_quit_confirmation">Are you sure you want to quit the running app? All unsaved data will be lost.</string>
-    <string name="applist_details_id">App ID:</string>
 
     <!-- Add computer manually activity -->
     <string name="title_add_pc">Add PC Manually</string>
@@ -177,12 +170,12 @@
     <string name="summary_seekbar_vibrate_fallback_strength">Amplify or reduce the vibration intensity on your device</string>
     <string name="suffix_seekbar_vibrate_fallback_strength">%</string>
     <string name="title_seekbar_deadzone">Adjust analog stick deadzone</string>
-    <string name="summary_seekbar_deadzone">Note: Some games can enforce a larger deadzone than what Moonlight is configured to use.</string>
+    <string name="summary_seekbar_deadzone">Note: Some games can enforce a larger deadzone than what LuMOONescence is configured to use.</string>
     <string name="suffix_seekbar_deadzone">%</string>
     <string name="title_checkbox_xb1_driver">Xbox 360/One USB gamepad driver</string>
     <string name="summary_checkbox_xb1_driver">Enables a built-in USB driver for devices without native Xbox controller support</string>
     <string name="title_checkbox_usb_bind_all">Override native Xbox gamepad support</string>
-    <string name="summary_checkbox_usb_bind_all">Use Moonlight\'s USB driver for all supported gamepads, even if native Xbox controller support is present</string>
+    <string name="summary_checkbox_usb_bind_all">Use LuMOONescence\'s USB driver for all supported gamepads, even if native Xbox controller support is present</string>
     <string name="title_checkbox_mouse_emulation">Mouse emulation via gamepad</string>
     <string name="summary_checkbox_mouse_emulation">Long pressing the Start button will switch the gamepad into mouse mode</string>
     <string name="title_checkbox_flip_face_buttons">Flip face buttons</string>
@@ -195,37 +188,134 @@
     <string name="summary_checkbox_gamepad_motion_fallback">Uses your device\'s built-in motion sensors if gamepad sensors are not supported by your connected gamepad or your Android version.\nNote: Enabling this option may cause your gamepad to appear as a PlayStation controller on the host.</string>
 
     <string name="category_input_settings">Input Settings</string>
-    <string name="title_checkbox_touchscreen_trackpad">Use the touchscreen as a trackpad</string>
-    <string name="summary_checkbox_touchscreen_trackpad">If enabled, the touchscreen acts like a trackpad. If disabled, the touchscreen directly controls the mouse cursor.</string>
     <string name="title_checkbox_absolute_mouse_mode">Remote desktop mouse mode</string>
     <string name="summary_checkbox_absolute_mouse_mode">This can make mouse acceleration behave more naturally for remote desktop usage, but it is incompatible with many games.</string>
     <string name="title_checkbox_mouse_nav_buttons">Enable back and forward mouse buttons</string>
     <string name="summary_checkbox_mouse_nav_buttons">Enabling this option may break right clicking on some buggy devices</string>
 
-    <string name="category_on_screen_controls_settings">On-screen Controls Settings</string>
-    <string name="title_checkbox_show_onscreen_controls">Show on-screen controls</string>
-    <string name="summary_checkbox_show_onscreen_controls">Show virtual controller overlay on touchscreen</string>
-    <string name="title_checkbox_vibrate_osc">Enable vibration</string>
-    <string name="summary_checkbox_vibrate_osc">Vibrates your device to emulate rumble for the on-screen controls</string>
-    <string name="title_only_l3r3">Only show L3 and R3</string>
-    <string name="summary_only_l3r3">Hide all virtual buttons except L3 and R3</string>
-    <string name="title_show_guide_button">Show Guide Button</string>
-    <string name="summary_show_guide_button">Show the guide button on screen</string>
-    <string name="title_reset_osc">Clear saved on-screen controls layout</string>
-    <string name="summary_reset_osc">Resets all on-screen controls to their default size and position</string>
-    <string name="dialog_title_reset_osc">Reset Layout</string>
-    <string name="dialog_text_reset_osc">Are you sure you want to delete your saved on-screen controls layout?</string>
-    <string name="toast_reset_osc_success">On-screen controls reset to default</string>
-    <string name="title_osc_opacity">Change opacity of on-screen controls</string>
-    <string name="summary_osc_opacity">Make the on-screen controls more/less transparent</string>
-    <string name="dialog_title_osc_opacity">Change opacity</string>
-    <string name="suffix_osc_opacity">%</string>
+
+    <string name="back">Back</string>
+    <string name="title_universal_layouts">On-screen layouts</string>
+    <string name="title_add_layout">Add layout</string>
+    <string name="title_layout_image">Layout image</string>
+    <string name="title_edit_controls">Edit controls</string>
+    <string name="title_reset_controls">Reset</string>
+    <string name="title_pick_image">Image</string>
+    <string name="title_use_default_image">Use default</string>
+    <string name="msg_layouts_help">Pick the layout used while streaming. Tap a layout to edit or remove it; add new ones with the plus button.</string>
+    <string name="msg_no_layouts">No layouts yet. Tap plus to create one.</string>
+    <string name="msg_layout_selected">Selected</string>
+    <string name="msg_no_images">No images found on this device.</string>
+    <string name="msg_image_permission_needed">Access to your images was not granted, so there is nothing to choose from. Grant the permission and open this screen again, or keep the default image.</string>
+    <string name="msg_image_picker_failed">Could not load the images from this device.</string>
+    <string name="dialog_title_layout_name">Layout name</string>
+    <string name="hint_layout_name">Layout name</string>
+    <string name="menu_edit_layout">Edit</string>
+    <string name="menu_choose_image">Change image</string>
+    <string name="menu_use_layout">Use this layout</string>
+    <string name="menu_delete_layout">Delete</string>
+    <string name="dialog_text_reset_layout_controls">Reset the controls of this layout to their default size and position?</string>
+    <string name="toast_layout_controls_reset">Controls reset to default</string>
+    <string name="toast_layout_adjusted_to_fit">This layout was arranged on a different screen size and has been scaled to fit. Use Reset if you want a layout made for this screen.</string>
+
+    <string name="title_layout_settings">Layout settings</string>
+    <string name="control_type_button">Button</string>
+    <string name="control_type_stick">Stick</string>
+    <string name="control_type_dpad">D-pad</string>
+    <string name="control_type_element">Control</string>
+    <string name="editor_label_center_button">Middle button</string>
+    <string name="editor_label_corner_radius">Corner radius</string>
+    <string name="editor_section_center_button">Middle of the stick</string>
+    <string name="editor_label_center_button_enabled">Tap the middle acts as a button</string>
+    <string name="editor_label_center_button_action">What the middle sends</string>
+    <string name="menu_add_button">Add button</string>
+    <string name="menu_add_stick">Add stick</string>
+    <string name="menu_add_dpad">Add D-pad</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_save_as">Save as</string>
+    <string name="menu_exit">Exit</string>
+    <string name="menu_duplicate">Duplicate</string>
+    <string name="menu_copy_size">Copy size</string>
+    <string name="menu_paste_size">Paste size</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_delete">Delete</string>
+    <string name="dialog_title_delete_control">Delete "%1$s"?</string>
+    <string name="stream_menu_title">Stream menu</string>
+    <string name="stream_menu_keyboard">Show keyboard</string>
+    <string name="stream_menu_touch">Touch input</string>
+    <string name="stream_menu_touch_off">Off</string>
+    <string name="stream_menu_touch_trackpad">Touchpad</string>
+    <string name="stream_menu_touch_right_stick">Right stick</string>
+    <string name="stream_menu_touch_left_stick">Left stick</string>
+    <string name="stream_menu_touch_events">Touch native (experimental)</string>
+    <string name="stream_menu_opacity">Opacity</string>
+    <string name="stream_menu_sensitivity">Sensitivity</string>
+    <string name="stream_menu_touchpad_mode">Touchpad mode</string>
+    <string name="stream_menu_touchpad_standard">Trackpad</string>
+    <string name="stream_menu_touchpad_direct">Direct cursor</string>
+    <string name="stream_menu_touchpad_no_clicks">No clicks</string>
+    <string name="stream_menu_extras">Extras</string>
+    <string name="stream_menu_vibration">Vibration</string>
+    <string name="stream_menu_controls">On-screen controls</string>
+    <string name="editor_label_pass_through">Pass through to touch (hold and move to look around)</string>
+    <string name="stream_menu_layout">Layout</string>
+    <string name="stream_menu_exit">Exit stream</string>
+    <string name="stream_menu_layout_next_time">"%1$s" will be used the next time you start streaming</string>
+    <string name="dialog_title_save_changes">Save changes?</string>
+    <string name="dialog_text_save_changes">Save the changes you made to this layout?</string>
+    <string name="menu_dont_save">Don\'t save</string>
+    <string name="dialog_title_save_layout_as">Save layout as</string>
+    <string name="hint_layout_name_new">Name of the new layout</string>
+    <string name="toast_layout_saved">Layout saved</string>
+    <string name="toast_layout_saved_as">Saved as &quot;%s&quot;</string>
+    <string name="toast_element_added">Added. Drag it into place.</string>
+    <string name="editor_section_element">Control</string>
+    <string name="editor_section_position">Position and size</string>
+    <string name="editor_section_action">Action</string>
+    <string name="editor_section_actions">This control</string>
+    <string name="menu_share_layout">Share layout</string>
+    <string name="title_import_layout">Import layout</string>
+    <string name="import_failed">Could not read that file</string>
+    <string name="import_done">Imported "%1$s"</string>
+    <string name="import_done_rescaled">Imported "%1$s", arranged for this screen</string>
+    <string name="editor_label_name">Name</string>
+    <string name="editor_label_x">X</string>
+    <string name="editor_label_y">Y</string>
+    <string name="editor_label_width">Width</string>
+    <string name="editor_label_height">Height</string>
+    <string name="editor_label_toggle">Toggle (tap to press, tap again to release)</string>
+    <string name="editor_toggle_off_while_pass_through">Toggle is off while pass through is on</string>
+    <string name="editor_label_sequence">Sequence of events</string>
+    <string name="editor_label_sequence_empty">No events yet. Add a step below.</string>
+    <string name="editor_label_step_delay">Delay after step (ms)</string>
+    <string name="editor_label_control_mode">Control mode</string>
+    <string name="editor_mode_axes">Axes</string>
+    <string name="editor_mode_buttons">Buttons</string>
+    <string name="editor_label_invert_y">Invert up and down (for a game that reads it the other way)</string>
+    <string name="editor_label_axis_x">Axis X</string>
+    <string name="editor_label_axis_y">Axis Y</string>
+    <string name="editor_label_direction_up">Button: up</string>
+    <string name="editor_label_direction_down">Button: down</string>
+    <string name="editor_label_direction_left">Button: left</string>
+    <string name="editor_label_direction_right">Button: right</string>
+    <string name="editor_add_step">Add step</string>
+    <string name="editor_add_event">Add event</string>
+    <string name="editor_remove_step">Remove step</string>
+    <string name="editor_step_title">Step %d</string>
+    <string name="editor_pick_device">Event type</string>
+    <string name="editor_device_keyboard">Keyboard</string>
+    <string name="editor_device_mouse">Mouse</string>
+    <string name="editor_device_gamepad">Gamepad</string>
+    <string name="editor_pick_key">Key</string>
+    <string name="editor_pick_button">Button</string>
+    <string name="editor_remove_event">Remove</string>
+    <string name="editor_label_direction_action">Action for %s</string>
 
     <string name="category_ui_settings">UI Settings</string>
     <string name="title_checkbox_enable_pip">Enable Picture-in-Picture observer mode</string>
     <string name="summary_checkbox_enable_pip">Allows the stream to be viewed (but not controlled) while multitasking</string>
     <string name="title_language_list">Language</string>
-    <string name="summary_language_list">Language to use for Moonlight</string>
+    <string name="summary_language_list">Language to use for LuMOONescence</string>
     <string name="title_checkbox_small_icon_mode">Use small box art</string>
     <string name="summary_checkbox_small_icon_mode">Smaller box art in the app grid allows more apps to be visible on screen</string>
 
@@ -242,8 +332,6 @@
     <string name="summary_checkbox_reduce_refresh_rate">Lower display refresh rates can save power at the expense of some additional video latency</string>
     <string name="title_checkbox_disable_warnings">Disable warning messages</string>
     <string name="summary_checkbox_disable_warnings">Disable on-screen connection warning messages while streaming</string>
-    <string name="title_disable_frame_drop">Never drop frames</string>
-    <string name="summary_disable_frame_drop">May reduce micro-stuttering on some devices, but can increase latency</string>
     <string name="title_video_format">Change codec settings</string>
     <string name="summary_video_format">Newer codecs can lower video bandwidth requirements if your device supports them. Codec selections may be ignored if not supported by the host software or GPU.</string>
     <string name="title_enable_hdr">Enable HDR (Experimental)</string>
@@ -260,14 +348,16 @@
     <string name="summary_setup_guide">View instructions on how to set up your gaming PC for streaming</string>
     <string name="title_troubleshooting">Troubleshooting guide</string>
     <string name="summary_troubleshooting">View tips for diagnosing and fixing common streaming issues</string>
+    <string name="category_about">About</string>
+    <string name="title_open_source_licenses">Open source licenses</string>
+    <string name="summary_open_source_licenses">The license this app is under and the licenses of what it is built from</string>
     <string name="title_privacy_policy">Privacy policy</string>
-    <string name="summary_privacy_policy">View Moonlight\'s privacy policy</string>
+    <string name="summary_privacy_policy">View LuMOONescence\'s privacy policy</string>
 
     <!-- Toasts -->
     <string name="toast_controller_type_changed">Gamepad type may be changed due to motion sensor emulation</string>
 
     <!-- Permission justification -->
-    <string name="local_network_rationale">Moonlight requires local network permissions to communicate with nearby hosts</string>
 
     <!-- Array strings -->
     <string name="resolution_360p">360p</string>

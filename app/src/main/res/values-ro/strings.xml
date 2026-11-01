@@ -12,7 +12,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Vezi lista de jocuri</string>
     <string name="pcview_menu_pair_pc">Împerechează PC-ul</string>
-    <string name="pcview_menu_unpair_pc">Desperechează</string>
     <string name="pcview_menu_send_wol">Trimite o cerere Wake-On-LAN</string>
     <string name="pcview_menu_delete_pc">Șterge PC</string>
     <string name="pcview_menu_details">Vezi detalii</string>
@@ -28,7 +27,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">PC-ul este accesibil</string>
     <string name="wol_no_mac">Nu s-a putut porni PC-ul deoarece GFE nu a comunicat o adresa MAC</string>
-    <string name="wol_waking_pc">Se pornește PC-ul…</string>
     <string name="wol_waking_msg">Poate dura puțin până PC-ul pornește. Dacă nu pornește, verifică dacă este configurat corect pentru Wake-On-LAN.</string>
     <string name="wol_fail">Nu s-au putut trimite pachetele Wake-On-LAN</string>
     <!-- Unpair messages -->
@@ -44,7 +42,7 @@
 	Este posibil sa apară această eroare daca folosești o alta aplicație de remote desktop. Încearcă să repornești PC-ul sau să reinstalezi GFE.
     </string>
     <string name="title_decoding_error">Decodorul video s-a închis în mod neașteptat</string>
-    <string name="message_decoding_error">Moonlight s-a închis în mod neașteptat datorită unei incompatibilități cu decodorul video al acestui dispozitiv. Asigură-te ca folosești ultima versiune de GFE. Dacă problema persistă, ajustează setările de streaming.</string>
+    <string name="message_decoding_error">LuMOONescence s-a închis în mod neașteptat datorită unei incompatibilități cu decodorul video al acestui dispozitiv. Asigură-te ca folosești ultima versiune de GFE. Dacă problema persistă, ajustează setările de streaming.</string>
     <string name="title_decoding_reset">Resetează setările video</string>
     <string name="message_decoding_reset">Decodorul video al acestui dispozitiv continuă să se blocheze folosind setările video curente. Au fost resetate cele implicite.</string>
     <string name="error_usb_prohibited">Accesul USB este interzis de către administratorul dispozitivului. Verifică setarile Knox sau MDM.</string>
@@ -84,19 +82,14 @@
     <string name="applist_menu_resume">Continuă Sesiunea</string>
     <string name="applist_menu_quit">Închide Sesiunea</string>
     <string name="applist_menu_quit_and_start">Închide Jocul Curent si Pornește</string>
-    <string name="applist_menu_cancel">Anulează</string>
     <string name="applist_menu_details">Vezi detalii</string>
     <string name="applist_menu_scut">Creează o scurtătură</string>
-    <string name="applist_menu_tv_channel">Adaugă la canal</string>
     <string name="applist_refresh_title">Lista de aplicații</string>
     <string name="applist_refresh_msg">Reîmprospătare aplicații…</string>
-    <string name="applist_refresh_error_title">Eroare</string>
-    <string name="applist_refresh_error_msg">Nu s-a putut obține lista de aplicații</string>
     <string name="applist_quit_app">Închidere în curs</string>
     <string name="applist_quit_success">Închis cu succes</string>
     <string name="applist_quit_fail">Nu s-a putut închide lista</string>
     <string name="applist_quit_confirmation">Sigur dorești să închizi aplicația curentă? Toate datele nesalvate vor fi pierdute.</string>
-    <string name="applist_details_id">ID-ul aplicației:</string>
     <!-- Add computer manually activity -->
     <string name="title_add_pc">Adaugă PC manual</string>
     <string name="msg_add_pc">Conectare în curs…</string>
@@ -133,30 +126,14 @@
     <string name="title_checkbox_xb1_driver">Driver pentru controllerele de Xbox 360/One</string>
     <string name="summary_checkbox_xb1_driver">Activează un driver USB pentru dispozitivele fără suport nativ pentru controllere Xbox</string>
     <string name="title_checkbox_usb_bind_all">Inlocuiește driverul implicit pentru controllere</string>
-    <string name="summary_checkbox_usb_bind_all">Forțează driverul USB Moonlight să preia toate controllerele Xbox suportate</string>
+    <string name="summary_checkbox_usb_bind_all">Forțează driverul USB LuMOONescence să preia toate controllerele Xbox suportate</string>
     <string name="title_checkbox_mouse_emulation">Simulează mouse cu controllerul</string>
     <string name="summary_checkbox_mouse_emulation">Apăsarea lungă pe butonul Start schimba modul de operare a controllerului în modul mouse.</string>
     <string name="title_checkbox_mouse_nav_buttons">Activează butoanele de înainte și înapoi ale mousului</string>
     <string name="summary_checkbox_mouse_nav_buttons">Această opțiune poate afecta click dreapta pentru unele dispozitive problematice.</string>
-    <string name="category_on_screen_controls_settings">Setări ale controalelor pe ecran</string>
-    <string name="title_checkbox_show_onscreen_controls">Afișează controale pe ecran</string>
-    <string name="summary_checkbox_show_onscreen_controls">Afișează un controller virtual pe ecran</string>
-    <string name="title_checkbox_vibrate_osc">Activează vibrațiile</string>
-    <string name="summary_checkbox_vibrate_osc">Dispozitivul va vibra asemănător unui controller</string>
-    <string name="title_only_l3r3">Afișează doar L3 si R3</string>
-    <string name="summary_only_l3r3">Ascunde toate butoanele în afară de L3 and R3</string>
-    <string name="title_reset_osc">Șterge schema salvată a controalelor</string>
-    <string name="summary_reset_osc">Resetează toate controalele de pe ecran la poziția și dimensiunea implicită</string>
-    <string name="dialog_title_reset_osc">Resetarea schemei de controale</string>
-    <string name="dialog_text_reset_osc">Sigur dorești să ștergi schema salvată a controalelor de pe ecran?</string>
-    <string name="toast_reset_osc_success">Controalele de pe ecran au fost resetate la setarile implicite</string>
-    <string name="title_osc_opacity">Modifică opacitatea controalelor de pe ecran</string>
-    <string name="summary_osc_opacity">Ajustează gradul de transparență al controalelor de pe ecran</string>
-    <string name="dialog_title_osc_opacity">Modifică opacitatea</string>
-    <string name="suffix_osc_opacity">%</string>
     <string name="category_ui_settings">Setari UI</string>
     <string name="title_language_list">Limba (Language)</string>
-    <string name="summary_language_list">Limba folosită de către Moonlight</string>
+    <string name="summary_language_list">Limba folosită de către LuMOONescence</string>
     <string name="title_checkbox_small_icon_mode">Folosește iconițe mici</string>
     <string name="summary_checkbox_small_icon_mode">Iconițele folosite în grile vor fi mici pentru a încăpea mai multe odata</string>
     <string name="category_host_settings">Setările PC-ului gazdă</string>
@@ -165,8 +142,6 @@
     <string name="title_checkbox_host_audio">Redă audio si pe PC</string>
     <string name="summary_checkbox_host_audio">Sunetul se va auzi atat pe acest dispozitiv cât și pe PC</string>
     <string name="category_advanced_settings">Setări avansate</string>
-    <string name="title_disable_frame_drop">Nu pierde cadre intenționat</string>
-    <string name="summary_disable_frame_drop">Poate să reducă micro-stuttering pe anumite device-uri, dar s-ar putea să crească latența</string>
     <string name="title_video_format">Modifica setările HEVC</string>
     <string name="summary_video_format">HEVC funcționează cu o conexiune mai slaba, dar necesită un dispozitiv recent, performant</string>
     <string name="title_enable_hdr">Activează HDR (Experimental)</string>

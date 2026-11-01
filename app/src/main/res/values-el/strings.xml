@@ -2,23 +2,22 @@
 <resources>
     <string name="unable_to_pin_shortcut">Η τρέχουσα εφαρμογή εκκίνησης δεν επιτρέπει τη δημιουργία καρφιτσωμένων συντομεύσεων.</string>
     <string name="pcview_menu_delete_pc">Διαγραφή υπολογιστή</string>
-    <string name="nettest_text_success">Το δίκτυό σας δεν φαίνεται να μπλοκάρει το Moonlight. Αν εξακολουθείτε να έχετε πρόβλημα σύνδεσης, ελέγξτε τις ρυθμίσεις του τείχους προστασίας του υπολογιστή σας.
+    <string name="nettest_text_success">Το δίκτυό σας δεν φαίνεται να μπλοκάρει το LuMOONescence. Αν εξακολουθείτε να έχετε πρόβλημα σύνδεσης, ελέγξτε τις ρυθμίσεις του τείχους προστασίας του υπολογιστή σας.
 \n
-\nΕάν προσπαθείτε να κάνετε streaming μέσω του Διαδικτύου, εγκαταστήστε το Moonlight Internet Hosting Tool στον υπολογιστή σας και εκτελέστε το συμπεριλαμβανόμενο Internet Streaming Tester για να ελέγξετε τη σύνδεση του υπολογιστή σας στο Διαδίκτυο.</string>
+\nΕάν προσπαθείτε να κάνετε streaming μέσω του Διαδικτύου, εγκαταστήστε το LuMOONescence Internet Hosting Tool στον υπολογιστή σας και εκτελέστε το συμπεριλαμβανόμενο Internet Streaming Tester για να ελέγξετε τη σύνδεση του υπολογιστή σας στο Διαδίκτυο.</string>
     <string name="error_manager_not_running">Η υπηρεσία ComputerManager δεν εκτελείται. Περιμένετε μερικά δευτερόλεπτα ή επανεκκινήστε την εφαρμογή.</string>
-    <string name="message_decoding_error">Το Moonlight κατέρρευσε λόγω ασυμβατότητας με τον αποκωδικοποιητή βίντεο αυτής της συσκευής. Βεβαιωθείτε ότι το GeForce Experience έχει ενημερωθεί στην τελευταία έκδοση στον υπολογιστή σας. Δοκιμάστε να προσαρμόσετε τις ρυθμίσεις ροής, εάν οι καταρρεύσεις συνεχίζονται.</string>
+    <string name="message_decoding_error">Το LuMOONescence κατέρρευσε λόγω ασυμβατότητας με τον αποκωδικοποιητή βίντεο αυτής της συσκευής. Βεβαιωθείτε ότι το GeForce Experience έχει ενημερωθεί στην τελευταία έκδοση στον υπολογιστή σας. Δοκιμάστε να προσαρμόσετε τις ρυθμίσεις ροής, εάν οι καταρρεύσεις συνεχίζονται.</string>
     <string name="help_loading_title">Πρόγραμμα προβολής βοήθειας</string>
     <string name="help_loading_msg">Φόρτωση σελίδας βοήθειας…</string>
     <string name="pcview_menu_header_online">Σε σύνδεση</string>
     <string name="pcview_menu_header_unknown">Ανανέωση</string>
     <string name="pcview_menu_app_list">Προβολή όλων των εφαρμογών</string>
     <string name="pcview_menu_pair_pc">Σύζευξη με υπολογιστή</string>
-    <string name="pcview_menu_unpair_pc">Κατάργηση ζεύξης</string>
     <string name="pcview_menu_send_wol">Αποστολή αιτήματος Wake-On-LAN</string>
     <string name="nettest_title_waiting">Δοκιμή σύνδεσης δικτύου</string>
     <string name="nettest_title_done">Ολοκληρώθηκε η δοκιμή δικτύου</string>
-    <string name="nettest_text_inconclusive">Η δοκιμή δικτύου δεν μπορούσε να πραγματοποιηθεί επειδή κανένας από τους διακομιστές δοκιμής σύνδεσης της Moonlight δεν ήταν προσβάσιμος. Ελέγξτε τη σύνδεσή σας στο Internet ή δοκιμάστε ξανά αργότερα.</string>
-    <string name="nettest_text_blocked">Η τρέχουσα σύνδεση δικτύου της συσκευής σας εμποδίζει το Moonlight. Η ροή μέσω του Internet ενδέχεται να μην λειτουργεί ενώ είστε συνδεδεμένοι σε αυτό το δίκτυο.</string>
+    <string name="nettest_text_inconclusive">Η δοκιμή δικτύου δεν μπορούσε να πραγματοποιηθεί επειδή κανένας από τους διακομιστές δοκιμής σύνδεσης της LuMOONescence δεν ήταν προσβάσιμος. Ελέγξτε τη σύνδεσή σας στο Internet ή δοκιμάστε ξανά αργότερα.</string>
+    <string name="nettest_text_blocked">Η τρέχουσα σύνδεση δικτύου της συσκευής σας εμποδίζει το LuMOONescence. Η ροή μέσω του Internet ενδέχεται να μην λειτουργεί ενώ είστε συνδεδεμένοι σε αυτό το δίκτυο.</string>
     <string name="pairing">Σύζευξη…</string>
     <string name="pair_pc_offline">Ο υπολογιστής είναι εκτός σύνδεσης</string>
     <string name="pair_pc_ingame">Ο υπολογιστής βρίσκεται αυτή τη στιγμή σε παιχνίδι. Πρέπει να κλείσετε το παιχνίδι πριν κάνετε σύζευξη.</string>
@@ -27,23 +26,19 @@
     <string name="pair_incorrect_pin">Λανθασμένο PIN</string>
     <string name="pair_already_in_progress">Η σύζευξη βρίσκεται ήδη σε εξέλιξη</string>
     <string name="wol_pc_online">Ο υπολογιστής είναι συνδεδεμένος</string>
-    <string name="wol_waking_pc">Αφύπνιση υπολογιστή…</string>
     <string name="wol_waking_msg">Μπορεί να χρειαστούν μερικά δευτερόλεπτα για να αφυπνισθεί ο υπολογιστής σας. Αν δεν το κάνει, βεβαιωθείτε ότι έχει ρυθμιστεί σωστά για Wake-On-LAN.</string>
     <string name="scut_invalid_app_id">Η παρεχόμενη εφαρμογή δεν είναι έγκυρη</string>
     <string name="scut_invalid_uuid">Ο παρεχόμενος υπολογιστής δεν είναι έγκυρος</string>
     <string name="pcview_menu_details">Προβολή λεπτομερειών</string>
-    <string name="nettest_text_failure">Η τρέχουσα σύνδεση δικτύου της συσκευής σας φαίνεται να εμποδίζει το Moonlight. Η ροή μέσω του Internet ενδέχεται να μην λειτουργεί ενώ είστε συνδεδεμένοι σε αυτό το δίκτυο.
+    <string name="nettest_text_failure">Η τρέχουσα σύνδεση δικτύου της συσκευής σας φαίνεται να εμποδίζει το LuMOONescence. Η ροή μέσω του Internet ενδέχεται να μην λειτουργεί ενώ είστε συνδεδεμένοι σε αυτό το δίκτυο.
 \n
 \nΟι ακόλουθες θύρες δικτύου αποκλείστηκαν:
 \n</string>
     <string name="perf_overlay_netlatency">Μέσος λανθάνων χρόνος δικτύου: %1$d MS (διακύμανση: %2$d ms)</string>
     <string name="applist_menu_hide_app">Απόκρυψη εφαρμογής</string>
     <string name="applist_refresh_title">Λίστα εφαρμογών</string>
-    <string name="applist_refresh_error_title">Σφάλμα</string>
-    <string name="applist_refresh_error_msg">Απέτυχε η λήψη λίστας εφαρμογών</string>
     <string name="applist_quit_fail">Αποτυχία διακοπής</string>
     <string name="applist_quit_confirmation">Είστε σίγουροι ότι θέλετε να τερματίσετε την τρέχουσα εφαρμογή; Όλα τα μη αποθηκευμένα δεδομένα θα χαθούν.</string>
-    <string name="dialog_text_reset_osc">Είστε βέβαιοι ότι θέλετε να διαγράψετε την αποθηκευμένη διάταξη στοιχείων ελέγχου στην οθόνη;</string>
     <string name="title_enable_perf_overlay">Εμφάνιση στατιστικών στοιχείων απόδοσης κατά τη ροή</string>
     <string name="unpair_error">Η συσκευή δεν είχε συζευξηθεί</string>
     <string name="error_pc_offline">Ο υπολογιστής είναι εκτός σύνδεσης</string>
@@ -68,8 +63,6 @@
     <string name="perf_overlay_streamdetails">Ροή βίντεο: %1$s %2$.2f FPS</string>
     <string name="perf_overlay_decoder">Αποκωδικοποιητής: %1$s</string>
     <string name="perf_overlay_incomingfps">Ρυθμός εισερχόμενων καρέ από το δίκτυο: %1$.2f FPS</string>
-    <string name="applist_menu_cancel">Ακύρωση</string>
-    <string name="applist_menu_tv_channel">Προσθήκη στο κανάλι</string>
     <string name="applist_refresh_msg">Ανανέωση εφαρμογών…</string>
     <string name="addpc_success">Ο υπολογιστής προστέθηκε με επιτυχία</string>
     <string name="addpc_unknown_host">Αδυναμία επίλυσης διεύθυνσης υπολογιστή. Βεβαιωθείτε ότι δεν κάνατε τυπογραφικό λάθος στη διεύθυνση.</string>
@@ -88,31 +81,22 @@
     <string name="title_checkbox_xb1_driver">Πρόγραμμα οδήγησης για Xbox 360/One USB gamepad</string>
     <string name="summary_checkbox_xb1_driver">Ενεργοποιεί ένα ενσωματωμένο πρόγραμμα οδήγησης USB για συσκευές χωρίς εγγενή υποστήριξη χειριστηρίου Xbox</string>
     <string name="title_checkbox_usb_bind_all">Παράκαμψη εγγενούς υποστήριξης του Xbox gamepad</string>
-    <string name="summary_checkbox_usb_bind_all">Χρησιμοποιήστε το πρόγραμμα οδήγησης USB του Moonlight για όλα τα υποστηριζόμενα gamepad, ακόμα και αν υπάρχει υποστήριξη εγγενούς ελεγκτή Xbox</string>
+    <string name="summary_checkbox_usb_bind_all">Χρησιμοποιήστε το πρόγραμμα οδήγησης USB του LuMOONescence για όλα τα υποστηριζόμενα gamepad, ακόμα και αν υπάρχει υποστήριξη εγγενούς ελεγκτή Xbox</string>
     <string name="title_checkbox_mouse_emulation">Εξομοίωση ποντικιού μέσω gamepad</string>
     <string name="title_checkbox_mouse_nav_buttons">Ενεργοποίηση κουμπιών ποντικιού πίσω και εμπρός</string>
     <string name="summary_checkbox_mouse_nav_buttons">Η ενεργοποίηση αυτής της επιλογής μπορεί να διακόψει το δεξί κλικ σε ορισμένες συσκευές με σφάλματα</string>
     <string name="title_checkbox_flip_face_buttons">Αναστροφή κουμπιών πρόσωψης</string>
     <string name="summary_checkbox_flip_face_buttons">Αλλάζει τα κουμπιά πρόσοψης A/B και X/Y για τα gamepad και τα χειριστήρια στην οθόνη</string>
-    <string name="summary_checkbox_show_onscreen_controls">Εμφάνιση επικάλυψης εικονικού ελεγκτή στην οθόνη αφής</string>
-    <string name="title_checkbox_vibrate_osc">Ενεργοποίηση δόνησης</string>
-    <string name="title_only_l3r3">Εμφάνιση μόνο των L3 και R3</string>
-    <string name="summary_only_l3r3">Απόκρυψη όλων των εικονικών κουμπιών εκτός των L3 και R3</string>
-    <string name="dialog_title_reset_osc">Επαναφορά διάταξης</string>
-    <string name="toast_reset_osc_success">Επαναφορά των στοιχείων ελέγχου στην οθόνη στις προεπιλογές</string>
-    <string name="title_osc_opacity">Αλλαγή της αδιαφάνειας των στοιχείων ελέγχου στην οθόνη</string>
-    <string name="summary_osc_opacity">Κάντε τα στοιχεία ελέγχου στην οθόνη περισσότερο/λιγότερο διαφανή</string>
-    <string name="suffix_osc_opacity">%</string>
     <string name="category_ui_settings">Ρυθμίσεις διεπαφής χρήστη</string>
     <string name="title_checkbox_enable_pip">Ενεργοποίηση της λειτουργίας παρατηρητή εικόνας μέσα σε εικόνα</string>
     <string name="summary_checkbox_enable_pip">Επιτρέπει την προβολή της ροής (αλλά όχι τον έλεγχο) κατά την εκτέλεση πολλαπλών εργασιών</string>
     <string name="title_language_list">Γλώσσα</string>
-    <string name="summary_language_list">Γλώσσα που χρησιμοποιείται για το Moonlight</string>
+    <string name="summary_language_list">Γλώσσα που χρησιμοποιείται για το LuMOONescence</string>
     <string name="title_checkbox_small_icon_mode">Χρησιμοποιήστε μικρά κουτιά</string>
     <string name="scut_not_paired">Ο υπολογιστής δεν έχει συζευχθεί</string>
     <string name="pcview_menu_header_offline">Εκτός σύνδεσης</string>
     <string name="pcview_menu_test_network">Δοκιμή σύνδεσης δικτύου</string>
-    <string name="nettest_text_waiting">Το Moonlight δοκιμάζει τη σύνδεση δικτύου σας για να διαπιστώσει εάν κάποια θύρα είναι αποκλεισμένη.
+    <string name="nettest_text_waiting">Το LuMOONescence δοκιμάζει τη σύνδεση δικτύου σας για να διαπιστώσει εάν κάποια θύρα είναι αποκλεισμένη.
 \n
 \n
 \nΑυτό μπορεί να πάρει μερικά δευτερόλεπτα…</string>
@@ -128,7 +112,6 @@
     <string name="summary_checkbox_host_audio">Αναπαραγωγή ήχου από τον υπολογιστή και αυτή τη συσκευή</string>
     <string name="title_checkbox_disable_warnings">Απενεργοποίηση προειδοποιητικών μηνυμάτων</string>
     <string name="summary_checkbox_disable_warnings">Απενεργοποίηση των προειδοποιητικών μηνυμάτων σύνδεσης στην οθόνη κατά τη ροή</string>
-    <string name="summary_disable_frame_drop">Μπορεί να μειώσει το micro-stuttering σε ορισμένες συσκευές, αλλά μπορεί να αυξήσει την καθυστέρηση</string>
     <string name="title_enable_hdr">Ενεργοποίηση HDR (πειραματικό)</string>
     <string name="summary_enable_hdr">Μεταδώστε HDR όταν το παιχνίδι και η GPU του υπολογιστή το υποστηρίζουν. Το HDR απαιτεί GPU της σειράς GTX 1000 ή νεότερη.</string>
     <string name="summary_enable_perf_overlay">Εμφάνιση πληροφοριών απόδοσης ροής σε πραγματικό χρόνο κατά τη ροή</string>
@@ -166,18 +149,15 @@
     <string name="poor_connection_msg">Κακή σύνδεση με τον υπολογιστή</string>
     <string name="applist_connect_msg">Σύνδεση σε υπολογιστή…</string>
     <string name="applist_menu_quit_and_start">Τερματισμός τρέχοντος παιχνιδιού και έναρξη</string>
-    <string name="summary_checkbox_touchscreen_trackpad">Εάν είναι ενεργοποιημένη, η οθόνη αφής λειτουργεί σαν trackpad. Εάν είναι απενεργοποιημένη, η οθόνη αφής ελέγχει απευθείας τον κέρσορα του ποντικιού.</string>
     <string name="title_checkbox_multi_controller">Αυτόματη ανίχνευση παρουσίας gamepad</string>
     <string name="applist_menu_details">Προβολή λεπτομερειών</string>
     <string name="applist_quit_success">Επιτυχής έξοδος</string>
     <string name="applist_menu_scut">Δημιουργία συντόμευσης</string>
-    <string name="applist_details_id">Αναγνωριστικό εφαρμογής:</string>
     <string name="addpc_fail">Αδυναμία σύνδεσης με τον καθορισμένο υπολογιστή. Βεβαιωθείτε ότι οι απαιτούμενες θύρες επιτρέπονται μέσω του τείχους προστασίας.</string>
     <string name="addpc_enter_ip">Πρέπει να εισαγάγετε μια διεύθυνση IP</string>
     <string name="title_resolution_list">Ανάλυση βίντεο</string>
     <string name="summary_audio_config_list">Ενεργοποίηση ήχου surround 5.1 ή 7.1 για συστήματα οικιακού κινηματογράφου</string>
     <string name="category_input_settings">Ρυθμίσεις εισόδου</string>
-    <string name="title_checkbox_touchscreen_trackpad">Χρήση της οθόνης αφής ως trackpad</string>
     <string name="summary_checkbox_multi_controller">Η απενεργοποίηση αυτής της επιλογής αναγκάζει ένα gamepad να είναι πάντα παρόν</string>
     <string name="category_basic_settings">Βασικές ρυθμίσεις</string>
     <string name="summary_resolution_list">Αυξήστε για να βελτιώσετε την ευκρίνεια της εικόνας. Μειώστε για καλύτερη απόδοση σε συσκευές χαμηλότερων επιδόσεων και σε πιο αργά δίκτυα.</string>
@@ -192,13 +172,7 @@
     <string name="title_checkbox_vibrate_fallback">Μιμηθείτε την υποστήριξη rumble με δόνηση</string>
     <string name="title_seekbar_deadzone">Ρύθμιση της νεκρής ζώνης του αναλογικού μοχλού</string>
     <string name="summary_checkbox_mouse_emulation">Με παρατεταμένο πάτημα του κουμπιού Έναρξη θα αλλάξει το gamepad σε λειτουργία ποντικιού</string>
-    <string name="category_on_screen_controls_settings">Ρυθμίσεις στοιχείων ελέγχου στην οθόνη</string>
-    <string name="summary_reset_osc">Επαναφέρει όλα τα στοιχεία ελέγχου στην οθόνη στο προεπιλεγμένο μέγεθος και τη θέση τους</string>
     <string name="title_unlock_fps">Ξεκλειδώστε όλους τους πιθανούς ρυθμούς καρέ</string>
-    <string name="title_checkbox_show_onscreen_controls">Εμφάνιση στοιχείων ελέγχου στην οθόνη</string>
-    <string name="summary_checkbox_vibrate_osc">Δονεί τη συσκευή σας για να μιμηθεί το rumble για τα χειριστήρια στην οθόνη</string>
-    <string name="title_reset_osc">Εκκαθάριση αποθηκευμένης διάταξης στοιχείων ελέγχου στην οθόνη</string>
-    <string name="dialog_title_osc_opacity">Αλλαγή αδιαφάνειας</string>
     <string name="title_checkbox_enable_sops">Βελτιστοποίηση ρυθμίσεων παιχνιδιού</string>
     <string name="summary_checkbox_enable_sops">Επιτρέψτε στη GFE να τροποποιήσει τις ρυθμίσεις του παιχνιδιού για βέλτιστη ροή</string>
     <string name="category_advanced_settings">Προηγμένες ρυθμίσεις</string>

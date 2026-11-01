@@ -4,11 +4,12 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.hardware.input.InputManager;
 import android.os.Build;
-import android.util.SparseArray;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class to translate a Android key code into the codes GFE is expecting
@@ -93,16 +94,31 @@ public class KeyboardTranslator implements InputManager.InputDeviceListener {
         }
     }
 
-    private final SparseArray<KeyboardMapping> keyboardMappings = new SparseArray<>();
+    /**
+     * Maps a device ID onto the layout of that device's keyboard. Kept as a plain map
+     * rather than a SparseArray, because this is a guess that is allowed to fail and the
+     * map has no platform behaviour to fail with.
+     */
+    private final Map<Integer, KeyboardMapping> keyboardMappings = new HashMap<>();
 
     public KeyboardTranslator() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return;
+        }
+
+        // Enumerating the device's keyboards is a convenience: it lets a key be mapped
+        // through the layout the device reports. If it is not available, translation still
+        // works through the fixed QWERTY mapping below, so a failure here must not stop
+        // the translator from being created.
+        try {
             for (int deviceId : InputDevice.getDeviceIds()) {
                 InputDevice device = InputDevice.getDevice(deviceId);
                 if (device != null && device.getKeyboardType() == InputDevice.KEYBOARD_TYPE_ALPHABETIC) {
-                    keyboardMappings.set(deviceId, new KeyboardMapping(device));
+                    keyboardMappings.put(deviceId, new KeyboardMapping(device));
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -394,7 +410,7 @@ public class KeyboardTranslator implements InputManager.InputDeviceListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             InputDevice device = InputDevice.getDevice(index);
             if (device != null && device.getKeyboardType() == InputDevice.KEYBOARD_TYPE_ALPHABETIC) {
-                keyboardMappings.set(index, new KeyboardMapping(device));
+                keyboardMappings.put(index, new KeyboardMapping(device));
             }
         }
     }

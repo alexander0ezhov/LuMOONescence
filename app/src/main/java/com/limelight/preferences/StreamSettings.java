@@ -29,6 +29,7 @@ import android.view.WindowInsets;
 
 import com.limelight.LimeLog;
 import com.limelight.PcView;
+import com.limelight.OpenSourceLicensesActivity;
 import com.limelight.R;
 import com.limelight.binding.video.MediaCodecHelper;
 import com.limelight.utils.Dialog;
@@ -277,11 +278,15 @@ public class StreamSettings extends Activity {
             addPreferencesFromResource(R.xml.preferences);
             PreferenceScreen screen = getPreferenceScreen();
 
-            // hide on-screen controls category on non touch screen devices
-            if (!getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN)) {
-                PreferenceCategory category =
-                        (PreferenceCategory) findPreference("category_onscreen_controls");
-                screen.removePreference(category);
+            Preference licenses = findPreference("open_source_licenses");
+            if (licenses != null) {
+                licenses.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        startActivity(new Intent(getActivity(), OpenSourceLicensesActivity.class));
+                        return true;
+                    }
+                });
             }
 
             // Hide remote desktop mouse mode on pre-Oreo (which doesn't have pointer capture)

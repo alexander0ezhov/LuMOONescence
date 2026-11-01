@@ -1,0 +1,1063 @@
+package com.limelight.binding.input.virtual_controller.universal.editor;
+
+import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.limelight.R;
+import com.limelight.binding.input.virtual_controller.universal.config.UniversalGeometry;
+
+import java.util.List;
+
+/**
+ * The editing panel of the layout editor.
+ *
+ * The panel is built in code rather than in XML because its content depends entirely on
+ * what is selected: a button and a stick need different rows, and the event sequence of a
+ * button can grow and shrink. The helper methods here are what the editor uses to compose
+ * that content, and they keep the styling in one place.
+ */
+public class UniversalEditorPanel {
+    private final Context context;
+    private final LinearLayout content;
+    private final ScrollView scrollView;
+
+    private Runnable onCloseRequested;
+    private Runnable onDragFinished;
+
+    /**
+     * Height of the drawer as a share of the screen, so it can never cover the arrangement
+     * completely.
+     */
+    private static final float MAX_HEIGHT_FRACTION = 0.75f;
+
+    /**
+     * Share of the screen width the drawer may take.
+     */
+    private static final float MAX_WIDTH_FRACTION = 0.45f;
+
+    /**
+     * Movement in pixels before a press on the header counts as a drag rather than a tap.
+     */
+    private static final int DRAG_SLOP_PX = 12;
+
+    /**
+     * Called when a slider or its input field changes the geometry.
+     */
+    public interface OnGeometryChanged {
+        void onGeometryChanged(int left, int top, int width, int height);
+    }
+
+    /**
+     * Called when the name field changes.
+     */
+    public interface OnNameChanged {
+        void onNameChanged(String name);
+    }
+
+    /**
+     * @param scrollView the scrolling area the rows are added into
+     * @param content    the view inside it that holds the rows, which is what a rebuild clears
+     * @param dragHandle the view that drags the panel around, which is its header
+     */
+    public UniversalEditorPanel(Context context, ScrollView scrollView, LinearLayout content,
+                                View dragHandle) {
+        this.context = context;
+        this.scrollView = scrollView;
+        this.content = content;
+
+        int padding = context.getResources().getDimensionPixelSize(R.dimen.layout_editor_panel_padding);
+        content.setPadding(padding, padding, padding, padding);
+
+        attachDragHandle(dragHandle);
+    }
+
+    public View getView() {
+        return scrollView;
+    }
+
+    /**
+     * Sets what happens when the header is tapped rather than dragged.
+     */
+    public void setOnCloseRequested(Runnable onCloseRequested) {
+        this.onCloseRequested = onCloseRequested;
+    }
+
+    /**
+     * Notified after the panel has been dragged, so the caller can remember where it is.
+     */
+    public void setOnDragFinished(Runnable onDragFinished) {
+        this.onDragFinished = onDragFinished;
+    }
+
+    /**
+     * Sizes the panel to fit the screen, so it stays usable on a phone and can never cover
+     * the arrangement completely.
+     */
+    public void applyScreenBounds(View panel) {
+        int screenWidth = context.getResources().getDisplayMetrics().widthPixels;
+        int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
+
+        ViewGroup.LayoutParams params = panel.getLayoutParams();
+        params.width = Math.min(
+                context.getResources().getDimensionPixelSize(R.dimen.layout_editor_panel_width),
+                (int) (screenWidth * MAX_WIDTH_FRACTION));
+        params.height = (int) (screenHeight * MAX_HEIGHT_FRACTION);
+        panel.setLayoutParams(params);
+    }
+
+    /**
+     * Makes the header a handle that drags the panel around the screen.
+     */
+    private void attachDragHandle(View handle) {
+        if (handle == null) {
+            return;
+        }
+
+        handle.setOnTouchListener(new View.OnTouchListener() {
+            private float downRawX;
+            private float downRawY;
+            private float startX;
+            private float startY;
+            private boolean moved;
+
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                View panel = (View) view.getParent();
+
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        downRawX = event.getRawX();
+                        downRawY = event.getRawY();
+                        startX = panel.getX();
+                        startY = panel.getY();
+                        moved = false;
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float deltaX = event.getRawX() - downRawX;
+                        float deltaY = event.getRawY() - downRawY;
+
+                        if (Math.abs(deltaX) > DRAG_SLOP_PX || Math.abs(deltaY) > DRAG_SLOP_PX) {
+                            moved = true;
+                        }
+
+                        if (moved) {
+                            moveWithin(panel, startX + deltaX, startY + deltaY);
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        if (moved) {
+                            if (onDragFinished != null) {
+                                onDragFinished.run();
+                            }
+                        }
+                        else if (onCloseRequested != null) {
+                            // A tap on the header puts the drawer away, which frees the screen
+                            // for arranging
+                            onCloseRequested.run();
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_CANCEL:
+                        if (moved && onDragFinished != null) {
+                            onDragFinished.run();
+                        }
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+        });
+    }
+
+    private void moveWithin(View panel, float x, float y) {
+        if (!(panel.getParent() instanceof ViewGroup)) {
+            return;
+        }
+
+        ViewGroup bounds = (ViewGroup) panel.getParent();
+
+        float maxX = Math.max(0, bounds.getWidth() - panel.getWidth());
+        float maxY = Math.max(0, bounds.getHeight() - panel.getHeight());
+
+        panel.setX(Math.max(0, Math.min(x, maxX)));
+        panel.setY(Math.max(0, Math.min(y, maxY)));
+    }
+
+    /**
+     * Removes everything that was previously added.
+     */
+    /**
+     * The height each button of each row asks for, for the debug smoke test. A row whose labels do
+     * not all fit on one line has to measure its buttons to the same height, or the tall one is
+     * drawn over whatever comes after it.
+     */
+    public int[][] getRowButtonHeightsForTesting() {
+        java.util.List<int[]> rows = new java.util.ArrayList<>();
+
+        for (int i = 0; i < content.getChildCount(); i++) {
+            android.view.View child = content.getChildAt(i);
+
+            if (!(child instanceof LinearLayout)) {
+                continue;
+            }
+
+            LinearLayout row = (LinearLayout) child;
+
+            if (row.getOrientation() != LinearLayout.HORIZONTAL) {
+                continue;
+            }
+
+            // Only rows made of buttons: the rows of a slider have a label and a bar in them, and
+            // those are measured to their own height on purpose
+            boolean allButtons = true;
+
+            for (int j = 0; j < row.getChildCount(); j++) {
+                if (!(row.getChildAt(j) instanceof Button)) {
+                    allButtons = false;
+                    break;
+                }
+            }
+
+            if (!allButtons || row.getChildCount() == 0) {
+                continue;
+            }
+
+            int[] heights = new int[row.getChildCount()];
+
+            for (int j = 0; j < heights.length; j++) {
+                heights[j] = row.getChildAt(j).getLayoutParams() == null
+                        ? 0
+                        : row.getChildAt(j).getLayoutParams().height;
+            }
+
+            rows.add(heights);
+        }
+
+        return rows.toArray(new int[0][]);
+    }
+
+    /**
+     * Scrolls the drawer to its end, so a screenshot can show the part below the fold.
+     */
+    public void scrollToEndForTesting() {
+        if (scrollView != null) {
+            scrollView.post(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView.fullScroll(android.view.View.FOCUS_DOWN);
+                }
+            });
+        }
+    }
+
+    public void clear() {
+        content.removeAllViews();
+        sliderRows.clear();
+    }
+
+    public void addSection(String title) {
+        TextView view = new TextView(context);
+        view.setText(title);
+        view.setTextColor(0xFF9E9EA8);
+        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        view.setPadding(0, dp(12), 0, dp(4));
+        content.addView(view);
+    }
+
+    public void addText(String text) {
+        TextView view = new TextView(context);
+        view.setText(text);
+        view.setTextColor(0xFFE0E0E6);
+        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        view.setPadding(0, dp(4), 0, dp(4));
+        content.addView(view);
+    }
+
+    public void addStatus(String text) {
+        TextView view = new TextView(context);
+        view.setText(text);
+        view.setTextColor(0xFF9E9EA8);
+        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        view.setPadding(0, dp(2), 0, dp(6));
+        content.addView(view);
+    }
+
+    /**
+     * Adds a labelled text field.
+     *
+     * @return the field, so the caller can read it back
+     */
+    public EditText addTextField(String label, String value, final OnTextChangedListener listener) {
+        addFieldLabel(label);
+
+        final EditText input = new EditText(context);
+        input.setSingleLine(true);
+        input.setTextColor(0xFFE0E0E6);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        // The text is set before the listener is attached, so showing an existing value is
+        // not reported as the user typing it.
+        input.setText(value);
+
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                listener.onTextChanged(s.toString());
+            }
+        });
+
+        content.addView(input, matchWidth());
+        return input;
+    }
+
+    /**
+     * Adds a checkbox with a label.
+     */
+    public CheckBox addCheckBox(String label, boolean checked, final OnCheckedListener listener) {
+        return addCheckBox(label, checked, true, listener);
+    }
+
+    /**
+     * Adds a checkbox that can also be shown as out of reach.
+     */
+    public CheckBox addCheckBox(String label, boolean checked, boolean enabled,
+                                final OnCheckedListener listener) {
+        final CheckBox checkBox = new CheckBox(context);
+        checkBox.setText(label);
+        checkBox.setTextColor(0xFFE0E0E6);
+        checkBox.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        checkBox.setChecked(checked);
+        checkBox.setEnabled(enabled);
+        checkBox.setAlpha(enabled ? 1f : 0.45f);
+        checkBox.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(android.widget.CompoundButton buttonView, boolean isChecked) {
+                listener.onCheckedChanged(isChecked);
+            }
+        });
+
+        content.addView(checkBox, matchWidth());
+        return checkBox;
+    }
+
+    /**
+     * Adds a dropdown.
+     *
+     * @return the spinner, so the caller can replace its adapter later
+     */
+    public Spinner addSpinner(String label, List<String> options, int selectedIndex,
+                              final OnItemSelectedListener listener) {
+        addFieldLabel(label);
+
+        final Spinner spinner = new Spinner(context);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
+                android.R.layout.simple_spinner_item, options);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(Math.max(0, Math.min(selectedIndex, options.size() - 1)), false);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                listener.onItemSelected(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        content.addView(spinner, matchWidth());
+        return spinner;
+    }
+
+    /**
+     * Adds a row with a slider and a field next to it, so a value can be dragged roughly
+     * and then typed exactly.
+     *
+     * @return the row, so the caller can refresh it when the element is dragged on screen
+     */
+    public SliderRow addSliderRow(String label, int value, int max,
+                                 final OnValueChangedListener listener) {
+        SliderRow row = new SliderRow(label, value, max, listener);
+        sliderRows.put(label, row);
+        return row;
+    }
+
+    public void addButton(String text, View.OnClickListener listener) {
+        content.addView(makeButton(text, listener, NORMAL_STYLE, true), rowParams());
+    }
+
+    /**
+     * Adds a row of buttons that share the available width.
+     */
+    public void addButtonRow(String[] texts, View.OnClickListener[] listeners) {
+        boolean[] enabled = new boolean[texts.length];
+
+        for (int i = 0; i < enabled.length; i++) {
+            enabled[i] = true;
+        }
+
+        addButtonRow(texts, listeners, enabled);
+    }
+
+    /**
+     * Adds a row of buttons, some of which may be unavailable.
+     *
+     * An unavailable button is still shown, greyed out, rather than removed: a row that comes
+     * and goes as things are copied makes the drawer jump about under the finger.
+     */
+    public void addButtonRow(String[] texts, View.OnClickListener[] listeners, boolean[] enabled) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+
+        // A label that does not fit on one line makes its button taller, and a row that lines the
+        // buttons up by their text baseline then pulls the tall one out of the row, over whatever
+        // is below it. Measuring the buttons to the same height keeps the row a row.
+        row.setBaselineAligned(false);
+
+        for (int i = 0; i < texts.length; i++) {
+            Button button = makeButton(texts[i], listeners[i], NORMAL_STYLE, enabled[i]);
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+
+            // The buttons of a row keep a gap between them, so they read as separate things
+            if (i > 0) {
+                params.setMarginStart(dp(6));
+            }
+
+            row.addView(button, params);
+        }
+
+        content.addView(row, rowParams());
+    }
+
+    /**
+     * Adds a button for something that cannot be undone.
+     *
+     * It is drawn in red, on a red wash, so the one entry of the drawer that destroys work never
+     * looks like the others and is never pressed by accident.
+     */
+    public void addDangerButton(String text, View.OnClickListener listener) {
+        content.addView(makeButton(text, listener, DANGER_STYLE, true), rowParams());
+    }
+
+    private Button makeButton(String text, View.OnClickListener listener, ButtonStyle style,
+                              boolean enabled) {
+        Button button = new Button(context);
+
+        button.setText(text);
+        button.setTextColor(style.text);
+        button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        button.setMinWidth(0);
+        button.setMinimumWidth(0);
+        button.setAllCaps(false);
+        button.setPadding(dp(8), dp(9), dp(8), dp(9));
+        button.setBackground(makeButtonBackground(style));
+        button.setOnClickListener(listener);
+        button.setEnabled(enabled);
+
+        return button;
+    }
+
+    /**
+     * The background of a button, which lightens while the button is held.
+     *
+     * A tap has to be felt as well as seen, and on a dark panel over a dark game the moment of
+     * contact is the only confirmation there is.
+     */
+    private android.graphics.drawable.Drawable makeButtonBackground(ButtonStyle style) {
+        android.graphics.drawable.StateListDrawable states =
+                new android.graphics.drawable.StateListDrawable();
+
+        states.addState(new int[]{-android.R.attr.state_enabled},
+                makeButtonShape(DISABLED_STYLE));
+        states.addState(new int[]{android.R.attr.state_pressed},
+                makeButtonShape(style, style.fillPressed, style.edgePressed));
+        states.addState(new int[]{}, makeButtonShape(style));
+
+        return states;
+    }
+
+    private GradientDrawable makeButtonShape(ButtonStyle style) {
+        return makeButtonShape(style, style.fill, style.edge);
+    }
+
+    private GradientDrawable makeButtonShape(ButtonStyle style, int fillColor, int edgeColor) {
+        GradientDrawable background = new GradientDrawable();
+
+        background.setColor(fillColor);
+        background.setCornerRadius(dp(8));
+
+        if (edgeColor != 0) {
+            background.setStroke(Math.max(1, dp(1) / 2), edgeColor);
+        }
+
+        return background;
+    }
+
+    /**
+     * The look of one kind of button: its text, its fill, and the lighter fill it takes while
+     * it is held.
+     */
+    private static final class ButtonStyle {
+        final int text;
+        final int fill;
+        final int fillPressed;
+        final int edge;
+        final int edgePressed;
+
+        ButtonStyle(int text, int fill, int fillPressed, int edge, int edgePressed) {
+            this.text = text;
+            this.fill = fill;
+            this.fillPressed = fillPressed;
+            this.edge = edge;
+            this.edgePressed = edgePressed;
+        }
+    }
+
+    /**
+     * An ordinary button of the drawer: a faint light fill with a soft edge, which is quiet
+     * enough not to compete with the values it sits under.
+     */
+    private static final ButtonStyle NORMAL_STYLE = new ButtonStyle(
+            0xFFE8EAF0, 0x1FFFFFFF, 0x3DFFFFFF, 0x33FFFFFF, 0x66FFFFFF);
+
+    private static final ButtonStyle DANGER_STYLE = new ButtonStyle(
+            0xFFFF7B72, 0x2EFF5A50, 0x4DFF6B60, 0x66FF6B60, 0x99FF6B60);
+
+    private static final ButtonStyle DISABLED_STYLE = new ButtonStyle(
+            0x59E8EAF0, 0x0FFFFFFF, 0x0FFFFFFF, 0x1FFFFFFF, 0x1FFFFFFF);
+
+    /**
+     * The text of every button in the panel, in the order they appear, and whether it can be
+     * pressed. Used by the debug smoke test to check what the drawer offers.
+     */
+    /**
+     * The labels of the checkboxes, in the order they are shown. Used by the debug smoke test.
+     */
+    public java.util.List<String> getCheckBoxLabelsForTesting() {
+        java.util.List<String> labels = new java.util.ArrayList<>();
+
+        collectCheckBoxLabels(content, labels);
+        return labels;
+    }
+
+    private void collectCheckBoxLabels(ViewGroup group, java.util.List<String> labels) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof CheckBox) {
+                labels.add(((CheckBox) child).getText().toString());
+            }
+            else if (child instanceof ViewGroup) {
+                collectCheckBoxLabels((ViewGroup) child, labels);
+            }
+        }
+    }
+
+    /**
+     * Whether the checkbox with this label can be used, or is shown as out of reach.
+     */
+    public boolean isCheckBoxEnabledForTesting(String label) {
+        CheckBox box = findCheckBox(label);
+        return box != null && box.isEnabled();
+    }
+
+    public boolean isCheckBoxCheckedForTesting(String label) {
+        CheckBox box = findCheckBox(label);
+        return box != null && box.isChecked();
+    }
+
+    /**
+     * Presses the checkbox with this label, exactly as a finger would.
+     */
+    public boolean clickCheckBoxForTesting(String label) {
+        CheckBox box = findCheckBox(label);
+
+        if (box == null || !box.isEnabled()) {
+            return false;
+        }
+
+        box.performClick();
+        return true;
+    }
+
+    private CheckBox findCheckBox(String label) {
+        return findCheckBox(content, label);
+    }
+
+    private CheckBox findCheckBox(ViewGroup group, String label) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof CheckBox && ((CheckBox) child).getText().toString().equals(label)) {
+                return (CheckBox) child;
+            }
+
+            if (child instanceof ViewGroup) {
+                CheckBox found = findCheckBox((ViewGroup) child, label);
+
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether any text in the panel says this. Used by the debug smoke test for the notes.
+     */
+    public boolean hasTextForTesting(String text) {
+        return hasText(content, text);
+    }
+
+    private boolean hasText(ViewGroup group, String text) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof TextView && !(child instanceof CheckBox)
+                    && ((TextView) child).getText().toString().equals(text)) {
+                return true;
+            }
+
+            if (child instanceof ViewGroup && hasText((ViewGroup) child, text)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public java.util.List<String> getButtonLabelsForTesting() {
+        java.util.List<String> labels = new java.util.ArrayList<>();
+
+        collectButtonLabels(content, labels);
+        return labels;
+    }
+
+    /**
+     * The buttons of the panel that cannot be pressed.
+     */
+    public java.util.List<String> getDisabledButtonLabelsForTesting() {
+        java.util.List<String> labels = new java.util.ArrayList<>();
+
+        collectDisabledButtonLabels(content, labels);
+        return labels;
+    }
+
+    private static void collectButtonLabels(ViewGroup group, java.util.List<String> labels) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof Button) {
+                labels.add(((Button) child).getText().toString());
+            }
+            else if (child instanceof ViewGroup) {
+                collectButtonLabels((ViewGroup) child, labels);
+            }
+        }
+    }
+
+    private static void collectDisabledButtonLabels(ViewGroup group, java.util.List<String> labels) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof Button) {
+                if (!child.isEnabled()) {
+                    labels.add(((Button) child).getText().toString());
+                }
+            }
+            else if (child instanceof ViewGroup) {
+                collectDisabledButtonLabels((ViewGroup) child, labels);
+            }
+        }
+    }
+
+    /**
+     * A row of the drawer keeps a little space under itself, so rows never look stuck together.
+     */
+    private LinearLayout.LayoutParams rowParams() {
+        LinearLayout.LayoutParams params = matchWidth();
+        params.bottomMargin = dp(6);
+        return params;
+    }
+
+    private void addFieldLabel(String label) {
+        TextView view = new TextView(context);
+        view.setText(label);
+        view.setTextColor(0xFFB0B0BA);
+        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        view.setPadding(0, dp(8), 0, 0);
+        content.addView(view);
+    }
+
+    private LinearLayout.LayoutParams matchWidth() {
+        return new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    private int dp(int value) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return Math.round(value * density);
+    }
+
+    /**
+     * Applies every number that was typed and not yet acted on.
+     *
+     * It is called before the drawer is closed or another control is picked, so a number that
+     * was typed is not quietly thrown away with the rows that held it.
+     */
+    public void applyPendingInputs() {
+        for (SliderRow row : sliderRows.values()) {
+            row.applyTypedValueIfPending();
+        }
+    }
+
+    /**
+     * Whether any row holds a typed number that has not been acted on yet.
+     */
+    public boolean hasPendingInputs() {
+        for (SliderRow row : sliderRows.values()) {
+            if (row.hasPendingInput()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public interface OnTextChangedListener {
+        void onTextChanged(String text);
+    }
+
+    public interface OnCheckedListener {
+        void onCheckedChanged(boolean checked);
+    }
+
+    public interface OnItemSelectedListener {
+        void onItemSelected(int position);
+    }
+
+    public interface OnValueChangedListener {
+        void onValueChanged(int value);
+    }
+
+    /**
+     * A slider with an input field beside it.
+     *
+     * The two stay in sync in both directions, and the caller is told about a change only
+     * when the value actually differs, so a drag does not fight with the field it updates.
+     */
+    public class SliderRow {
+        private final SeekBar seekBar;
+        private final EditText input;
+
+        /**
+         * Kept so a test can run the slider exactly as a drag does; the platform does not
+         * hand the listener back.
+         */
+        private final SeekBar.OnSeekBarChangeListener changeListener;
+
+        /**
+         * The value that was last applied.
+         *
+         * This is not always the position of the handle: a number typed into the field may be
+         * larger than the slider can show, and the number that was typed is the one that
+         * counts.
+         */
+        private int value;
+
+        private boolean updating;
+
+        private final OnValueChangedListener listener;
+
+        SliderRow(String label, int initialValue, int max, final OnValueChangedListener listener) {
+            this.value = initialValue;
+            this.listener = listener;
+
+            LinearLayout row = new LinearLayout(context);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+
+            TextView labelView = new TextView(context);
+            labelView.setText(label);
+            labelView.setTextColor(0xFFB0B0BA);
+            labelView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            labelView.setMinWidth(dp(72));
+            row.addView(labelView, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            seekBar = new SeekBar(context);
+            seekBar.setMax(Math.max(1, max));
+            seekBar.setProgress(clamp(initialValue, max));
+            row.addView(seekBar, new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
+            input = new EditText(context);
+            input.setSingleLine(true);
+            input.setText(String.valueOf(initialValue));
+            input.setTextColor(0xFFE0E0E6);
+            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+            input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            input.setGravity(Gravity.END);
+            row.addView(input, new LinearLayout.LayoutParams(
+                    context.getResources().getDimensionPixelSize(R.dimen.layout_editor_slider_input_width),
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            changeListener = new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {
+                    if (!fromUser || updating) {
+                        return;
+                    }
+
+                    updating = true;
+                    input.setText(String.valueOf(progress));
+                    updating = false;
+
+                    SliderRow.this.value = progress;
+
+                    // The handle is the newer word on the value, so nothing is left waiting
+                    typedNotApplied = false;
+
+                    listener.onValueChanged(progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar bar) {
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar bar) {
+                }
+            };
+
+            seekBar.setOnSeekBarChangeListener(changeListener);
+
+            input.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (updating) {
+                        return;
+                    }
+
+                    int parsed;
+                    try {
+                        parsed = Integer.parseInt(s.toString().trim());
+                    } catch (NumberFormatException e) {
+                        // A half typed number is not a value yet
+                        return;
+                    }
+
+                    updating = true;
+                    seekBar.setProgress(clamp(parsed, seekBar.getMax()));
+                    updating = false;
+
+                    // The number that was typed is the value, even when the slider cannot
+                    // show it, so a large typed size is not quietly cut down. It is only
+                    // recorded here, though: applying it on every character would fight the
+                    // user, because the values are held inside the layout and a half typed
+                    // number is not one that should be acted on.
+                    value = parsed;
+                    typedNotApplied = true;
+                }
+            });
+
+            // Leaving the field finishes the entry
+            input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean hasFocus) {
+                    if (!hasFocus) {
+                        applyTypedValue();
+                    }
+                }
+            });
+
+            // So does the key that says the entry is done, and the keyboard goes away with it
+            input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+                    boolean finished = actionId == EditorInfo.IME_ACTION_DONE
+                            || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER);
+
+                    if (!finished) {
+                        return false;
+                    }
+
+                    applyTypedValue();
+                    input.clearFocus();
+
+                    // The keyboard covers the layout being edited, so it is put away
+                    android.view.inputmethod.InputMethodManager keyboard =
+                            (android.view.inputmethod.InputMethodManager) context.getSystemService(
+                                    Context.INPUT_METHOD_SERVICE);
+
+                    if (keyboard != null) {
+                        keyboard.hideSoftInputFromWindow(input.getWindowToken(), 0);
+                    }
+
+                    return true;
+                }
+            });
+
+            content.addView(row, matchWidth());
+        }
+
+        /**
+         * Whether the field holds a number that has been typed but not yet acted on.
+         */
+        private boolean typedNotApplied;
+
+        /**
+         * Acts on a number that was typed and not yet applied.
+         *
+         * Nothing happens when there is nothing waiting, so a field that was left alone does not
+         * report a value nobody changed.
+         */
+        private void applyTypedValue() {
+            if (!typedNotApplied) {
+                return;
+            }
+
+            typedNotApplied = false;
+            listener.onValueChanged(value);
+        }
+
+        /**
+         * Applies a number that was typed and not yet acted on, if there is one.
+         */
+        public void applyTypedValueIfPending() {
+            applyTypedValue();
+        }
+
+        /**
+         * Whether this row holds a typed number that has not been acted on yet.
+         */
+        public boolean hasPendingInput() {
+            return typedNotApplied;
+        }
+
+        /**
+         * Types a number into the field, as a finger would, for the debug smoke test.
+         */
+        public void typeForTesting(int typed) {
+            input.setText(String.valueOf(typed));
+        }
+
+        private int clamp(int value, int max) {
+            if (value < 0) {
+                return 0;
+            }
+
+            return Math.min(value, max);
+        }
+
+        /**
+         * Shows a value that changed elsewhere, for example because the control was
+         * dragged on screen. Nothing is reported back to the caller, so this cannot loop.
+         */
+        public void setValue(int value) {
+            this.value = value;
+
+            // The value that just arrived is the one that counts, so anything typed is spent
+            typedNotApplied = false;
+
+            updating = true;
+            seekBar.setProgress(clamp(value, seekBar.getMax()));
+            input.setText(String.valueOf(value));
+            updating = false;
+        }
+
+        /**
+         * The value the row currently stands for, which is what the editor applies. It is the
+         * typed number for a typed value and the handle position for a drag.
+         */
+        public int getValue() {
+            return value;
+        }
+
+        /**
+         * Moves the slider the way a finger does, so the listener runs exactly as it does
+         * during a drag. Used by the debug smoke test.
+         */
+        public void dragTo(int value) {
+            int clamped = clamp(value, seekBar.getMax());
+            seekBar.setProgress(clamped);
+            changeListener.onProgressChanged(seekBar, clamped, true);
+        }    }
+
+    /**
+     * The rows that were added, by their label. Used by the debug smoke test to check that a
+     * change to one row does not disturb another.
+     */
+    private final java.util.Map<String, SliderRow> sliderRows = new java.util.HashMap<>();
+
+    public SliderRow getSliderRow(String label) {
+        return sliderRows.get(label);
+    }
+
+    /**
+     * Shows the current geometry on the position and size sliders.
+     *
+     * A change made on one slider must not rebuild the drawer: rebuilding it would replace
+     * the control the user is holding, and the rows of the new drawer would report the size
+     * they were built with, silently undoing the change just made. Updating the values in
+     * place is what keeps a width and a height change from overwriting each other.
+     */
+    public void showGeometry(UniversalGeometry geometry) {
+        setSliderValue(R.string.editor_label_x, geometry.getLeft());
+        setSliderValue(R.string.editor_label_y, geometry.getTop());
+        setSliderValue(R.string.editor_label_width, geometry.getWidth());
+        setSliderValue(R.string.editor_label_height, geometry.getHeight());
+    }
+
+    private void setSliderValue(int labelId, int value) {
+        SliderRow row = sliderRows.get(context.getString(labelId));
+        if (row != null) {
+            row.setValue(value);
+        }
+    }
+}

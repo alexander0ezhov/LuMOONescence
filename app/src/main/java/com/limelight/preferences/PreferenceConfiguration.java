@@ -35,16 +35,20 @@ public class PreferenceConfiguration {
     private static final String DISABLE_TOASTS_PREF_STRING = "checkbox_disable_warnings";
     private static final String HOST_AUDIO_PREF_STRING = "checkbox_host_audio";
     private static final String DEADZONE_PREF_STRING = "seekbar_deadzone";
-    private static final String OSC_OPACITY_PREF_STRING = "seekbar_osc_opacity";
     private static final String LANGUAGE_PREF_STRING = "list_languages";
     private static final String SMALL_ICONS_PREF_STRING = "checkbox_small_icon_mode";
     private static final String MULTI_CONTROLLER_PREF_STRING = "checkbox_multi_controller";
     static final String AUDIO_CONFIG_PREF_STRING = "list_audio_config";
     private static final String USB_DRIVER_PREF_SRING = "checkbox_usb_driver";
     private static final String VIDEO_FORMAT_PREF_STRING = "video_format";
-    private static final String ONSCREEN_CONTROLLER_PREF_STRING = "checkbox_show_onscreen_controls";
-    private static final String ONLY_L3_R3_PREF_STRING = "checkbox_only_show_L3R3";
-    private static final String SHOW_GUIDE_BUTTON_PREF_STRING = "checkbox_show_guide_button";
+    public static final String UNIVERSAL_LAYOUT_PREF_STRING = "checkbox_show_universal_layout";
+
+    /**
+     * How opaque the universal layout is drawn, in percent. One setting for the whole layout.
+     */
+    public static final String UNIVERSAL_LAYOUT_OPACITY_PREF_STRING = "universal_layout_opacity";
+    public static final int UNIVERSAL_LAYOUT_OPACITY_DEFAULT = 100;
+    public static final int UNIVERSAL_LAYOUT_OPACITY_MIN = 20;
     private static final String LEGACY_DISABLE_FRAME_DROP_PREF_STRING = "checkbox_disable_frame_drop";
     private static final String ENABLE_HDR_PREF_STRING = "checkbox_enable_hdr";
     private static final String ENABLE_PIP_PREF_STRING = "checkbox_enable_pip";
@@ -59,6 +63,91 @@ public class PreferenceConfiguration {
     private static final String VIBRATE_FALLBACK_STRENGTH_PREF_STRING = "seekbar_vibrate_fallback_strength";
     private static final String FLIP_FACE_BUTTONS_PREF_STRING = "checkbox_flip_face_buttons";
     private static final String TOUCHSCREEN_TRACKPAD_PREF_STRING = "checkbox_touchscreen_trackpad";
+
+    /**
+     * What the touchscreen does while streaming, which the stream's own menu can change.
+     *
+     * This is one setting rather than the pair of switches it replaces, because the choices are
+     * exclusive: a touch cannot both move the mouse and push a stick.
+     */
+    private static final String TOUCH_MODE_PREF_STRING = "touch_screen_mode";
+
+    /** The touchscreen does nothing. */
+    public static final int TOUCH_MODE_OFF = 0;
+
+    /** The touchscreen moves the mouse like a trackpad. */
+    public static final int TOUCH_MODE_TRACKPAD = 1;
+
+    /** The touchscreen moves the mouse pointer to where the finger is. */
+    public static final int TOUCH_MODE_TOUCHSCREEN = 2;
+
+    /** The touchscreen pushes the right analog stick. */
+    public static final int TOUCH_MODE_RIGHT_STICK = 3;
+
+    /**
+     * The touchscreen is sent on as real touch events rather than as a mouse, the way a Windows
+     * tablet sends them. It is an experiment: it does nothing on a host that does not take
+     * touch input.
+     */
+    public static final int TOUCH_MODE_TOUCH_EVENTS = 4;
+
+    /**
+     * The touchscreen moves the mouse but never clicks.
+     *
+     * It is the setting for aiming with a finger on a control that is already pressed: the view
+     * turns without the tap that would fire a second time.
+     */
+    public static final int TOUCH_MODE_TRACKPAD_NO_CLICKS = 5;
+
+    /** The touchscreen pushes the left analog stick, for a game that turns with it. */
+    public static final int TOUCH_MODE_LEFT_STICK = 6;
+
+    /**
+     * How much a finger has to move for the touchpad to move the view, as a percentage of the
+     * normal amount. A larger value turns further for the same swipe.
+     */
+    public static final int SENSITIVITY_MIN = 20;
+    public static final int SENSITIVITY_MAX = 300;
+    public static final int SENSITIVITY_DEFAULT = 100;
+
+    private static final String TOUCHPAD_SENSITIVITY_PREF_STRING = "seekbar_touchpad_sensitivity";
+    private static final String STICK_SENSITIVITY_PREF_STRING = "seekbar_stick_sensitivity";
+
+    public static int getTouchpadSensitivity(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt(
+                TOUCHPAD_SENSITIVITY_PREF_STRING, SENSITIVITY_DEFAULT);
+    }
+
+    public static void setTouchpadSensitivity(Context context, int percent) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(TOUCHPAD_SENSITIVITY_PREF_STRING, clampSensitivity(percent))
+                .apply();
+    }
+
+    public static int getStickSensitivity(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt(
+                STICK_SENSITIVITY_PREF_STRING, SENSITIVITY_DEFAULT);
+    }
+
+    public static void setStickSensitivity(Context context, int percent) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(STICK_SENSITIVITY_PREF_STRING, clampSensitivity(percent))
+                .apply();
+    }
+
+    private static int clampSensitivity(int percent) {
+        return Math.max(SENSITIVITY_MIN, Math.min(SENSITIVITY_MAX, percent));
+    }
+
+    /**
+     * Whether the touchscreen behaves as some kind of trackpad, which is what decides if the
+     * choice of how it behaves is worth offering.
+     */
+    public static boolean isTouchpadMode(int mode) {
+        return mode == TOUCH_MODE_TRACKPAD
+                || mode == TOUCH_MODE_TRACKPAD_NO_CLICKS
+                || mode == TOUCH_MODE_TOUCHSCREEN;
+    }
     private static final String LATENCY_TOAST_PREF_STRING = "checkbox_enable_post_stream_toast";
     private static final String FRAME_PACING_PREF_STRING = "frame_pacing";
     private static final String ABSOLUTE_MOUSE_MODE_PREF_STRING = "checkbox_absolute_mouse_mode";
@@ -76,15 +165,12 @@ public class PreferenceConfiguration {
     private static final boolean DEFAULT_DISABLE_TOASTS = false;
     private static final boolean DEFAULT_HOST_AUDIO = false;
     private static final int DEFAULT_DEADZONE = 7;
-    private static final int DEFAULT_OPACITY = 90;
     public static final String DEFAULT_LANGUAGE = "default";
     private static final boolean DEFAULT_MULTI_CONTROLLER = true;
     private static final boolean DEFAULT_USB_DRIVER = true;
     private static final String DEFAULT_VIDEO_FORMAT = "auto";
 
-    private static final boolean ONSCREEN_CONTROLLER_DEFAULT = false;
-    private static final boolean ONLY_L3_R3_DEFAULT = false;
-    private static final boolean SHOW_GUIDE_BUTTON_DEFAULT = true;
+    private static final boolean UNIVERSAL_LAYOUT_DEFAULT = false;
     private static final boolean DEFAULT_ENABLE_HDR = false;
     private static final boolean DEFAULT_ENABLE_PIP = false;
     private static final boolean DEFAULT_ENABLE_PERF_OVERLAY = false;
@@ -126,13 +212,14 @@ public class PreferenceConfiguration {
     public int bitrate;
     public FormatOption videoFormat;
     public int deadzonePercentage;
-    public int oscOpacity;
+
+    /** How far the touchpad turns for a swipe, and how far the finger goes for a full stick. */
+    public int touchpadSensitivity = SENSITIVITY_DEFAULT;
+    public int stickSensitivity = SENSITIVITY_DEFAULT;
     public boolean stretchVideo, enableSops, playHostAudio, disableWarnings;
     public String language;
     public boolean smallIconMode, multiController, usbDriver, flipFaceButtons;
-    public boolean onscreenController;
-    public boolean onlyL3R3;
-    public boolean showGuideButton;
+    public boolean universalLayout;
     public boolean enableHdr;
     public boolean enablePip;
     public boolean enablePerfOverlay;
@@ -146,6 +233,11 @@ public class PreferenceConfiguration {
     public boolean vibrateFallbackToDevice;
     public int vibrateFallbackToDeviceStrength;
     public boolean touchscreenTrackpad;
+
+    /**
+     * What the touchscreen does, one of the TOUCH_MODE_ values.
+     */
+    public int touchMode;
     public MoonBridge.AudioConfiguration audioConfiguration;
     public int framePacing;
     public boolean absoluteMouseMode;
@@ -339,11 +431,81 @@ public class PreferenceConfiguration {
         return context.getResources().getConfiguration().smallestScreenWidthDp < 500;
     }
 
+    /**
+     * The bitrate a stream starts with before the user has set one.
+     *
+     * It used to be worked out from the resolution and the frame rate, which is the table the
+     * Moonlight Qt client uses. That table is tuned for cards from when GameStream was new, and
+     * it leaves a modern phone at a bitrate where fine detail is the first thing to go. Fifty
+     * megabits is a better starting point on a local network, and the slider is there for anyone
+     * whose link cannot take it.
+     */
+    public static final int DEFAULT_BITRATE_KBPS = 50000;
+
     public static int getDefaultBitrate(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return getDefaultBitrate(
-                prefs.getString(RESOLUTION_PREF_STRING, DEFAULT_RESOLUTION),
-                prefs.getString(FPS_PREF_STRING, DEFAULT_FPS));
+        return DEFAULT_BITRATE_KBPS;
+    }
+
+    /**
+     * Whether the phone should buzz when the game rumbles and an on-screen layout is what is
+     * receiving it.
+     */
+    public static boolean isVibrationEnabled(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(VIBRATE_OSC_PREF_STRING, DEFAULT_VIBRATE_OSC);
+    }
+
+    public static void setVibrationEnabled(Context context, boolean enabled) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putBoolean(VIBRATE_OSC_PREF_STRING, enabled)
+                .apply();
+    }
+
+    /**
+     * Whether the on-screen layout is used at all. It is the switch on the layouts screen and
+     * the switch in the stream menu, which is why both write it here.
+     */
+    public static boolean isUniversalLayoutEnabled(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(UNIVERSAL_LAYOUT_PREF_STRING, UNIVERSAL_LAYOUT_DEFAULT);
+    }
+
+    public static void setUniversalLayoutEnabled(Context context, boolean enabled) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putBoolean(UNIVERSAL_LAYOUT_PREF_STRING, enabled)
+                .apply();
+    }
+
+    /**
+     * The transparency of the on-screen layout, as a percentage.
+     */
+    public static int getUniversalLayoutOpacity(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(UNIVERSAL_LAYOUT_OPACITY_PREF_STRING, UNIVERSAL_LAYOUT_OPACITY_DEFAULT);
+    }
+
+    /**
+     * Stores the transparency of the on-screen layout. The layout on screen is told separately,
+     * so the change is seen at once.
+     */
+    public static void setUniversalLayoutOpacity(Context context, int percent) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(UNIVERSAL_LAYOUT_OPACITY_PREF_STRING,
+                        Math.max(UNIVERSAL_LAYOUT_OPACITY_MIN,
+                                Math.min(100, percent)))
+                .apply();
+    }
+
+    /**
+     * Stores what the touchscreen should do while streaming.
+     *
+     * The running stream is told separately, so the choice takes effect at once rather than at
+     * the next connection.
+     */
+    public static void setTouchMode(Context context, int mode) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt(TOUCH_MODE_PREF_STRING, mode)
+                .apply();
     }
 
     private static FormatOption getVideoFormatValue(Context context) {
@@ -566,7 +728,10 @@ public class PreferenceConfiguration {
 
         config.deadzonePercentage = prefs.getInt(DEADZONE_PREF_STRING, DEFAULT_DEADZONE);
 
-        config.oscOpacity = prefs.getInt(OSC_OPACITY_PREF_STRING, DEFAULT_OPACITY);
+        config.touchpadSensitivity = prefs.getInt(TOUCHPAD_SENSITIVITY_PREF_STRING,
+                SENSITIVITY_DEFAULT);
+        config.stickSensitivity = prefs.getInt(STICK_SENSITIVITY_PREF_STRING,
+                SENSITIVITY_DEFAULT);
 
         config.language = prefs.getString(LANGUAGE_PREF_STRING, DEFAULT_LANGUAGE);
 
@@ -578,9 +743,7 @@ public class PreferenceConfiguration {
         config.smallIconMode = prefs.getBoolean(SMALL_ICONS_PREF_STRING, getDefaultSmallMode(context));
         config.multiController = prefs.getBoolean(MULTI_CONTROLLER_PREF_STRING, DEFAULT_MULTI_CONTROLLER);
         config.usbDriver = prefs.getBoolean(USB_DRIVER_PREF_SRING, DEFAULT_USB_DRIVER);
-        config.onscreenController = prefs.getBoolean(ONSCREEN_CONTROLLER_PREF_STRING, ONSCREEN_CONTROLLER_DEFAULT);
-        config.onlyL3R3 = prefs.getBoolean(ONLY_L3_R3_PREF_STRING, ONLY_L3_R3_DEFAULT);
-        config.showGuideButton = prefs.getBoolean(SHOW_GUIDE_BUTTON_PREF_STRING, SHOW_GUIDE_BUTTON_DEFAULT);
+        config.universalLayout = prefs.getBoolean(UNIVERSAL_LAYOUT_PREF_STRING, UNIVERSAL_LAYOUT_DEFAULT);
         config.enableHdr = prefs.getBoolean(ENABLE_HDR_PREF_STRING, DEFAULT_ENABLE_HDR) && !isShieldAtvFirmwareWithBrokenHdr();
         config.enablePip = prefs.getBoolean(ENABLE_PIP_PREF_STRING, DEFAULT_ENABLE_PIP);
         config.enablePerfOverlay = prefs.getBoolean(ENABLE_PERF_OVERLAY_STRING, DEFAULT_ENABLE_PERF_OVERLAY);
@@ -593,6 +756,21 @@ public class PreferenceConfiguration {
         config.vibrateFallbackToDeviceStrength = prefs.getInt(VIBRATE_FALLBACK_STRENGTH_PREF_STRING, DEFAULT_VIBRATE_FALLBACK_STRENGTH);
         config.flipFaceButtons = prefs.getBoolean(FLIP_FACE_BUTTONS_PREF_STRING, DEFAULT_FLIP_FACE_BUTTONS);
         config.touchscreenTrackpad = prefs.getBoolean(TOUCHSCREEN_TRACKPAD_PREF_STRING, DEFAULT_TOUCHSCREEN_TRACKPAD);
+
+        // The switches above are what an existing user already had, so they decide what the
+        // touchscreen does until the mode is chosen in the stream's menu
+        int legacyTouchMode;
+        if (!config.mouseEmulation) {
+            legacyTouchMode = TOUCH_MODE_OFF;
+        }
+        else if (config.touchscreenTrackpad) {
+            legacyTouchMode = TOUCH_MODE_TRACKPAD;
+        }
+        else {
+            legacyTouchMode = TOUCH_MODE_TOUCHSCREEN;
+        }
+
+        config.touchMode = prefs.getInt(TOUCH_MODE_PREF_STRING, legacyTouchMode);
         config.enableLatencyToast = prefs.getBoolean(LATENCY_TOAST_PREF_STRING, DEFAULT_LATENCY_TOAST);
         config.absoluteMouseMode = prefs.getBoolean(ABSOLUTE_MOUSE_MODE_PREF_STRING, DEFAULT_ABSOLUTE_MOUSE_MODE);
         config.enableAudioFx = prefs.getBoolean(ENABLE_AUDIO_FX_PREF_STRING, DEFAULT_ENABLE_AUDIO_FX);

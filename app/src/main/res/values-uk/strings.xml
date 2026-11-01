@@ -3,7 +3,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Подивитися перелік застосунків</string>
     <string name="pcview_menu_pair_pc">Створити пару з пристроєм</string>
-    <string name="pcview_menu_unpair_pc">Розірвати пару</string>
     <string name="pcview_menu_send_wol">Надіслати запит Wake-On-LAN</string>
     <string name="pcview_menu_delete_pc">Видалити пристрій</string>
     <!-- Pair messages -->
@@ -17,7 +16,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">Пристрій у мережі</string>
     <string name="wol_no_mac">Не вдається розбудити ПК, оскільки немає збереженої MAC-адреси</string>
-    <string name="wol_waking_pc">Пробудження пристрою…</string>
     <string name="wol_waking_msg">Пробудження пристрою може зайняти кілька секунд. Якщо цього не відбувається, упевніться що Wake-On-LAN налаштований правильно.</string>
     <string name="wol_fail">Помилка при відправці Wake-On-LAN пакетів</string>
     <!-- Unpair messages -->
@@ -54,12 +52,8 @@
     <string name="applist_menu_resume">Відновити сесію</string>
     <string name="applist_menu_quit">Вийти з сесії</string>
     <string name="applist_menu_quit_and_start">Вийти з поточної гри і запустити</string>
-    <string name="applist_menu_cancel">Скасувати</string>
-    <string name="applist_menu_tv_channel">Додати на канал</string>
     <string name="applist_refresh_title">Перелік застосунків</string>
     <string name="applist_refresh_msg">Оновлення застосунків…</string>
-    <string name="applist_refresh_error_title">Помилка</string>
-    <string name="applist_refresh_error_msg">Помилка отримання переліку застосунків</string>
     <string name="applist_quit_app">Виходимо з</string>
     <string name="applist_quit_success">Успішний вихід з</string>
     <string name="applist_quit_fail">Помилка при виході</string>
@@ -91,7 +85,7 @@
     <string name="summary_checkbox_xb1_driver">Вмикає вбудований USB драйвер для пристроїв без власної підтримки контролерів Xbox</string>
     <string name="category_ui_settings">Налаштування інтерфейсу</string>
     <string name="title_language_list">Мова</string>
-    <string name="summary_language_list">Мова, яка буде використовуватися в Moonlight</string>
+    <string name="summary_language_list">Мова, яка буде використовуватися в LuMOONescence</string>
     <string name="title_checkbox_small_icon_mode">Використовувати маленькі іконки</string>
     <string name="summary_checkbox_small_icon_mode">Використовувати маленькі іконки в сітці застосунків, для відображення більшої кількості елементів на екрані</string>
     <string name="category_host_settings">Налаштування хоста</string>
@@ -102,11 +96,6 @@
     <string name="category_advanced_settings">Розширені налаштування</string>
     <string name="title_video_format">Змінити налаштування кодека</string>
     <string name="summary_video_format">Нові кодеки можуть знизити вимоги до пропускної здатності відео, якщо ваш пристрій їх підтримує. Вибрані кодеки можуть ігноруватися, якщо вони не підтримуються програмним забезпеченням хоста або графічним процесором.</string>
-    <string name="category_on_screen_controls_settings">Налаштування екранних ґудзиків</string>
-    <string name="title_checkbox_show_onscreen_controls">Показувати екранні ґудзики</string>
-    <string name="summary_checkbox_show_onscreen_controls">Відображати віртуальні ґудзики контролера на екрані</string>
-    <string name="title_only_l3r3">Показувати тільки L3 та R3</string>
-    <string name="summary_only_l3r3">Приховувати всі віртуальні ґудзики окрім L3 та R3</string>
     <string name="scut_deleted_pc">Пристрій видалено</string>
     <string name="scut_not_paired">Пристрій не парований</string>
     <string name="help_loading_title">Перегляд допомоги</string>
@@ -115,7 +104,7 @@
     <string name="help">Допомога</string>
     <string name="applist_connect_msg">Підключення до пристрою…</string>
     <string name="title_decoding_error">Збій відео розцифрувача</string>
-    <string name="message_decoding_error">Moonlight аварійно завершив роботу через несумісність із відеодекодером цього пристрою. Спробуйте налаштувати параметри потокового передавання, якщо збої триватимуть.</string>
+    <string name="message_decoding_error">LuMOONescence аварійно завершив роботу через несумісність із відеодекодером цього пристрою. Спробуйте налаштувати параметри потокового передавання, якщо збої триватимуть.</string>
     <string name="title_decoding_reset">Налаштування відео скинуті</string>
     <string name="message_decoding_reset">Відео розцифрувач вашого пристрою продовжує давати збої з поточними налаштуваннями трансляції. Налаштування трансляції були скинуті до значень за замовчуванням.</string>
     <string name="error_usb_prohibited">USB доступ заборонений адміністратором пристрою. Перевірте налаштування Knox або MDM.</string>
@@ -123,34 +112,22 @@
     <string name="title_checkbox_enable_pip">Увімкнути режим перегляду \"Картинка в картинці\"</string>
     <string name="summary_checkbox_enable_pip">Дозволяє переглядати стрім (але не контролювати) під час багатозадачності</string>
     <string name="title_checkbox_usb_bind_all">Вимкнути рідну підтримку Xbox контролерів від Андроїда</string>
-    <string name="summary_checkbox_usb_bind_all">Використовувати USB драйвер Moonlight для усіх підтриманих контролерів, навіть якщо існує рідна підтримка</string>
+    <string name="summary_checkbox_usb_bind_all">Використовувати USB драйвер LuMOONescence для усіх підтриманих контролерів, навіть якщо існує рідна підтримка</string>
     <string name="title_checkbox_mouse_emulation">Емуляція миші через контролер</string>
     <string name="summary_checkbox_mouse_emulation">Довге натиснення ґудзика Start, перемкне контролер в режим миші</string>
-    <string name="title_reset_osc">Скинути власне розташування ґудзиків на екрані</string>
-    <string name="summary_reset_osc">Повертає всі екранні елементи керування до їх розташуванням за замовчуванням</string>
-    <string name="dialog_title_reset_osc">Скинути розташування</string>
-    <string name="dialog_text_reset_osc">Ви впевнені що хочете видалити збережене розташування ґудзиків\?</string>
-    <string name="toast_reset_osc_success">Екранні елементи керування повернуті до положень за замовчуванням</string>
-    <string name="title_disable_frame_drop">Ніколи не пропускати кадри</string>
-    <string name="summary_disable_frame_drop">Може зменшити мікрозависання на деяких пристроях але, також збільшити затримку</string>
     <string name="title_enable_hdr">Увімкнути HDR (Експериментально)</string>
     <string name="summary_enable_hdr">Транслювати в HDR, якщо це підтримується грою та графічним процесором ПК. Для HDR потрібен графічний процесор із підтримкою кодування HEVC Main 10.</string>
-    <string name="title_checkbox_vibrate_osc">Увімкнути вібрацію</string>
     <string name="title_fps_list">Частота кадрів</string>
     <string name="applist_menu_details">Переглянути деталі</string>
     <string name="applist_menu_scut">Створити ярлик</string>
     <string name="category_input_settings">Налаштування введення</string>
-    <string name="title_checkbox_touchscreen_trackpad">Використовувати сенсорний екран як пальцевід</string>
-    <string name="summary_checkbox_touchscreen_trackpad">Якщо увімкнено, сенсорний екран працює як ноутбуковий пальцевід. Якщо вимкнено, безпосередньо керує вказівником миші.</string>
     <string name="delete_pc_msg">Ви впевнені що хочете видалити цей пристрій\?</string>
     <string name="pcview_menu_details">Переглянути деталі</string>
     <string name="poor_connection_msg">Слабке з\'єднання з пристроєм</string>
     <string name="title_details">Деталі</string>
     <string name="title_enable_perf_overlay">Увімкнути відображення статистики</string>
     <string name="title_unlock_fps">Розблокувати всі можливі частоти кадрів</string>
-    <string name="applist_details_id">ID застосунку:</string>
     <string name="title_checkbox_vibrate_fallback">Емуляція вібровіддачі</string>
-    <string name="summary_checkbox_vibrate_osc">Вібрація пристрою для емуляції вібровіддачі при екранному управлінні</string>
     <string name="summary_checkbox_vibrate_fallback">Вібрує пристрій для емуляції вібровіддачі, якщо під\'єднаний контролер не підтримує її</string>
     <string name="summary_checkbox_mouse_nav_buttons">Вмикання цієї опції може привести до неправильної роботи правої клавіші миші на деяких пристроях</string>
     <string name="title_checkbox_flip_face_buttons">Перевернути ґудзики</string>
@@ -170,18 +147,14 @@
     <string name="summary_fps_list">Збільшіть для плавнішого відео потоку. Зменшіть для кращої продуктивності на повільних пристроях.</string>
     <string name="scut_invalid_uuid">Зазначений пристрій недійсний</string>
     <string name="scut_invalid_app_id">Зазначений застосунок недійсний</string>
-    <string name="title_osc_opacity">Змінити прозорість екранних елементів керування</string>
-    <string name="summary_osc_opacity">Зробити екранні елементи керування більш/менш прозорими</string>
-    <string name="dialog_title_osc_opacity">Зміна прозорості</string>
-    <string name="suffix_osc_opacity">%</string>
     <string name="title_enable_post_stream_toast">Статистика затримки після трансляції</string>
     <string name="summary_enable_post_stream_toast">Показувати статистику затримки після закінчення трансляції</string>
     <string name="early_termination_error">Щось пішло не так на вашому головному ПК під час запуску потоку.
 \n
 \nПереконайтеся, що на головному ПК немає відкритого вмісту, захищеного DRM. Ви також можете спробувати перезавантажити головний ПК.</string>
-    <string name="nettest_text_success">Схоже що ваша мережа не блокує Moonlight. Якщо у вас й надалі проблеми з підключенням, перевірте налаштування брандмауера.
+    <string name="nettest_text_success">Схоже що ваша мережа не блокує LuMOONescence. Якщо у вас й надалі проблеми з підключенням, перевірте налаштування брандмауера.
 \n
-\nЯкщо ви намагаєтеся транслювати через Інтернет, встановіть на своєму пристрої Moonlight Internet Hosting Tool, та запустіть випробування мережі щоб перевірити ваше з\'єднання до Інтернету.</string>
+\nЯкщо ви намагаєтеся транслювати через Інтернет, встановіть на своєму пристрої LuMOONescence Internet Hosting Tool, та запустіть випробування мережі щоб перевірити ваше з\'єднання до Інтернету.</string>
     <string name="resolution_prefix_native_fullscreen">Рідний повноекранний</string>
     <string name="resolution_prefix_native">Рідна</string>
     <string name="suffix_seekbar_bitrate_mbps">Мб/с</string>
@@ -200,14 +173,14 @@
     <string name="no_frame_received_error">Здається, ваше мережеве з\'єднання човпає. Спробуйте зменшити швидкість потоку (бітрейт) чи переключіть пристрій на швидшу мережу.</string>
     <string name="no_video_received_error">Не отримано відео від хоста.</string>
     <string name="video_decoder_init_failed">Не вдалося запустити відео розцифрувач. Ваш пристрій може не підтримувати розмір екрану чи частоту кадрів.</string>
-    <string name="nettest_text_blocked">Поточне мережеве з’єднання вашого пристрою блокує Moonlight. Трансляції через Інтернет можуть не працювати на цієї мережі.</string>
-    <string name="nettest_text_failure">Поточне мережеве з’єднання вашого пристрою блокує Moonlight. Трансляції через Інтернет можуть не працювати на цієї мережі.
+    <string name="nettest_text_blocked">Поточне мережеве з’єднання вашого пристрою блокує LuMOONescence. Трансляції через Інтернет можуть не працювати на цієї мережі.</string>
+    <string name="nettest_text_failure">Поточне мережеве з’єднання вашого пристрою блокує LuMOONescence. Трансляції через Інтернет можуть не працювати на цієї мережі.
 \n
 \nНаступні мережеві порти були заблоковані:
 \n</string>
-    <string name="nettest_text_inconclusive">Не вдалося перевірити мережу, тому що усі мережо-перевірочні сервери Moonlight недосяжні. Перевірте ваше з\'єднання з інтернетом та спробуйте знову.</string>
+    <string name="nettest_text_inconclusive">Не вдалося перевірити мережу, тому що усі мережо-перевірочні сервери LuMOONescence недосяжні. Перевірте ваше з\'єднання з інтернетом та спробуйте знову.</string>
     <string name="nettest_title_done">Перевірка мережі завершена</string>
-    <string name="nettest_text_waiting">Moonlight перевіряє ваше мережеве з’єднання, щоб визначити, чи заблоковані необхідні порти.
+    <string name="nettest_text_waiting">LuMOONescence перевіряє ваше мережеве з’єднання, щоб визначити, чи заблоковані необхідні порти.
 \n
 \nЦе може зайняти кілька секунд…</string>
     <string name="nettest_title_waiting">Перевіряємо з\'єднання</string>
@@ -241,7 +214,7 @@
     <string name="title_privacy_policy">Політика конфіденційності</string>
     <string name="summary_troubleshooting">Переглянути поради щодо діагностики та усунення поширених проблем з потоковою передачею</string>
     <string name="summary_checkbox_reduce_refresh_rate">Більш низька частота оновлення дисплея може заощадити енергію за рахунок деякої додаткової затримки відео</string>
-    <string name="summary_seekbar_deadzone">Примітка: Деякі ігри можуть встановлювати більшу мертву зону, ніж та, на яку налаштовано Moonlight.</string>
+    <string name="summary_seekbar_deadzone">Примітка: Деякі ігри можуть встановлювати більшу мертву зону, ніж та, на яку налаштовано LuMOONescence.</string>
     <string name="title_checkbox_absolute_mouse_mode">Режим миші віддаленого робочого столу</string>
     <string name="title_setup_guide">Гайд по налаштуванню</string>
     <string name="summary_setup_guide">Переглянути інструкцію, як налаштувати ігровий ПК для стрімінгу</string>
@@ -252,7 +225,7 @@
     <string name="summary_checkbox_absolute_mouse_mode">Це може зробити прискорення миші більш природним під час використання віддаленого робочого столу, але воно несумісне з багатьма іграми.</string>
     <string name="title_checkbox_reduce_refresh_rate">Дозволити зниження частоти оновлення</string>
     <string name="category_help">Допомога</string>
-    <string name="summary_privacy_policy">Переглянути політику конфіденційності Moonlight</string>
+    <string name="summary_privacy_policy">Переглянути політику конфіденційності LuMOONescence</string>
     <string name="frame_conversion_error">Головний комп\'ютер повідомив про фатальну помилку кодування відео.
 \n
 \nСпробуйте вимкнути режим HDR, змінити роздільну здатність потокового відео або змінити роздільну здатність дисплея головного комп\'ютера.</string>
@@ -283,4 +256,122 @@
     <string name="toast_controller_type_changed">Тип геймпада може бути змінений через емуляцію датчика руху</string>
     <string name="pcview_menu_eol">Закриття сервісів NVIDIA GameStream</string>
     <string name="perf_overlay_hostprocessinglatency">Затримка обробки хостом мін./макс./середня: %1$.1f/%2$.1f/%3$.1f мс</string>
+    <string name="back">Назад</string>
+    <string name="title_universal_layouts">Екранні розкладки</string>
+    <string name="title_add_layout">Додати розкладку</string>
+    <string name="title_layout_image">Картинка розкладки</string>
+    <string name="title_edit_controls">Редагувати кнопки</string>
+    <string name="title_reset_controls">Скинути</string>
+    <string name="title_pick_image">Зображення</string>
+    <string name="title_use_default_image">За замовчуванням</string>
+    <string name="msg_layouts_help">Виберіть розкладку для трансляції. Натисніть на розкладку, щоб змінити або видалити її; нова додається кнопкою з плюсом.</string>
+    <string name="msg_no_layouts">Розкладок поки немає. Натисніть плюс, щоб створити.</string>
+    <string name="msg_layout_selected">Вибрана</string>
+    <string name="msg_no_images">На цьому пристрої не знайдено зображень.</string>
+    <string name="msg_image_permission_needed">Доступ до зображень не надано, тому вибирати нема з чого. Надайте доступ і спробуйте ще раз.</string>
+    <string name="msg_image_picker_failed">Не вдалося завантажити зображення з цього пристрою.</string>
+    <string name="dialog_title_layout_name">Назва розкладки</string>
+    <string name="hint_layout_name">Назва розкладки</string>
+    <string name="menu_edit_layout">Змінити</string>
+    <string name="menu_choose_image">Змінити картинку</string>
+    <string name="menu_use_layout">Використовувати цю розкладку</string>
+    <string name="menu_delete_layout">Видалити</string>
+    <string name="dialog_text_reset_layout_controls">Повернути кнопкам цієї розкладки розмір і положення за замовчуванням?</string>
+    <string name="toast_layout_controls_reset">Кнопки повернуто до значень за замовчуванням</string>
+    <string name="toast_layout_adjusted_to_fit">Цю розкладку створено для іншого розміру екрана й підігнано під цей. Натисніть «Скинути», щоб повернути початковий вигляд.</string>
+    <string name="title_layout_settings">Налаштування розкладки</string>
+    <string name="control_type_button">Кнопка</string>
+    <string name="control_type_stick">Стик</string>
+    <string name="control_type_dpad">D-pad</string>
+    <string name="control_type_element">Елемент</string>
+    <string name="editor_label_center_button">Середня кнопка</string>
+    <string name="editor_label_corner_radius">Заокруглення</string>
+    <string name="editor_section_center_button">Середина стика</string>
+    <string name="editor_label_center_button_enabled">Натискання по центру працює як кнопка</string>
+    <string name="editor_label_center_button_action">Що надсилає центр</string>
+    <string name="menu_add_button">Додати кнопку</string>
+    <string name="menu_add_stick">Додати стик</string>
+    <string name="menu_add_dpad">Додати D-pad</string>
+    <string name="menu_save">Зберегти</string>
+    <string name="menu_save_as">Зберегти як</string>
+    <string name="menu_exit">Вийти</string>
+    <string name="menu_duplicate">Дублювати</string>
+    <string name="menu_copy_size">Копіювати розмір</string>
+    <string name="menu_paste_size">Вставити розмір</string>
+    <string name="menu_edit">Змінити</string>
+    <string name="menu_delete">Видалити</string>
+    <string name="dialog_title_delete_control">Видалити «%1$s»?</string>
+    <string name="stream_menu_title">Меню трансляції</string>
+    <string name="stream_menu_keyboard">Показати клавіатуру</string>
+    <string name="stream_menu_touch">Ввід дотиком</string>
+    <string name="stream_menu_touch_off">Вимкнений</string>
+    <string name="stream_menu_touch_trackpad">Тачпад</string>
+    <string name="stream_menu_touch_right_stick">Правий стик</string>
+    <string name="stream_menu_touch_left_stick">Лівий стик</string>
+    <string name="stream_menu_touch_events">Справжні дотики (експеримент)</string>
+    <string name="stream_menu_opacity">Прозорість</string>
+    <string name="stream_menu_sensitivity">Чутливість</string>
+    <string name="stream_menu_touchpad_mode">Режим тачпада</string>
+    <string name="stream_menu_touchpad_standard">Звичайний</string>
+    <string name="stream_menu_touchpad_direct">Курсор за пальцем</string>
+    <string name="stream_menu_touchpad_no_clicks">Без кліків</string>
+    <string name="stream_menu_extras">Ще</string>
+    <string name="stream_menu_vibration">Вібрація</string>
+    <string name="stream_menu_controls">Екранні кнопки</string>
+    <string name="editor_label_pass_through">Передавати дотик на екран (тримайте й ведіть, щоб оглядатися)</string>
+    <string name="stream_menu_layout">Розкладка</string>
+    <string name="stream_menu_exit">Вийти з трансляції</string>
+    <string name="stream_menu_layout_next_time">«%1$s» буде використано під час наступної трансляції</string>
+    <string name="dialog_title_save_changes">Зберегти зміни?</string>
+    <string name="dialog_text_save_changes">Зберегти зміни цієї розкладки?</string>
+    <string name="menu_dont_save">Не зберігати</string>
+    <string name="dialog_title_save_layout_as">Зберегти розкладку як</string>
+    <string name="hint_layout_name_new">Назва нової розкладки</string>
+    <string name="toast_layout_saved">Розкладку збережено</string>
+    <string name="toast_layout_saved_as">Збережено як &amp;quot;%s&amp;quot;</string>
+    <string name="toast_element_added">Додано. Перетягніть на потрібне місце.</string>
+    <string name="editor_section_element">Елемент</string>
+    <string name="editor_section_position">Положення й розмір</string>
+    <string name="editor_section_action">Дія</string>
+    <string name="editor_section_actions">Цей елемент</string>
+    <string name="menu_share_layout">Поділитися розкладкою</string>
+    <string name="title_import_layout">Імпорт розкладки</string>
+    <string name="import_failed">Не вдалося прочитати цей файл</string>
+    <string name="import_done">Імпортовано «%1$s»</string>
+    <string name="import_done_rescaled">Імпортовано «%1$s», підігнано під цей екран</string>
+    <string name="editor_label_name">Назва</string>
+    <string name="editor_label_x">X</string>
+    <string name="editor_label_y">Y</string>
+    <string name="editor_label_width">Ширина</string>
+    <string name="editor_label_height">Висота</string>
+    <string name="editor_label_toggle">Засувка (натискання — увімкнути, ще одне — вимкнути)</string>
+    <string name="editor_toggle_off_while_pass_through">Засувка вимкнена, поки ввімкнено наскрізне натискання</string>
+    <string name="editor_label_sequence">Послідовність подій</string>
+    <string name="editor_label_sequence_empty">Подій поки немає. Додайте крок нижче.</string>
+    <string name="editor_label_step_delay">Затримка після кроку (мс)</string>
+    <string name="editor_label_control_mode">Режим роботи</string>
+    <string name="editor_mode_axes">Осі</string>
+    <string name="editor_mode_buttons">Кнопки</string>
+    <string name="editor_label_invert_y">Інвертувати верх і низ (якщо гра читає навпаки)</string>
+    <string name="editor_label_axis_x">Вісь X</string>
+    <string name="editor_label_axis_y">Вісь Y</string>
+    <string name="editor_label_direction_up">Кнопка: вгору</string>
+    <string name="editor_label_direction_down">Кнопка: вниз</string>
+    <string name="editor_label_direction_left">Кнопка: вліво</string>
+    <string name="editor_label_direction_right">Кнопка: вправо</string>
+    <string name="editor_add_step">Додати крок</string>
+    <string name="editor_add_event">Додати подію</string>
+    <string name="editor_remove_step">Видалити крок</string>
+    <string name="editor_step_title">Крок %d</string>
+    <string name="editor_pick_device">Тип події</string>
+    <string name="editor_device_keyboard">Клавіатура</string>
+    <string name="editor_device_mouse">Миша</string>
+    <string name="editor_device_gamepad">Геймпад</string>
+    <string name="editor_pick_key">Клавіша</string>
+    <string name="editor_pick_button">Кнопка</string>
+    <string name="editor_remove_event">Прибрати</string>
+    <string name="editor_label_direction_action">Дія для %s</string>
+    <string name="category_about">Про застосунок</string>
+    <string name="title_open_source_licenses">Ліцензії відкритого коду</string>
+    <string name="summary_open_source_licenses">Ліцензія застосунку та ліцензії того, з чого він зібраний</string>
 </resources>

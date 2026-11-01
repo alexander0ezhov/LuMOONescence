@@ -3,7 +3,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">Ver lista de juegos</string>
     <string name="pcview_menu_pair_pc">Emparejar con PC</string>
-    <string name="pcview_menu_unpair_pc">Desemparejar</string>
     <string name="pcview_menu_send_wol">Enviar petición Wake-On-LAN</string>
     <string name="pcview_menu_delete_pc">Eliminar PC</string>
     <!-- Pair messages -->
@@ -17,7 +16,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">Ordenador encendido</string>
     <string name="wol_no_mac">No se puede activar el PC porque no hay ninguna dirección MAC almacenada</string>
-    <string name="wol_waking_pc">Iniciando PC…</string>
     <string name="wol_waking_msg">Puede tomar algunos segundos iniciar tu PC.
 	    Si no se inicia asegúrate que está configurado correctamente para Wake-On-LAN.
     </string>
@@ -56,11 +54,8 @@
     <string name="applist_menu_resume">Reanudar sesión</string>
     <string name="applist_menu_quit">Cerrar sesión</string>
     <string name="applist_menu_quit_and_start">Cerrar juego actual e iniciar</string>
-    <string name="applist_menu_cancel">Cancelar</string>
     <string name="applist_refresh_title">Lista de aplicaciones</string>
     <string name="applist_refresh_msg">Actualizando lista de aplicaciones…</string>
-    <string name="applist_refresh_error_title">Error</string>
-    <string name="applist_refresh_error_msg">Error al cargar lista de aplicaciones</string>
     <string name="applist_quit_app">Cerrando</string>
     <string name="applist_quit_success">Cerrado satisfactoriamente</string>
     <string name="applist_quit_fail">Error al cerrar</string>
@@ -88,14 +83,9 @@
     <string name="suffix_seekbar_deadzone">%</string>
     <string name="title_checkbox_xb1_driver">Driver para mando Xbox 360/One</string>
     <string name="summary_checkbox_xb1_driver">Activa el driver USB incluido para dispositivos sin soporte nativo para mandos de Xbox</string>
-    <string name="category_on_screen_controls_settings">Configuración de controles en pantalla</string>
-    <string name="title_checkbox_show_onscreen_controls">Mostrar controles en pantalla</string>
-    <string name="summary_checkbox_show_onscreen_controls">Muestra controles virtuales superpuestos en la pantalla táctil</string>
-    <string name="title_only_l3r3">Solo muestra L3 y R3</string>
-    <string name="summary_only_l3r3">Ocultar todo excepto L3 y R3</string>
     <string name="category_ui_settings">Configuración de la interfaz</string>
     <string name="title_language_list">Idioma</string>
-    <string name="summary_language_list">Idioma a usar por Moonlight</string>
+    <string name="summary_language_list">Idioma a usar por LuMOONescence</string>
     <string name="title_checkbox_small_icon_mode">Usar iconos pequeños</string>
     <string name="summary_checkbox_small_icon_mode">Usar iconos pequeños en las entradas de cuadrículas para permitir más entradas en la pantalla</string>
     <string name="category_host_settings">Configuración de servidor</string>
@@ -119,11 +109,11 @@
     <string name="pcview_menu_test_network">Probar Conexión de Red</string>
     <string name="pcview_menu_details">Ver Detalles</string>
     <string name="nettest_title_waiting">Probando Conexión de Red</string>
-    <string name="nettest_text_waiting">Moonlight está probando tu conexión a la red para determinar si algún puerto necesario está bloqueado.
+    <string name="nettest_text_waiting">LuMOONescence está probando tu conexión a la red para determinar si algún puerto necesario está bloqueado.
 \n
 \nEsto puede tardar unos segundos…</string>
-    <string name="nettest_text_inconclusive">La prueba de red no pudo ejecutarse debido a que no se pudo alcanzar ningún servidor de prueba de conexión de Moonlight. Revisa tu conexión a internet o prueba nuevamente mas tarde.</string>
-    <string name="nettest_text_failure">La actual conexión de red de tu dispositivo parece estar bloqueando Moonlight. La Transmisión mediante Internet puede no funcionar mientras estes conectado a esta red.
+    <string name="nettest_text_inconclusive">La prueba de red no pudo ejecutarse debido a que no se pudo alcanzar ningún servidor de prueba de conexión de LuMOONescence. Revisa tu conexión a internet o prueba nuevamente mas tarde.</string>
+    <string name="nettest_text_failure">La actual conexión de red de tu dispositivo parece estar bloqueando LuMOONescence. La Transmisión mediante Internet puede no funcionar mientras estes conectado a esta red.
 \n
 \nSe han bloqueado los siguientes puertos de red:
 \n</string>
@@ -132,16 +122,15 @@
     <string name="scut_pc_not_found">PC no encontrado</string>
     <string name="help_loading_msg">Cargando página de ayuda…</string>
     <string name="pcview_menu_header_offline">Fuera de línea</string>
-    <string name="nettest_text_success">Tu red parece no estar bloqueando Moonlight. Si aun tienes problemas de conexión, comprueba la configuración del firewall de tu PC.
+    <string name="nettest_text_success">Tu red parece no estar bloqueando LuMOONescence. Si aun tienes problemas de conexión, comprueba la configuración del firewall de tu PC.
 \n
-\nSi estas intentado transmitir mediante Internet, instala en tu pc la Moonlight Internet Hosting Tool y ejecuta el Internet Streaming Tester incluido para comprobar la conexión de tu PC a internet.</string>
-    <string name="nettest_text_blocked">La conexión de red actual de tu dispositivo esta bloqueando Moonlight. La Transmisión mediante Internet puede no funcionar mientras estés conectado a esta red.</string>
+\nSi estas intentado transmitir mediante Internet, instala en tu pc la LuMOONescence Internet Hosting Tool y ejecuta el Internet Streaming Tester incluido para comprobar la conexión de tu PC a internet.</string>
+    <string name="nettest_text_blocked">La conexión de red actual de tu dispositivo esta bloqueando LuMOONescence. La Transmisión mediante Internet puede no funcionar mientras estés conectado a esta red.</string>
     <string name="pair_already_in_progress">Emparejamiento ya en progreso</string>
     <string name="resolution_prefix_native_fullscreen">Pantalla Completa Nativa</string>
     <string name="title_audio_config_list">Configuración de Sonido Envolvente</string>
     <string name="title_decoding_reset">Reiniciar Opciones de Video</string>
     <string name="no_video_received_error">No se recibe video desde el equipo anfitrión.</string>
-    <string name="applist_details_id">ID de Aplicación:</string>
     <string name="title_checkbox_mouse_emulation">Emulación de ratón usando el mando</string>
     <string name="pacing_latency">Preferir la menor latencia posible</string>
     <string name="pacing_balanced">Equilibrado</string>
@@ -155,13 +144,11 @@
     <string name="perf_overlay_streamdetails">Transmisión video: %1$s %2$.2f FPS</string>
     <string name="title_fps_list">Tasa de cuadros en el video</string>
     <string name="summary_fps_list">Incrementar para una experiencia mas fluida en la transmisión. Disminuir para una mejoría en el rendimiento en dispositivos de gama de entrada.</string>
-    <string name="summary_reset_osc">Reiniciar toda la configuración a las predeterminadas de tamaño y posición para los controles en pantalla</string>
     <string name="summary_troubleshooting">Mostrar consejos para diagnosticar y corregir errores comunes respecto a la transmisión</string>
     <string name="title_privacy_policy">Política de Privacidad</string>
     <string name="resolution_360p">360p</string>
     <string name="resolution_1440p">1440p</string>
     <string name="resolution_4k">4K</string>
-    <string name="suffix_osc_opacity">%</string>
     <string name="title_checkbox_enable_pip">Activar modo Pantalla-en-Pantalla para modo espectador</string>
     <string name="resolution_720p">720p</string>
     <string name="fps_120">120 FPS</string>
@@ -174,7 +161,7 @@
     <string name="audioconf_stereo">Estéreo</string>
     <string name="check_ports_msg">Revisa la configuración de tu firewall, así como, las reglas de redireccionamiento para él(los) puerto(s):</string>
     <string name="error_usb_prohibited">El acceso a USB está restringido en tu dispositivo por el administrador. Revisar tus ajustes en MDM o Knox.</string>
-    <string name="message_decoding_error">Moonlight se ha bloqueado debido a una incompatibilidad con el descodificador de vídeo de este dispositivo. Intenta ajustar la configuración de streaming si los bloqueos continúan.</string>
+    <string name="message_decoding_error">LuMOONescence se ha bloqueado debido a una incompatibilidad con el descodificador de vídeo de este dispositivo. Intenta ajustar la configuración de streaming si los bloqueos continúan.</string>
     <string name="message_decoding_reset">La decodificación de video de tu equipo sigue fallando con las opciones elegidas. Las opciones de la transmisión han sido revertidas a las predeterminadas.</string>
     <string name="video_decoder_init_failed">El descodificador de video no pudo ser iniciado. Tu dispositivo puede no soportar la resolución elegida o la tasa de cuadros por segundo.</string>
     <string name="no_frame_received_error">La conexión de red no está teniendo un buen desempeño. Reduce la tasa de bits de video o prueba con una conexión de mayor velocidad.</string>
@@ -186,7 +173,6 @@
     <string name="poor_connection_msg">Conexión pobre al PC</string>
     <string name="applist_menu_details">Ver Detalles</string>
     <string name="applist_menu_scut">Crear Acceso Directo</string>
-    <string name="applist_menu_tv_channel">Agregar al Canal</string>
     <string name="applist_menu_hide_app">Esconder Aplicación</string>
     <string name="applist_connect_msg">Conectando al Equipo…</string>
     <string name="summary_checkbox_mouse_nav_buttons">Activar esta opción puede desconfigurar la función de clic derecho en algunos dispositivos inestables</string>
@@ -201,7 +187,7 @@
     <string name="summary_audio_config_list">Activar sonido envolvente de 5.1 o 7.1 canales para sistemas de teatro en casa</string>
     <string name="title_checkbox_vibrate_fallback">Emular la vibración del mando con vibración del equipo</string>
     <string name="summary_checkbox_enable_audiofx">Permitir funcionar efectos de sonido durante la transmisión, pero podría incrementar la latencia del sonido</string>
-    <string name="summary_checkbox_usb_bind_all">Usar el controlador de USB de Moonlight para todos los mandos soportados, incluso si el control de Xbox se encuentra presente</string>
+    <string name="summary_checkbox_usb_bind_all">Usar el controlador de USB de LuMOONescence para todos los mandos soportados, incluso si el control de Xbox se encuentra presente</string>
     <string name="summary_checkbox_mouse_emulation">Presionar por un periodo largo el botón de inicio hará cambiar el mando a modo de ratón</string>
     <string name="title_checkbox_mouse_nav_buttons">Activar los botones atrás y adelante del ratón</string>
     <string name="title_unlock_fps">Desbloquear todas las opciones de tasa de cuadros disponibles</string>
@@ -216,9 +202,7 @@
     <string name="title_native_res_dialog">Advertencia Resolución Nativa</string>
     <string name="suffix_seekbar_bitrate_mbps">Mbps</string>
     <string name="category_input_settings">Opciones de Entrada</string>
-    <string name="title_checkbox_touchscreen_trackpad">Usa la pantalla táctil como panel táctil</string>
-    <string name="summary_checkbox_touchscreen_trackpad">Si está activo, la pantalla táctil funcionará como panel táctil. Si está desactivado, la pantalla táctil directamente controlará el cursor del ratón.</string>
-    <string name="summary_seekbar_deadzone">Nota: Algunos juegos pueden forzar una zona muerta mayor a la que Moonlight esta configurada a usar.</string>
+    <string name="summary_seekbar_deadzone">Nota: Algunos juegos pueden forzar una zona muerta mayor a la que LuMOONescence esta configurada a usar.</string>
     <string name="title_checkbox_flip_face_buttons">Invertir botones frontales</string>
     <string name="summary_checkbox_absolute_mouse_mode">Esto puede hacer que la aceleración de mouse se comporte mas natural para uso de escritorio remoto, pero es incompatible con muchos juegos.</string>
     <string name="title_checkbox_enable_audiofx">Activar el soporte para ecualizador de sistema</string>
@@ -226,18 +210,7 @@
     <string name="title_checkbox_usb_bind_all">Sobrescribir el soporte nativo del control de Xbox</string>
     <string name="summary_checkbox_flip_face_buttons">Invertir botones frontales A/B y X/Y para los mandos y los botones sobre la pantalla</string>
     <string name="title_checkbox_absolute_mouse_mode">Modo de ratón para escritorio remoto</string>
-    <string name="title_checkbox_vibrate_osc">Activar vibración</string>
-    <string name="summary_checkbox_vibrate_osc">Hacer vibrar tu dispositivo para emular la vibración del juego para los controles en pantalla</string>
-    <string name="title_reset_osc">Borrar la configuración guardada de la plantilla para el control en pantalla</string>
-    <string name="dialog_title_reset_osc">Reiniciar a Plantilla Predeterminada</string>
-    <string name="dialog_text_reset_osc">¿Estás seguro de que quieres eliminar tus configuraciones guardadas para las plantillas de los controles en pantalla\?</string>
-    <string name="toast_reset_osc_success">Establecer Controles en Pantalla en modo Predeterminado</string>
-    <string name="title_osc_opacity">Cambiar la transparencia de los controles en pantalla</string>
-    <string name="summary_osc_opacity">Hacer los controles en pantalla más/menos transparentes</string>
-    <string name="dialog_title_osc_opacity">Cambiar opacidad</string>
     <string name="summary_checkbox_enable_pip">Permite que la transmisión sea vista (pero no controlable) mientras se usa la multitarea</string>
-    <string name="title_disable_frame_drop">Nunca disminuir cuadros</string>
-    <string name="summary_disable_frame_drop">Puede reducir micro-tartamudeos (Stuttering) en algunos dispositivos , pero puede incrementar latencia</string>
     <string name="title_enable_hdr">Activar HDR (Alto Rango Dinámico / Experimental)</string>
     <string name="summary_enable_hdr">Transmite en HDR cuando el juego y la GPU del PC lo admitan. HDR requiere una GPU compatible con la codificación HEVC Main 10.</string>
     <string name="summary_enable_perf_overlay">Mostrar en tiempo real la información del desempeño de la transmisión mientras está activa la misma</string>
@@ -245,7 +218,7 @@
     <string name="category_help">Ayuda</string>
     <string name="title_setup_guide">Guía para la Configuración</string>
     <string name="summary_setup_guide">Mostrar instrucciones para como configurar tu PC para juegos para la transmisión</string>
-    <string name="summary_privacy_policy">Mostrar la política de privacidad de Moonlight</string>
+    <string name="summary_privacy_policy">Mostrar la política de privacidad de LuMOONescence</string>
     <string name="resolution_480p">480p</string>
     <string name="fps_30">30 FPS</string>
     <string name="fps_60">60 FPS</string>
@@ -285,4 +258,122 @@
     <string name="title_seekbar_vibrate_fallback_strength">Ajustar la intensidad del ruido emulado</string>
     <string name="summary_seekbar_vibrate_fallback_strength">Amplifica o reduce la intensidad de la vibración de tu dispositivo</string>
     <string name="suffix_seekbar_vibrate_fallback_strength">%</string>
+    <string name="back">Atrás</string>
+    <string name="title_universal_layouts">Diseños en pantalla</string>
+    <string name="title_add_layout">Añadir diseño</string>
+    <string name="title_layout_image">Imagen del diseño</string>
+    <string name="title_edit_controls">Editar controles</string>
+    <string name="title_reset_controls">Restablecer</string>
+    <string name="title_pick_image">Imagen</string>
+    <string name="title_use_default_image">Usar predeterminada</string>
+    <string name="msg_layouts_help">Elige el diseño que se usará al transmitir. Toca un diseño para editarlo o eliminarlo; el botón más añade uno nuevo.</string>
+    <string name="msg_no_layouts">Aún no hay diseños. Toca el más para crear uno.</string>
+    <string name="msg_layout_selected">Elegido</string>
+    <string name="msg_no_images">No se han encontrado imágenes en este dispositivo.</string>
+    <string name="msg_image_permission_needed">No se ha concedido acceso a tus imágenes, así que no hay nada que elegir. Concédelo y vuelve a intentarlo.</string>
+    <string name="msg_image_picker_failed">No se han podido cargar las imágenes de este dispositivo.</string>
+    <string name="dialog_title_layout_name">Nombre del diseño</string>
+    <string name="hint_layout_name">Nombre del diseño</string>
+    <string name="menu_edit_layout">Editar</string>
+    <string name="menu_choose_image">Cambiar imagen</string>
+    <string name="menu_use_layout">Usar este diseño</string>
+    <string name="menu_delete_layout">Eliminar</string>
+    <string name="dialog_text_reset_layout_controls">¿Restablecer el tamaño y la posición de los controles de este diseño?</string>
+    <string name="toast_layout_controls_reset">Controles restablecidos</string>
+    <string name="toast_layout_adjusted_to_fit">Este diseño se hizo para otro tamaño de pantalla y se ha adaptado a esta. Usa «Restablecer» para recuperar su aspecto original.</string>
+    <string name="title_layout_settings">Ajustes del diseño</string>
+    <string name="control_type_button">Botón</string>
+    <string name="control_type_stick">Stick</string>
+    <string name="control_type_dpad">Cruceta</string>
+    <string name="control_type_element">Elemento</string>
+    <string name="editor_label_center_button">Botón central</string>
+    <string name="editor_label_corner_radius">Radio de las esquinas</string>
+    <string name="editor_section_center_button">Centro del stick</string>
+    <string name="editor_label_center_button_enabled">Tocar el centro actúa como un botón</string>
+    <string name="editor_label_center_button_action">Qué envía el centro</string>
+    <string name="menu_add_button">Añadir botón</string>
+    <string name="menu_add_stick">Añadir stick</string>
+    <string name="menu_add_dpad">Añadir cruceta</string>
+    <string name="menu_save">Guardar</string>
+    <string name="menu_save_as">Guardar como</string>
+    <string name="menu_exit">Salir</string>
+    <string name="menu_duplicate">Duplicar</string>
+    <string name="menu_copy_size">Copiar tamaño</string>
+    <string name="menu_paste_size">Pegar tamaño</string>
+    <string name="menu_edit">Editar</string>
+    <string name="menu_delete">Eliminar</string>
+    <string name="dialog_title_delete_control">¿Eliminar «%1$s»?</string>
+    <string name="stream_menu_title">Menú de transmisión</string>
+    <string name="stream_menu_keyboard">Mostrar teclado</string>
+    <string name="stream_menu_touch">Entrada táctil</string>
+    <string name="stream_menu_touch_off">Desactivada</string>
+    <string name="stream_menu_touch_trackpad">Panel táctil</string>
+    <string name="stream_menu_touch_right_stick">Stick derecho</string>
+    <string name="stream_menu_touch_left_stick">Stick izquierdo</string>
+    <string name="stream_menu_touch_events">Táctil real (experimental)</string>
+    <string name="stream_menu_opacity">Opacidad</string>
+    <string name="stream_menu_sensitivity">Sensibilidad</string>
+    <string name="stream_menu_touchpad_mode">Modo del panel táctil</string>
+    <string name="stream_menu_touchpad_standard">Panel táctil</string>
+    <string name="stream_menu_touchpad_direct">Cursor bajo el dedo</string>
+    <string name="stream_menu_touchpad_no_clicks">Sin clics</string>
+    <string name="stream_menu_extras">Extras</string>
+    <string name="stream_menu_vibration">Vibración</string>
+    <string name="stream_menu_controls">Controles en pantalla</string>
+    <string name="editor_label_pass_through">Pasar al táctil (mantén y mueve para mirar alrededor)</string>
+    <string name="stream_menu_layout">Diseño</string>
+    <string name="stream_menu_exit">Salir de la transmisión</string>
+    <string name="stream_menu_layout_next_time">«%1$s» se usará la próxima vez que transmitas</string>
+    <string name="dialog_title_save_changes">¿Guardar los cambios?</string>
+    <string name="dialog_text_save_changes">¿Guardar los cambios de este diseño?</string>
+    <string name="menu_dont_save">No guardar</string>
+    <string name="dialog_title_save_layout_as">Guardar diseño como</string>
+    <string name="hint_layout_name_new">Nombre del nuevo diseño</string>
+    <string name="toast_layout_saved">Diseño guardado</string>
+    <string name="toast_layout_saved_as">Guardado como &amp;quot;%s&amp;quot;</string>
+    <string name="toast_element_added">Añadido. Arrástralo a su sitio.</string>
+    <string name="editor_section_element">Elemento</string>
+    <string name="editor_section_position">Posición y tamaño</string>
+    <string name="editor_section_action">Acción</string>
+    <string name="editor_section_actions">Este elemento</string>
+    <string name="menu_share_layout">Compartir diseño</string>
+    <string name="title_import_layout">Importar diseño</string>
+    <string name="import_failed">No se ha podido leer ese archivo</string>
+    <string name="import_done">«%1$s» importado</string>
+    <string name="import_done_rescaled">«%1$s» importado, adaptado a esta pantalla</string>
+    <string name="editor_label_name">Nombre</string>
+    <string name="editor_label_x">X</string>
+    <string name="editor_label_y">Y</string>
+    <string name="editor_label_width">Ancho</string>
+    <string name="editor_label_height">Alto</string>
+    <string name="editor_label_toggle">Bloqueo (toca para pulsar, toca otra vez para soltar)</string>
+    <string name="editor_toggle_off_while_pass_through">El bloqueo está apagado mientras el paso al táctil está activo</string>
+    <string name="editor_label_sequence">Secuencia de eventos</string>
+    <string name="editor_label_sequence_empty">Aún no hay eventos. Añade un paso abajo.</string>
+    <string name="editor_label_step_delay">Retardo tras el paso (ms)</string>
+    <string name="editor_label_control_mode">Modo de funcionamiento</string>
+    <string name="editor_mode_axes">Ejes</string>
+    <string name="editor_mode_buttons">Botones</string>
+    <string name="editor_label_invert_y">Invertir arriba y abajo (si el juego lo lee al revés)</string>
+    <string name="editor_label_axis_x">Eje X</string>
+    <string name="editor_label_axis_y">Eje Y</string>
+    <string name="editor_label_direction_up">Botón: arriba</string>
+    <string name="editor_label_direction_down">Botón: abajo</string>
+    <string name="editor_label_direction_left">Botón: izquierda</string>
+    <string name="editor_label_direction_right">Botón: derecha</string>
+    <string name="editor_add_step">Añadir paso</string>
+    <string name="editor_add_event">Añadir evento</string>
+    <string name="editor_remove_step">Quitar paso</string>
+    <string name="editor_step_title">Paso %d</string>
+    <string name="editor_pick_device">Tipo de evento</string>
+    <string name="editor_device_keyboard">Teclado</string>
+    <string name="editor_device_mouse">Ratón</string>
+    <string name="editor_device_gamepad">Mando</string>
+    <string name="editor_pick_key">Tecla</string>
+    <string name="editor_pick_button">Botón</string>
+    <string name="editor_remove_event">Quitar</string>
+    <string name="editor_label_direction_action">Acción para %s</string>
+    <string name="category_about">Acerca de</string>
+    <string name="title_open_source_licenses">Licencias de código abierto</string>
+    <string name="summary_open_source_licenses">La licencia de esta aplicación y las de aquello con lo que está construida</string>
 </resources>

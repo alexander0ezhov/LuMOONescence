@@ -9,7 +9,6 @@
     <!-- PC view menu entries -->
     <string name="pcview_menu_app_list">모든 게임 보기</string>
     <string name="pcview_menu_pair_pc">PC와 페어링</string>
-    <string name="pcview_menu_unpair_pc">페어링 해제</string>
     <string name="pcview_menu_send_wol">Wake-On-LAN request 보내기</string>
     <string name="pcview_menu_delete_pc">PC 삭제</string>
     <!-- Pair messages -->
@@ -24,7 +23,6 @@
     <!-- WOL messages -->
     <string name="wol_pc_online">컴퓨터가 온라인 상태입니다</string>
     <string name="wol_no_mac">저장된 MAC 주소가 없기 때문에 PC를 켤 수 없습니다</string>
-    <string name="wol_waking_pc">PC를 깨우는 중…</string>
     <string name="wol_waking_msg">PC를 켜는 데에 약간의 시간이 걸립니다. PC가 켜지지 않으면, Wake-On-Lan이 설정되어있는지 확인하세요.</string>
     <string name="wol_fail">Wake-On-LAN 패킷을 보내는 데에 실패했습니다</string>
     <!-- Unpair messages -->
@@ -65,11 +63,8 @@
     <string name="applist_menu_resume">세션 계속</string>
     <string name="applist_menu_quit">세션 종료</string>
     <string name="applist_menu_quit_and_start">현재 게임 종료 후 시작</string>
-    <string name="applist_menu_cancel">취소</string>
     <string name="applist_refresh_title">앱 리스트</string>
     <string name="applist_refresh_msg">앱 로드 중…</string>
-    <string name="applist_refresh_error_title">오류</string>
-    <string name="applist_refresh_error_msg">앱 리스트를 얻는데 실패함</string>
     <string name="applist_quit_app">종료중</string>
     <string name="applist_quit_success">종료됨</string>
     <string name="applist_quit_fail">종료 실패</string>
@@ -97,12 +92,9 @@
     <string name="suffix_seekbar_deadzone">%</string>
     <string name="title_checkbox_xb1_driver">Xbox 360/One 컨트롤러 드라이버</string>
     <string name="summary_checkbox_xb1_driver">네이티브 Xbox 컨트롤러 지원 없이 빌드인 USB드라이버를 활성화합니다</string>
-    <string name="category_on_screen_controls_settings">화면 상의 컨트롤 설정</string>
-    <string name="title_checkbox_show_onscreen_controls">화면 위에 컨트롤러 표시</string>
-    <string name="summary_checkbox_show_onscreen_controls">터치스크린에 가상 컨트롤러 오버레이를 표시합니다</string>
     <string name="category_ui_settings">UI 설정</string>
     <string name="title_language_list">언어</string>
-    <string name="summary_language_list">Moonlight에서 사용할 언어를 선택합니다</string>
+    <string name="summary_language_list">LuMOONescence에서 사용할 언어를 선택합니다</string>
     <string name="title_checkbox_small_icon_mode">작은 아이콘 사용</string>
     <string name="summary_checkbox_small_icon_mode">한 화면에서 더 많은 게임을 볼 수 있게 게임을 더 작게 표시합니다</string>
     <string name="category_host_settings">호스트 설정</string>
@@ -113,12 +105,9 @@
     <string name="category_advanced_settings">고급 설정</string>
     <string name="title_video_format">코덱 설정 변경</string>
     <string name="summary_video_format">최신 코덱은 장치에서 지원하는 경우 비디오 대역폭 요구 사항을 낮출 수 있습니다. 호스트 소프트웨어 또는 GPU에서 지원하지 않는 경우 코덱 선택을 무시할 수 있습니다.</string>
-    <string name="suffix_osc_opacity">%</string>
     <string name="title_checkbox_enable_pip">PIP모드 활성화</string>
     <string name="summary_checkbox_vibrate_fallback">컨트롤러가 진동을 지원하지 않는 경우 장치를 진동 시켜 진동을 활성화합니다</string>
     <string name="title_checkbox_vibrate_fallback">게임패드 진동을 장치에서 사용하기</string>
-    <string name="summary_checkbox_touchscreen_trackpad">활성화시 터치 스크린이 트랙 패드처럼 작동합니다. 비활성화 된 경우 터치 스크린처럼 작동합니다.</string>
-    <string name="title_checkbox_touchscreen_trackpad">터치 스크린을 트랙 패드로 사용하기</string>
     <string name="category_input_settings">입력 설정</string>
     <string name="summary_audio_config_list">홈 시어터 시스템을 위한 5.1 또는 7.1 서라운드 사운드 활성화</string>
     <string name="title_audio_config_list">서라운드 사운드 설정</string>
@@ -129,12 +118,11 @@
 \n
 \n화면 설정과 일치하도록 NVIDIA 제어판에서 사용자 정의 해상도를 생성 할 경우 모니터 손상, PC 불안정 및 기타 잠재적인 문제에 대한 NVIDIA의 경고를 읽고 이해했는지 확인하십시오.
 \n
-\nMoonlight는 PC에서 사용자 지정 해상도를 생성하여 발생하는 문제에 대해 책임을 지지 않습니다.
+\nLuMOONescence는 PC에서 사용자 지정 해상도를 생성하여 발생하는 문제에 대해 책임을 지지 않습니다.
 \n
 \n모니터가 필요한 디스플레이 구성을 지원하지 않을 경우 가상 모니터 설정을 시도할 수 있습니다. 장치나 호스트 PC가 특정 해상도나 새로 고침 빈도로 스트리밍을 지원하지 않을 수 있습니다.</string>
     <string name="title_native_res_dialog">네이티브 해상도 주의사항</string>
     <string name="addpc_wrong_sitelocal">주소가 잘못된 것 같습니다. 인터넷을 통해 스트리밍하려면 라우터의 공용 IP 주소를 사용해야합니다.</string>
-    <string name="applist_details_id">앱 ID:</string>
     <string name="applist_menu_hide_app">게임 숨기기</string>
     <string name="applist_menu_scut">바로가기 만들기</string>
     <string name="applist_menu_details">세부사항</string>
@@ -159,19 +147,19 @@
     <string name="error_usb_prohibited">기기 관리자에 의해 USB 액세스가 차단되었습니다. Knox 또는 MDM 설정을 확인하십시오.</string>
     <string name="message_decoding_reset">선택한 스트리밍 설정에서 장치의 비디오 디코더가 계속 문제가 발생합니다. 스트리밍 설정이 기본값으로 재설정되었습니다.</string>
     <string name="title_decoding_reset">비디오 설정 초기화</string>
-    <string name="message_decoding_error">이 장치의 비디오 디코더와 호환되지 않아 Moonlight에서 오류가 발생했습니다. 충돌이 계속되면 스트리밍 설정을 조정 해보십시오.</string>
+    <string name="message_decoding_error">이 장치의 비디오 디코더와 호환되지 않아 LuMOONescence에서 오류가 발생했습니다. 충돌이 계속되면 스트리밍 설정을 조정 해보십시오.</string>
     <string name="title_decoding_error">비디오 디코더 오류</string>
-    <string name="nettest_text_blocked">기기의 현재 네트워크가 Moonlight를 차단하고 있습니다. 이 네트워크에 연결되어 있으면 인터넷을 통한 스트리밍이 작동하지 않을 수 있습니다.</string>
-    <string name="nettest_text_failure">기기의 현재 네트워크가 Moonlight를 차단하는 것 같습니다. 이 네트워크에 연결되어 있으면 인터넷을 통한 스트리밍이 작동하지 않을 수 있습니다.
+    <string name="nettest_text_blocked">기기의 현재 네트워크가 LuMOONescence를 차단하고 있습니다. 이 네트워크에 연결되어 있으면 인터넷을 통한 스트리밍이 작동하지 않을 수 있습니다.</string>
+    <string name="nettest_text_failure">기기의 현재 네트워크가 LuMOONescence를 차단하는 것 같습니다. 이 네트워크에 연결되어 있으면 인터넷을 통한 스트리밍이 작동하지 않을 수 있습니다.
 \n
 \n차단된 네트워크 포트:
 \n</string>
-    <string name="nettest_text_inconclusive">Moonlight의 테스트 서버에 연결할 수 없기 때문에 네트워크 테스트를 할 수 없습니다. 인터넷 연결을 확인하거나 나중에 다시 시도하십시오.</string>
-    <string name="nettest_text_success">네트워크가 Moonlight를 차단하지 않는 것 같습니다. 여전히 연결에 문제가 있으면 PC의 방화벽 설정을 확인하십시오
+    <string name="nettest_text_inconclusive">LuMOONescence의 테스트 서버에 연결할 수 없기 때문에 네트워크 테스트를 할 수 없습니다. 인터넷 연결을 확인하거나 나중에 다시 시도하십시오.</string>
+    <string name="nettest_text_success">네트워크가 LuMOONescence를 차단하지 않는 것 같습니다. 여전히 연결에 문제가 있으면 PC의 방화벽 설정을 확인하십시오
 \n
-\n인터넷을 통해 연결하려는 경우 PC에 Moonlight Internet Hosting Tool을 설치하고 Internet Streaming Tester를 실행하여 PC의 인터넷 연결을 확인하십시오.</string>
+\n인터넷을 통해 연결하려는 경우 PC에 LuMOONescence Internet Hosting Tool을 설치하고 Internet Streaming Tester를 실행하여 PC의 인터넷 연결을 확인하십시오.</string>
     <string name="nettest_title_done">네트워크 연결 테스트 완료</string>
-    <string name="nettest_text_waiting">Moonlight는 필요한 포트가 차단되었는지 확인하기 위해 네트워크 연결을 테스트하고 있습니다.
+    <string name="nettest_text_waiting">LuMOONescence는 필요한 포트가 차단되었는지 확인하기 위해 네트워크 연결을 테스트하고 있습니다.
 \n
 \n잠시 기다려 주세요…</string>
     <string name="pcview_menu_header_unknown">상태 확인중</string>
@@ -182,7 +170,6 @@
     <string name="pcview_menu_details">PC 세부정보</string>
     <string name="scut_pc_not_found">PC를 찾을 수 없음</string>
     <string name="suffix_seekbar_bitrate_mbps">Mbps</string>
-    <string name="applist_menu_tv_channel">채널 추가하기</string>
     <string name="scut_invalid_uuid">PC를 사용할 수 없음</string>
     <string name="scut_invalid_app_id">앱을 사용할 수 없음</string>
     <string name="summary_enable_post_stream_toast">스트림 종료 후 지연시간 정보 표시</string>
@@ -191,29 +178,15 @@
     <string name="summary_enable_perf_overlay">스트리밍하는 동안 실시간 스트림 성능 정보 표시</string>
     <string name="summary_enable_hdr">게임 및 PC의 GPU가 HDR을 지원하는 경우 HDR을 활성화합니다. HDR에는 HEVC Main 10 인코딩을 지원하는 GPU가 필요합니다.</string>
     <string name="title_enable_hdr">HDR활성화 (실험용)</string>
-    <string name="summary_disable_frame_drop">일부 장치에서 미세한 끊김 현상을 줄일 수 있지만 지연 시간이 늘어날 수 있습니다</string>
-    <string name="title_disable_frame_drop">프레임드랍 최적화</string>
     <string name="summary_unlock_fps">90 또는 120FPS로 스트리밍하면 지연 시간이 줄어들 수 있지만 이를 지원할 수 없는 장치에서는 지연 또는 불안정 할 수 있습니다</string>
     <string name="title_unlock_fps">모든 프레임 속도 잠금 해제</string>
     <string name="summary_checkbox_enable_pip">PIP모드를 사용하는 중에 화면은 볼 수 있지만 제어는 할 수 없습니다</string>
-    <string name="dialog_title_osc_opacity">투명도 조절</string>
-    <string name="summary_osc_opacity">가상컨트롤러의 투명도를 조절할 수 있습니다</string>
-    <string name="title_osc_opacity">가상컨트롤러의 투명도 설정</string>
-    <string name="toast_reset_osc_success">가상 컨트롤러 배치가 초기화되었습니다</string>
-    <string name="dialog_text_reset_osc">저장된 가상 컨트롤러 배치를 초기화 하시겠습니까\?</string>
-    <string name="dialog_title_reset_osc">가상 컨트롤러 배치 초기화</string>
-    <string name="summary_reset_osc">가상 컨트롤러를 기본 크기 및 위치로 초기화합니다</string>
-    <string name="title_reset_osc">가상 컨트롤러 배치 초기화</string>
-    <string name="summary_only_l3r3">L3 및 R3을 제외한 모든 가상 버튼을 숨깁니다</string>
-    <string name="title_only_l3r3">L3와 R3버튼만 표시하기</string>
     <string name="summary_checkbox_flip_face_buttons">컨트롤러 및 가상 컨트롤러의 A / B 와 X / Y 버튼을 바꿉니다</string>
-    <string name="summary_checkbox_vibrate_osc">가상 컨트롤러에서 장치를 진동하여 게임패드 진동을 구현합니다</string>
-    <string name="title_checkbox_vibrate_osc">진동 활성화</string>
     <string name="title_checkbox_flip_face_buttons">버튼 바꾸기</string>
     <string name="summary_checkbox_mouse_nav_buttons">이 옵션을 활성화하면 일부 장치에서 오른쪽 클릭에 문제가 있을 수 있습니다</string>
     <string name="title_checkbox_mouse_nav_buttons">마우스 사이드버튼 활성화</string>
     <string name="summary_checkbox_mouse_emulation">패드의 Start 버튼을 길게 누르면 컨트롤러가 마우스 모드로 전환됩니다</string>
-    <string name="summary_checkbox_usb_bind_all">Xbox 컨트롤러를 기본으로 지원하는 경우에도 지원되는 모든 컨트롤러에 Moonlight의 USB 드라이버를 사용합니다</string>
+    <string name="summary_checkbox_usb_bind_all">Xbox 컨트롤러를 기본으로 지원하는 경우에도 지원되는 모든 컨트롤러에 LuMOONescence의 USB 드라이버를 사용합니다</string>
     <string name="title_checkbox_usb_bind_all">기본 Xbox 컨트롤러 지원 무시</string>
     <string name="title_checkbox_mouse_emulation">컨트롤러를 마우스처럼 사용하기</string>
     <string name="perf_overlay_streamdetails">비디오 스트림 : %1$s %2$.2f FPS</string>
@@ -238,7 +211,7 @@
     <string name="title_troubleshooting">문제 해결 가이드</string>
     <string name="summary_troubleshooting">일반적인 스트리밍 문제 진단 및 해결을 위한 팁 보기</string>
     <string name="title_privacy_policy">개인 정보 정책</string>
-    <string name="summary_privacy_policy">Moonlight의 개인 정보 보호 정책 보기</string>
+    <string name="summary_privacy_policy">LuMOONescence의 개인 정보 보호 정책 보기</string>
     <string name="summary_frame_pacing">비디오 지연 시간과 부드러움의 균형을 맞추는 방법 설정</string>
     <string name="pacing_latency">최저 지연 시간 선호</string>
     <string name="pacing_balanced">균형</string>
@@ -287,4 +260,122 @@
     <string name="title_seekbar_vibrate_fallback_strength">에뮬레이트된 진동 강도 조정</string>
     <string name="summary_analog_scrolling">마우스 에뮬레이션 모드에서 스크롤할 아날로그 스틱을 선택하세요</string>
     <string name="suffix_seekbar_vibrate_fallback_strength">%</string>
+    <string name="back">뒤로</string>
+    <string name="title_universal_layouts">화면 레이아웃</string>
+    <string name="title_add_layout">레이아웃 추가</string>
+    <string name="title_layout_image">레이아웃 이미지</string>
+    <string name="title_edit_controls">컨트롤 편집</string>
+    <string name="title_reset_controls">초기화</string>
+    <string name="title_pick_image">이미지</string>
+    <string name="title_use_default_image">기본값 사용</string>
+    <string name="msg_layouts_help">스트리밍 중에 사용할 레이아웃을 고르세요. 레이아웃을 탭하면 편집하거나 삭제할 수 있고, 새 레이아웃은 더하기 버튼으로 만듭니다.</string>
+    <string name="msg_no_layouts">아직 레이아웃이 없습니다. 더하기를 눌러 만드세요.</string>
+    <string name="msg_layout_selected">선택됨</string>
+    <string name="msg_no_images">이 기기에서 이미지를 찾지 못했습니다.</string>
+    <string name="msg_image_permission_needed">이미지 접근이 허용되지 않아 고를 것이 없습니다. 권한을 허용한 뒤 다시 시도하세요.</string>
+    <string name="msg_image_picker_failed">이 기기에서 이미지를 불러오지 못했습니다.</string>
+    <string name="dialog_title_layout_name">레이아웃 이름</string>
+    <string name="hint_layout_name">레이아웃 이름</string>
+    <string name="menu_edit_layout">편집</string>
+    <string name="menu_choose_image">이미지 변경</string>
+    <string name="menu_use_layout">이 레이아웃 사용</string>
+    <string name="menu_delete_layout">삭제</string>
+    <string name="dialog_text_reset_layout_controls">이 레이아웃의 컨트롤을 기본 크기와 위치로 되돌릴까요?</string>
+    <string name="toast_layout_controls_reset">컨트롤을 기본값으로 되돌렸습니다</string>
+    <string name="toast_layout_adjusted_to_fit">이 레이아웃은 다른 화면 크기에 맞춰 만들어져 이 화면에 맞게 조정되었습니다. 원래 모습으로 되돌리려면 초기화를 사용하세요.</string>
+    <string name="title_layout_settings">레이아웃 설정</string>
+    <string name="control_type_button">버튼</string>
+    <string name="control_type_stick">스틱</string>
+    <string name="control_type_dpad">십자 키</string>
+    <string name="control_type_element">요소</string>
+    <string name="editor_label_center_button">가운데 버튼</string>
+    <string name="editor_label_corner_radius">모서리 반경</string>
+    <string name="editor_section_center_button">스틱 가운데</string>
+    <string name="editor_label_center_button_enabled">가운데를 누르면 버튼처럼 동작</string>
+    <string name="editor_label_center_button_action">가운데가 보내는 것</string>
+    <string name="menu_add_button">버튼 추가</string>
+    <string name="menu_add_stick">스틱 추가</string>
+    <string name="menu_add_dpad">십자 키 추가</string>
+    <string name="menu_save">저장</string>
+    <string name="menu_save_as">다른 이름으로 저장</string>
+    <string name="menu_exit">나가기</string>
+    <string name="menu_duplicate">복제</string>
+    <string name="menu_copy_size">크기 복사</string>
+    <string name="menu_paste_size">크기 붙여넣기</string>
+    <string name="menu_edit">편집</string>
+    <string name="menu_delete">삭제</string>
+    <string name="dialog_title_delete_control">&quot;%1$s&quot;을(를) 삭제할까요?</string>
+    <string name="stream_menu_title">스트리밍 메뉴</string>
+    <string name="stream_menu_keyboard">키보드 표시</string>
+    <string name="stream_menu_touch">터치 입력</string>
+    <string name="stream_menu_touch_off">끔</string>
+    <string name="stream_menu_touch_trackpad">터치패드</string>
+    <string name="stream_menu_touch_right_stick">오른쪽 스틱</string>
+    <string name="stream_menu_touch_left_stick">왼쪽 스틱</string>
+    <string name="stream_menu_touch_events">실제 터치 (실험적)</string>
+    <string name="stream_menu_opacity">불투명도</string>
+    <string name="stream_menu_sensitivity">감도</string>
+    <string name="stream_menu_touchpad_mode">터치패드 모드</string>
+    <string name="stream_menu_touchpad_standard">터치패드</string>
+    <string name="stream_menu_touchpad_direct">손가락 아래 커서</string>
+    <string name="stream_menu_touchpad_no_clicks">클릭 없음</string>
+    <string name="stream_menu_extras">기타</string>
+    <string name="stream_menu_vibration">진동</string>
+    <string name="stream_menu_controls">화면 컨트롤</string>
+    <string name="editor_label_pass_through">터치로 넘기기 (누른 채 움직여 둘러보기)</string>
+    <string name="stream_menu_layout">레이아웃</string>
+    <string name="stream_menu_exit">스트리밍 종료</string>
+    <string name="stream_menu_layout_next_time">&quot;%1$s&quot;이(가) 다음 스트리밍에서 사용됩니다</string>
+    <string name="dialog_title_save_changes">변경 사항을 저장할까요?</string>
+    <string name="dialog_text_save_changes">이 레이아웃의 변경 사항을 저장할까요?</string>
+    <string name="menu_dont_save">저장하지 않음</string>
+    <string name="dialog_title_save_layout_as">레이아웃 다른 이름으로 저장</string>
+    <string name="hint_layout_name_new">새 레이아웃 이름</string>
+    <string name="toast_layout_saved">레이아웃을 저장했습니다</string>
+    <string name="toast_layout_saved_as">&quot;%s&quot;(으)로 저장했습니다</string>
+    <string name="toast_element_added">추가했습니다. 원하는 위치로 끌어다 놓으세요.</string>
+    <string name="editor_section_element">요소</string>
+    <string name="editor_section_position">위치와 크기</string>
+    <string name="editor_section_action">동작</string>
+    <string name="editor_section_actions">이 요소</string>
+    <string name="menu_share_layout">레이아웃 공유</string>
+    <string name="title_import_layout">레이아웃 가져오기</string>
+    <string name="import_failed">그 파일을 읽을 수 없습니다</string>
+    <string name="import_done">&quot;%1$s&quot;을(를) 가져왔습니다</string>
+    <string name="import_done_rescaled">&quot;%1$s&quot;을(를) 가져와 이 화면에 맞췄습니다</string>
+    <string name="editor_label_name">이름</string>
+    <string name="editor_label_x">X</string>
+    <string name="editor_label_y">Y</string>
+    <string name="editor_label_width">너비</string>
+    <string name="editor_label_height">높이</string>
+    <string name="editor_label_toggle">고정 (탭하면 누르고, 다시 탭하면 놓음)</string>
+    <string name="editor_toggle_off_while_pass_through">터치로 넘기기가 켜져 있는 동안 고정은 꺼집니다</string>
+    <string name="editor_label_sequence">이벤트 순서</string>
+    <string name="editor_label_sequence_empty">아직 이벤트가 없습니다. 아래에서 단계를 추가하세요.</string>
+    <string name="editor_label_step_delay">단계 후 지연 (ms)</string>
+    <string name="editor_label_control_mode">동작 모드</string>
+    <string name="editor_mode_axes">축</string>
+    <string name="editor_mode_buttons">버튼</string>
+    <string name="editor_label_invert_y">위아래 반전 (게임이 반대로 읽는 경우)</string>
+    <string name="editor_label_axis_x">X 축</string>
+    <string name="editor_label_axis_y">Y 축</string>
+    <string name="editor_label_direction_up">버튼: 위</string>
+    <string name="editor_label_direction_down">버튼: 아래</string>
+    <string name="editor_label_direction_left">버튼: 왼쪽</string>
+    <string name="editor_label_direction_right">버튼: 오른쪽</string>
+    <string name="editor_add_step">단계 추가</string>
+    <string name="editor_add_event">이벤트 추가</string>
+    <string name="editor_remove_step">단계 삭제</string>
+    <string name="editor_step_title">%d단계</string>
+    <string name="editor_pick_device">이벤트 종류</string>
+    <string name="editor_device_keyboard">키보드</string>
+    <string name="editor_device_mouse">마우스</string>
+    <string name="editor_device_gamepad">게임패드</string>
+    <string name="editor_pick_key">키</string>
+    <string name="editor_pick_button">버튼</string>
+    <string name="editor_remove_event">빼기</string>
+    <string name="editor_label_direction_action">%s 동작</string>
+    <string name="category_about">앱 정보</string>
+    <string name="title_open_source_licenses">오픈 소스 라이선스</string>
+    <string name="summary_open_source_licenses">이 앱의 라이선스와 이 앱을 구성하는 것들의 라이선스</string>
 </resources>

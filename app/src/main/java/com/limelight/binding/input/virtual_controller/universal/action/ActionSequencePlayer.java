@@ -1,0 +1,247 @@
+package com.limelight.binding.input.virtual_controller.universal.action;
+
+import android.os.Handler;
+import android.os.Looper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Turns an action sequence into host input.
+ *
+ * A press walks the steps in order, and a release undoes them in reverse order so no
+ * input is left held. Because a step can carry a delay, the steps after the first are
+ * scheduled on the main looper; each scheduled run belongs to a generation, so a release
+ * that arrives while a sequence is still running cancels what has not happened yet
+ * instead of letting it fire after the element was let go.
+ *
+ * Only the inputs this player pressed are ever released, so two elements can hold
+ * different inputs at the same time without disturbing each other.
+ */
+public class ActionSequencePlayer {
+    /**
+     * What the player needs from its owner to reach the host.
+     */
+    public interface HostInput {
+        /**
+         * Adds or removes gamepad button flags and lets the owner report the new state.
+         */
+        void setGamepadButtons(int flagsToAdd, int flagsToRemove);
+
+        /**
+         * Sets one of the analog triggers, see InputEvent.TRIGGER_*.
+         */
+        void setTrigger(int trigger, int value);
+
+        void sendMouseButton(int button, boolean down);
+
+        void sendKeyboardKey(short keyCode, boolean down);
+    }
+
+    private final HostInput host;
+
+    /**
+     * Runs the delayed steps. A layout is built on the main thread, but a caller that
+     * builds one elsewhere still gets a working player instead of an exception.
+     */
+    private final Handler handler;
+
+    private ActionSequence activeSequence;
+    private final List<InputEvent> pressedEvents = new ArrayList<>();
+    private int generation;
+
+    /**
+     * Set when the finger has been lifted while steps are still to come. A sequence is a short
+     * piece of input the user put together, so letting go of the control plays the rest of it
+     * rather than cutting it short at the step that happened to be running.
+     */
+    private boolean playingOut;
+
+    public ActionSequencePlayer(HostInput host) {
+        this.host = host;
+
+        Looper looper = Looper.myLooper();
+        this.handler = looper != null ? new Handler(looper) : new Handler(Looper.getMainLooper());
+    }
+
+    /**
+     * True while a press is running or while something it pressed is still held. A
+     * toggle element uses this to decide whether the next tap presses or releases.
+     */
+    public boolean isHolding() {
+        return !pressedEvents.isEmpty();
+    }
+
+    /**
+     * Presses the sequence. A sequence that is already held is replaced, so a repeated
+     * press event cannot leave duplicate inputs behind.
+     */
+    public void press(ActionSequence sequence) {
+        if (sequence == null || sequence.isEmpty()) {
+            return;
+        }
+
+        // Invalidate anything still scheduled before starting a new run
+        generation++;
+
+        handler.removeCallbacksAndMessages(null);
+
+        releasePressed();
+
+        activeSequence = sequence;
+        playingOut = false;
+
+        playFrom(0, generation);
+    }
+
+    /**
+     * Ends the press, letting go of what is held and playing whatever is still to come.
+     *
+     * A sequence of one step ends here, which is what makes a plain button a plain button. A
+     * sequence with steps after the running one keeps going, because a tap that only ever sent
+     * the first step of it would make the rest of it unreachable without holding the control for
+     * as long as the delays add up to.
+     */
+    public void finish() {
+        if (activeSequence == null || !hasStepsAfterRunning()) {
+            release();
+            return;
+        }
+
+        playingOut = true;
+        releasePressed();
+    }
+
+    private boolean hasStepsAfterRunning() {
+        return pendingStepIndex >= 0;
+    }
+
+    /**
+     * The step the run is waiting to play next, or -1 when nothing is waiting.
+     */
+    private int pendingStepIndex = -1;
+
+    /**
+     * Releases everything the last press sent, in reverse order.
+     */
+    public void release() {
+        // Invalidate anything still scheduled, then undo what already happened
+        generation++;
+        handler.removeCallbacksAndMessages(null);
+
+        releasePressed();
+        activeSequence = null;
+        playingOut = false;
+        pendingStepIndex = -1;
+    }
+
+    /**
+     * Stops the sequence and releases what is held. The owner calls this before it goes
+     * away, so the host is never left with a key that stays down.
+     */
+    public void cancel() {
+        release();
+    }
+
+    private void playFrom(final int stepIndex, final int runGeneration) {
+        if (runGeneration != generation || activeSequence == null) {
+            // A release happened while this run was scheduled
+            return;
+        }
+
+        if (stepIndex >= activeSequence.getSteps().size()) {
+            pendingStepIndex = -1;
+            return;
+        }
+
+        ActionStep step = activeSequence.getSteps().get(stepIndex);
+
+        for (InputEvent event : step.getEvents()) {
+            // Only an input that is not already down is pressed, so a sequence that lists
+            // the same input twice cannot press it twice.
+            if (!pressedEvents.contains(event) && applyEvent(event, true)) {
+                pressedEvents.add(event);
+            }
+        }
+
+        final long delay = Math.max(0, step.getDelayMs());
+
+        if (stepIndex + 1 < activeSequence.getSteps().size()) {
+            pendingStepIndex = stepIndex + 1;
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    playFrom(stepIndex + 1, runGeneration);
+                }
+            }, delay);
+        }
+        else if (playingOut) {
+            // Nothing is left to play, so what this step pressed is let go once its own delay is
+            // over, which is what ends a sequence that was tapped rather than held
+            pendingStepIndex = stepIndex;
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (runGeneration != generation) {
+                        return;
+                    }
+
+                    playingOut = false;
+                    pendingStepIndex = -1;
+                    releasePressed();
+                    activeSequence = null;
+                }
+            }, delay);
+        }
+    }
+
+    private void releasePressed() {
+        // Undo the presses in reverse order, which is what a user expects from a
+        // combination: the last thing that went down comes up first.
+        for (int i = pressedEvents.size() - 1; i >= 0; i--) {
+            applyEvent(pressedEvents.get(i), false);
+        }
+
+        pressedEvents.clear();
+    }
+
+    /**
+     * Sends one input to the host.
+     *
+     * @return true when the input actually reached the host, so a sequence does not record
+     *         an event it never sent
+     */
+    private boolean applyEvent(InputEvent event, boolean down) {
+        if (event.isGamepad()) {
+            int flag = event.getGamepadFlag();
+            if (flag == 0) {
+                // An unassigned button, which the editor allows as a placeholder
+                return false;
+            }
+
+            host.setGamepadButtons(down ? flag : 0, down ? 0 : flag);
+            return true;
+        }
+
+        if (event.isTrigger()) {
+            // A trigger is released by letting it back out, which is what a value of zero is
+            host.setTrigger(event.getCode(),
+                    down ? InputEvent.TRIGGER_FULLY_PULLED : 0);
+            return true;
+        }
+
+        if (event.isMouse()) {
+            host.sendMouseButton(event.getCode(), down);
+            return true;
+        }
+
+        if (event.isKeyboard()) {
+            host.sendKeyboardKey((short) event.getCode(), down);
+            return true;
+        }
+
+        return false;
+    }
+}

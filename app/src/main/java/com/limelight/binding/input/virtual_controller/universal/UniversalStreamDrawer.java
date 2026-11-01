@@ -1,0 +1,1316 @@
+package com.limelight.binding.input.virtual_controller.universal;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
+import android.util.TypedValue;
+import android.view.MotionEvent;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.ScrollView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import com.limelight.R;
+import com.limelight.preferences.PreferenceConfiguration;
+
+import java.util.List;
+
+/**
+ * The menu of a running stream, which slides in from the right.
+ *
+ * It takes the place of the back button ending the stream outright. The first press of back
+ * opens it, a press while it is open leaves the stream, and a tap outside it closes it again.
+ *
+ * While it is open a fully transparent sheet covers the whole screen. The sheet is what makes a
+ * tap outside close the menu: it swallows the touch, so the press cannot also reach the game or
+ * the on-screen controls behind it.
+ */
+public class UniversalStreamDrawer {
+    /**
+     * What the drawer needs from the stream. Everything it can do is something the stream owns.
+     */
+    public interface Host {
+        void onExitStream();
+
+        void onShowKeyboard();
+
+        /**
+         * What the touchscreen does now, one of the PreferenceConfiguration.TOUCH_MODE_ values.
+         */
+        int getTouchMode();
+
+        void onTouchModeChanged(int mode);
+
+        /**
+         * The layouts the user has made, or null when there are none.
+         */
+        List<UniversalLayoutDefinition> getLayouts();
+
+        String getSelectedLayoutId();
+
+        void onLayoutChosen(String layoutId);
+
+        /**
+         * Whether the on-screen controls are shown at all. Like the touch setting, this is
+         * remembered, so the next stream starts the same way.
+         */
+        boolean isOnScreenControlsEnabled();
+
+        void onOnScreenControlsToggled(boolean enabled);
+
+        /**
+         * The transparency of the on-screen layout, as a percentage.
+         */
+        int getLayoutOpacity();
+
+        void onLayoutOpacityChanged(int percent);
+
+        /**
+         * How far the touchscreen turns the view, or how short a push fills a stick, as a
+         * percentage of the normal amount.
+         */
+        int getSensitivity();
+
+        void onSensitivityChanged(int percent);
+
+        /**
+         * Whether the phone buzzes when the game rumbles.
+         */
+        boolean isVibrationEnabled();
+
+        void onVibrationChanged(boolean enabled);
+    }
+
+    private final Activity activity;
+    private final Host host;
+
+    private final FrameLayout root;
+    private final LinearLayout panel;
+    private final LinearLayout content;
+
+    private boolean open;
+
+    /**
+     * The row that is unfolded, or null when only the rows themselves are showing.
+     */
+    private View expandedBody;
+
+    private ImageView expandedArrow;
+
+    /**
+     * How wide the panel is: a quarter of the screen, so the game stays visible beside it.
+     */
+    private static final float WIDTH_SHARE = 0.25f;
+
+    private static final int PANEL_WIDTH_MIN_DP = 280;
+
+    /**
+     * What sits between the title of a row and what is chosen in it.
+     */
+    private static final String ROW_SEPARATOR = "   \u00b7   ";
+
+    /**
+     * The lowest transparency the slider offers. Below this the controls are hard to see at all,
+     * which makes them look broken rather than faint.
+     */
+    private static final int OPACITY_MIN = 20;
+
+    public UniversalStreamDrawer(Activity activity, FrameLayout parent, Host host) {
+        this.activity = activity;
+        this.host = host;
+
+        root = new FrameLayout(activity);
+        root.setVisibility(View.GONE);
+
+        // A sheet over everything, transparent and yet touchable: taps land here instead of on
+        // the game, and a tap here closes the menu
+        root.setBackgroundColor(0x00000000);
+        root.setClickable(true);
+        root.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hide();
+            }
+        });
+
+        panel = new LinearLayout(activity);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setBackgroundColor(0xF21A1A20);
+        panel.setClickable(true);
+
+        // The panel swallows its own taps, so pressing it does not close it through the sheet
+        panel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
+
+        content = new LinearLayout(activity);
+        content.setOrientation(LinearLayout.VERTICAL);
+
+        ScrollView scroll = new ScrollView(activity);
+        scroll.addView(content, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        panel.addView(buildTitle(), matchWidth());
+        panel.addView(scroll, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+        panel.addView(buildExitButton(), matchWidth());
+
+        buildRows();
+
+        FrameLayout.LayoutParams panelParams = new FrameLayout.LayoutParams(
+                panelWidth(), ViewGroup.LayoutParams.MATCH_PARENT);
+        panelParams.gravity = Gravity.END;
+
+        root.addView(panel, panelParams);
+        parent.addView(root, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    /**
+     * Builds the rows again, so the marks and the values follow what was chosen.
+     */
+    private void buildRows() {
+        content.removeAllViews();
+        expandedBody = null;
+        expandedArrow = null;
+
+        content.addView(buildKeyboardRow(), matchWidth());
+        content.addView(buildTouchModeRow(), matchWidth());
+
+        // How the touchpad behaves only matters while the touchpad is what the touchscreen
+        // does, so the row appears with it
+        if (PreferenceConfiguration.isTouchpadMode(host.getTouchMode())) {
+            content.addView(buildTouchpadModeRow(), matchWidth());
+        }
+
+        // How sensitive the touch is applies to a touchpad and to a stick, and to nothing else
+        if (showsSensitivity()) {
+            content.addView(buildSensitivityRow(), matchWidth());
+        }
+
+        content.addView(buildControlsRow(), matchWidth());
+        content.addView(buildLayoutRow(), matchWidth());
+        content.addView(buildOpacityRow(), matchWidth());
+        content.addView(buildExtrasRow(), matchWidth());
+    }
+
+    private int panelWidth() {
+        int screen = activity.getResources().getDisplayMetrics().widthPixels;
+        int minimum = dp(PANEL_WIDTH_MIN_DP);
+
+        return Math.max(minimum, Math.round(screen * WIDTH_SHARE));
+    }
+
+    private View buildTitle() {
+        TextView title = new TextView(activity);
+
+        title.setText(R.string.stream_menu_title);
+        title.setTextColor(0xFFF2F4F8);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f);
+        title.setPadding(dp(16), dp(16), dp(16), dp(10));
+
+        return title;
+    }
+
+    /**
+     * The row that brings up the software keyboard. It is not a choice, so it has no arrow.
+     */
+    private View buildKeyboardRow() {
+        TextView row = makePlainRow(getString(R.string.stream_menu_keyboard));
+
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hide();
+                host.onShowKeyboard();
+            }
+        });
+
+        return row;
+    }
+
+    /**
+     * A row that unfolds into what the touchscreen can do.
+     */
+    private View buildTouchModeRow() {
+        ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_touch), touchModeName());
+        RadioGroup choices = makeChoiceGroup();
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touch_off),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_OFF,
+                PreferenceConfiguration.TOUCH_MODE_OFF);
+
+        // Picking the touchpad keeps the way it behaves, so a choice made below is not thrown
+        // away by touching this row again
+        addChoice(value -> host.onTouchModeChanged(
+                        PreferenceConfiguration.isTouchpadMode(host.getTouchMode())
+                                ? host.getTouchMode() : PreferenceConfiguration.TOUCH_MODE_TRACKPAD),
+                choices, getString(R.string.stream_menu_touch_trackpad),
+                PreferenceConfiguration.isTouchpadMode(host.getTouchMode()),
+                -1);
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touch_events),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS,
+                PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS);
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touch_right_stick),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK,
+                PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK);
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touch_left_stick),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK,
+                PreferenceConfiguration.TOUCH_MODE_LEFT_STICK);
+
+        return row.withChoices(choices);
+    }
+
+    /**
+     * A row for what the touchpad does, which is offered only while the touchpad is what the
+     * touchscreen does.
+     */
+    private View buildTouchpadModeRow() {
+        ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_touchpad_mode),
+                touchpadModeName());
+        RadioGroup choices = makeChoiceGroup();
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touchpad_standard),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TRACKPAD,
+                PreferenceConfiguration.TOUCH_MODE_TRACKPAD);
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touchpad_direct),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN,
+                PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN);
+
+        addChoice(value -> host.onTouchModeChanged(value),
+                choices, getString(R.string.stream_menu_touchpad_no_clicks),
+                host.getTouchMode() == PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS,
+                PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS);
+
+        return row.withChoices(choices);
+    }
+
+    /**
+     * The switch that turns the on-screen controls off altogether, which is how the screen is
+     * seen with nothing on it.
+     */
+    private View buildControlsRow() {
+        LinearLayout row = new LinearLayout(activity);
+
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(16), dp(10), dp(14), dp(10));
+        row.setBackground(rowBackground());
+
+        TextView title = new TextView(activity);
+        title.setText(R.string.stream_menu_controls);
+        title.setTextColor(0xFFE8EAF0);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+        final android.widget.Switch toggle = new android.widget.Switch(activity);
+
+        // The mark is set before the listener is attached, so building the row does not report
+        // a change nobody made
+        toggle.setChecked(host.isOnScreenControlsEnabled());
+        toggle.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(android.widget.CompoundButton button, boolean checked) {
+                host.onOnScreenControlsToggled(checked);
+            }
+        });
+
+        // The whole row works as the switch, which is easier to hit than the switch itself
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggle.setChecked(!toggle.isChecked());
+            }
+        });
+
+        row.addView(title, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        row.addView(toggle);
+
+        return row;
+    }
+
+    /**
+     * The transparency of the on-screen layout, which is the one setting worth having at hand
+     * while playing: what reads well over one game is invisible over the next.
+     */
+    private View buildOpacityRow() {
+        LinearLayout row = new LinearLayout(activity);
+
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(16), dp(12), dp(16), dp(12));
+        row.setBackground(rowBackground());
+
+        TextView title = new TextView(activity);
+        title.setText(R.string.stream_menu_opacity);
+        title.setTextColor(0xFFE8EAF0);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+        final TextView value = new TextView(activity);
+        value.setTextColor(0xFFE8EAF0);
+        value.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        value.setText(String.valueOf(host.getLayoutOpacity()));
+        value.setMinWidth(dp(38));
+        value.setGravity(Gravity.END);
+
+        final SeekBar slider = new SeekBar(activity);
+        slider.setMax(100 - OPACITY_MIN);
+        slider.setProgress(Math.max(0, Math.min(100 - OPACITY_MIN,
+                host.getLayoutOpacity() - OPACITY_MIN)));
+        slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int percent = OPACITY_MIN + progress;
+
+                value.setText(String.valueOf(percent));
+
+                if (fromUser) {
+                    host.onLayoutOpacityChanged(percent);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        LinearLayout.LayoutParams sliderParams = new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        sliderParams.setMarginStart(dp(10));
+
+        row.addView(title, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        row.addView(slider, sliderParams);
+        row.addView(value);
+
+        return row;
+    }
+
+    /**
+     * Whether the sensitivity setting means anything for what the touchscreen is doing now.
+     */
+    private boolean showsSensitivity() {
+        int mode = host.getTouchMode();
+
+        return PreferenceConfiguration.isTouchpadMode(mode)
+                || mode == PreferenceConfiguration.TOUCH_MODE_RIGHT_STICK
+                || mode == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK;
+    }
+
+    /**
+     * How far a swipe turns the view, or how short a push fills a stick.
+     */
+    private View buildSensitivityRow() {
+        LinearLayout row = new LinearLayout(activity);
+
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(16), dp(12), dp(16), dp(12));
+        row.setBackground(rowBackground());
+
+        TextView title = new TextView(activity);
+        title.setText(R.string.stream_menu_sensitivity);
+        title.setTextColor(0xFFE8EAF0);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+        final TextView value = new TextView(activity);
+        value.setTextColor(0xFFE8EAF0);
+        value.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        value.setText(String.valueOf(host.getSensitivity()));
+        value.setMinWidth(dp(38));
+        value.setGravity(Gravity.END);
+
+        final SeekBar slider = new SeekBar(activity);
+        slider.setMax(PreferenceConfiguration.SENSITIVITY_MAX - PreferenceConfiguration.SENSITIVITY_MIN);
+        slider.setProgress(Math.max(0, Math.min(slider.getMax(),
+                host.getSensitivity() - PreferenceConfiguration.SENSITIVITY_MIN)));
+        slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int percent = PreferenceConfiguration.SENSITIVITY_MIN + progress;
+
+                value.setText(String.valueOf(percent));
+
+                if (fromUser) {
+                    host.onSensitivityChanged(percent);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        LinearLayout.LayoutParams sliderParams = new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        sliderParams.setMarginStart(dp(10));
+
+        row.addView(title, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        row.addView(slider, sliderParams);
+        row.addView(value);
+
+        return row;
+    }
+
+    /**
+     * A row that unfolds into the layouts the user has made, with the choice to have none at all.
+     */
+    private View buildLayoutRow() {
+        ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_layout),
+                selectedLayoutName());
+        RadioGroup choices = makeChoiceGroup();
+
+        List<UniversalLayoutDefinition> layouts = host.getLayouts();
+        String selectedId = host.getSelectedLayoutId();
+
+        if (layouts != null) {
+            for (final UniversalLayoutDefinition layout : layouts) {
+                RadioButton choice = addPlainChoice(choices, layout.getName(),
+                        layout.getId().equals(selectedId));
+
+                choice.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        host.onLayoutChosen(layout.getId());
+
+                        // The list folds away and the row shows the new layout, while the menu
+                        // stays open
+                        buildRows();
+                    }
+                });
+            }
+        }
+
+        return row.withChoices(choices);
+    }
+
+    private View buildExitButton() {
+        Button exit = new Button(activity);
+
+        exit.setText(R.string.stream_menu_exit);
+        exit.setAllCaps(false);
+        exit.setTextColor(0xFFFF7B72);
+        exit.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+        exit.setPadding(dp(8), dp(12), dp(8), dp(12));
+
+        GradientDrawable shape = new GradientDrawable();
+        shape.setColor(0x2EFF5A50);
+        shape.setCornerRadius(dp(8));
+        shape.setStroke(Math.max(1, dp(1) / 2), 0x66FF6B60);
+
+        LinearLayout.LayoutParams params = matchWidth();
+        params.setMargins(dp(12), dp(10), dp(12), dp(14));
+        exit.setBackground(shape);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                host.onExitStream();
+            }
+        });
+
+        LinearLayout holder = new LinearLayout(activity);
+        holder.setOrientation(LinearLayout.VERTICAL);
+        holder.addView(exit, params);
+
+        return holder;
+    }
+
+    /**
+     * The last accordion of the menu, for options that do not belong to a control or a layout.
+     */
+    private View buildExtrasRow() {
+        ExpandableRow row = makeExpandableRow(getString(R.string.stream_menu_extras), null);
+        LinearLayout body = new LinearLayout(activity);
+
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.setVisibility(View.GONE);
+
+        LinearLayout vibration = new LinearLayout(activity);
+        vibration.setOrientation(LinearLayout.HORIZONTAL);
+        vibration.setGravity(Gravity.CENTER_VERTICAL);
+        vibration.setPadding(dp(24), dp(10), dp(14), dp(10));
+        vibration.setBackground(rowBackground());
+
+        TextView title = new TextView(activity);
+        title.setText(R.string.stream_menu_vibration);
+        title.setTextColor(0xFFD8DBE2);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+        final android.widget.Switch toggle = new android.widget.Switch(activity);
+
+        // The mark is set before the listener is attached, so building the row does not report a
+        // change nobody made
+        toggle.setChecked(host.isVibrationEnabled());
+        toggle.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(android.widget.CompoundButton button, boolean checked) {
+                host.onVibrationChanged(checked);
+            }
+        });
+
+        // The whole line works as the switch
+        vibration.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggle.setChecked(!toggle.isChecked());
+            }
+        });
+
+        vibration.addView(title, new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        vibration.addView(toggle);
+
+        body.addView(vibration, matchWidth());
+        return row.withBody(body);
+    }
+
+    /**
+     * A row with nothing to unfold.
+     */
+    private TextView makePlainRow(String title) {
+        TextView row = new TextView(activity);
+
+        row.setText(title);
+        row.setTextColor(0xFFE8EAF0);
+        row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+        row.setPadding(dp(16), dp(14), dp(16), dp(14));
+        row.setBackground(rowBackground());
+
+        return row;
+    }
+
+    /**
+     * A row with the chosen value and an arrow at its right edge.
+     */
+    private ExpandableRow makeExpandableRow(String title, String value) {
+        return new ExpandableRow(title, value);
+    }
+
+    /**
+     * A row that can be unfolded, and the list that belongs to it.
+     */
+    private final class ExpandableRow {
+        private final LinearLayout row;
+        private final ImageView arrow;
+
+        ExpandableRow(String title, String value) {
+            row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(dp(16), dp(14), dp(14), dp(14));
+            row.setBackground(rowBackground());
+
+            TextView titleView = new TextView(activity);
+            titleView.setText(value == null || value.isEmpty()
+                    ? title : title + ROW_SEPARATOR + value);
+            titleView.setTextColor(0xFFE8EAF0);
+            titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+
+            arrow = new ImageView(activity);
+            arrow.setImageResource(R.drawable.ic_expand_more);
+            arrow.setAlpha(0.75f);
+
+            LinearLayout.LayoutParams arrowParams = new LinearLayout.LayoutParams(dp(18), dp(18));
+            arrowParams.setMarginStart(dp(8));
+
+            row.addView(titleView, new LinearLayout.LayoutParams(0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            row.addView(arrow, arrowParams);
+        }
+
+        /**
+         * Returns the row together with its list, and arranges for the arrow to unfold it.
+         */
+        View withChoices(final RadioGroup choices) {
+            return withBody(choices);
+        }
+
+        /**
+         * The same, for an accordion whose body is not a list of choices.
+         */
+        View withBody(final View body) {
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    unfold(body, arrow);
+                }
+            });
+
+            LinearLayout holder = new LinearLayout(activity);
+            holder.setOrientation(LinearLayout.VERTICAL);
+            holder.addView(row, matchWidth());
+            holder.addView(body, matchWidth());
+
+            return holder;
+        }
+    }
+
+    private Drawable rowBackground() {
+        StateListDrawable states = new StateListDrawable();
+
+        GradientDrawable pressed = new GradientDrawable();
+        pressed.setColor(0x3DFFFFFF);
+
+        GradientDrawable normal = new GradientDrawable();
+        normal.setColor(0x14FFFFFF);
+
+        states.addState(new int[]{android.R.attr.state_pressed}, pressed);
+        states.addState(new int[]{}, normal);
+
+        return states;
+    }
+
+    /**
+     * The list of choices of one row.
+     *
+     * All the choices of a row go into one group, which is what makes them exclusive: a group of
+     * one per choice would leave every choice the user has ever pressed looking as if it were
+     * still on.
+     */
+    private RadioGroup makeChoiceGroup() {
+        RadioGroup group = new RadioGroup(activity);
+
+        group.setOrientation(RadioGroup.VERTICAL);
+        group.setVisibility(View.GONE);
+
+        return group;
+    }
+
+    /**
+     * Adds one choice.
+     *
+     * Choosing reports what was chosen and then rebuilds the rows, which folds the list away and
+     * puts the new value on its row. The menu itself stays open: a setting changed here is
+     * usually followed by another.
+     */
+    private RadioButton addChoice(final java.util.function.IntConsumer settle,
+                                  RadioGroup group, String label, boolean checked, int tagValue) {
+        RadioButton choice = new RadioButton(activity);
+
+        choice.setText(label);
+        choice.setTextColor(0xFFD8DBE2);
+        choice.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        choice.setPadding(dp(24), dp(4), dp(12), dp(4));
+        choice.setTag(tagValue);
+
+        // The mark is set before the listener is attached, so building the row does not report a
+        // choice nobody made
+        choice.setChecked(checked);
+
+        choice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Object tag = view.getTag();
+
+                settle.accept(tag instanceof Integer ? (Integer) tag : 0);
+                buildRows();
+            }
+        });
+
+        group.addView(choice, matchWidth());
+        return choice;
+    }
+
+    /**
+     * Adds a choice that does its own work, such as picking a layout.
+     */
+    private RadioButton addPlainChoice(RadioGroup group, String label, boolean checked) {
+        RadioButton choice = new RadioButton(activity);
+
+        choice.setText(label);
+        choice.setTextColor(0xFFD8DBE2);
+        choice.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        choice.setPadding(dp(24), dp(4), dp(12), dp(4));
+        choice.setChecked(checked);
+
+        group.addView(choice, matchWidth());
+        return choice;
+    }
+
+    /**
+     * Opens one of the rows and closes whichever other row was open, so only one list is out at
+     * a time. The arrow turns over while its list is showing.
+     */
+    private void unfold(View body, ImageView arrow) {
+        boolean wasOpen = body.getVisibility() == View.VISIBLE;
+
+        if (expandedBody != null && expandedBody != body) {
+            expandedBody.setVisibility(View.GONE);
+
+            if (expandedArrow != null) {
+                expandedArrow.setRotation(0f);
+            }
+        }
+
+        body.setVisibility(wasOpen ? View.GONE : View.VISIBLE);
+        arrow.setRotation(wasOpen ? 0f : 180f);
+
+        expandedBody = wasOpen ? null : body;
+        expandedArrow = wasOpen ? null : arrow;
+    }
+
+    private String touchModeName() {
+        int mode = host.getTouchMode();
+
+        if (mode == PreferenceConfiguration.TOUCH_MODE_OFF) {
+            return getString(R.string.stream_menu_touch_off);
+        }
+
+        // Every kind of touchpad is one entry of this row; what it does is the row below it
+        if (PreferenceConfiguration.isTouchpadMode(mode)) {
+            return getString(R.string.stream_menu_touch_trackpad);
+        }
+
+        if (mode == PreferenceConfiguration.TOUCH_MODE_TOUCH_EVENTS) {
+            return getString(R.string.stream_menu_touch_events);
+        }
+
+        if (mode == PreferenceConfiguration.TOUCH_MODE_LEFT_STICK) {
+            return getString(R.string.stream_menu_touch_left_stick);
+        }
+
+        return getString(R.string.stream_menu_touch_right_stick);
+    }
+
+    /**
+     * What the touchpad is set to do.
+     */
+    private String touchpadModeName() {
+        int mode = host.getTouchMode();
+
+        if (mode == PreferenceConfiguration.TOUCH_MODE_TOUCHSCREEN) {
+            return getString(R.string.stream_menu_touchpad_direct);
+        }
+
+        if (mode == PreferenceConfiguration.TOUCH_MODE_TRACKPAD_NO_CLICKS) {
+            return getString(R.string.stream_menu_touchpad_no_clicks);
+        }
+
+        return getString(R.string.stream_menu_touchpad_standard);
+    }
+
+    private String selectedLayoutName() {
+        List<UniversalLayoutDefinition> layouts = host.getLayouts();
+        String selectedId = host.getSelectedLayoutId();
+
+        if (layouts != null) {
+            for (UniversalLayoutDefinition layout : layouts) {
+                if (layout.getId().equals(selectedId)) {
+                    return layout.getName();
+                }
+            }
+        }
+
+        return "";
+    }
+
+    private LinearLayout.LayoutParams matchWidth() {
+        return new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    private int dp(int value) {
+        return Math.round(value * activity.getResources().getDisplayMetrics().density);
+    }
+
+    private String getString(int id) {
+        return activity.getString(id);
+    }
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void show() {
+        if (open) {
+            return;
+        }
+
+        // The rows are rebuilt on every opening, so the marks and the values are what they are
+        // now, whatever changed them in between
+        buildRows();
+
+        open = true;
+        root.setVisibility(View.VISIBLE);
+
+        // The on-screen controls live in the same layout and are added again whenever the layout
+        // is rebuilt, so the menu asks to be on top rather than assuming it still is
+        root.bringToFront();
+
+        // Slides in from the edge of the screen
+        panel.setTranslationX(panelWidth());
+        panel.animate().translationX(0f).setDuration(180).start();
+    }
+
+    /**
+     * Puts the menu above everything else in its layout.
+     */
+    public void bringToFront() {
+        root.bringToFront();
+    }
+
+    public void hide() {
+        if (!open) {
+            return;
+        }
+
+        open = false;
+        collapse();
+
+        panel.animate().translationX(panelWidth()).setDuration(150)
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        root.setVisibility(View.GONE);
+                    }
+                })
+                .start();
+    }
+
+    /**
+     * Handles the back button.
+     *
+     * @return true when the drawer used the press
+     */
+    public boolean handleBack() {
+        if (open) {
+            // The menu is already open, so back means what it says at the bottom of it
+            host.onExitStream();
+            return true;
+        }
+
+        show();
+        return true;
+    }
+
+    private void close() {
+        collapse();
+        hide();
+    }
+
+    private void collapse() {
+        if (expandedBody != null) {
+            expandedBody.setVisibility(View.GONE);
+            expandedBody = null;
+        }
+
+        if (expandedArrow != null) {
+            expandedArrow.setRotation(0f);
+            expandedArrow = null;
+        }
+    }
+
+    /**
+     * Puts the menu in place with no animation, for the debug smoke test, which draws it into a
+     * picture rather than onto the screen.
+     */
+    public void settleForTesting() {
+        open = true;
+        root.setVisibility(View.VISIBLE);
+        panel.setTranslationX(0f);
+    }
+
+    /**
+     * Drags the sensitivity slider the way a finger does, for the debug smoke test.
+     */
+    public boolean dragSensitivityToForTesting(int percent) {
+        SeekBar slider = getSliderForTesting(getString(R.string.stream_menu_sensitivity));
+
+        return dragSliderForTesting(slider, percent,
+                PreferenceConfiguration.SENSITIVITY_MIN, PreferenceConfiguration.SENSITIVITY_MAX);
+    }
+
+    /**
+     * Drags the opacity slider the way a finger does, for the debug smoke test.
+     *
+     * Setting the progress of a slider reports a change that came from the code rather than
+     * from the user, which is deliberately not passed on, so a check has to touch it.
+     */
+    public boolean dragOpacityToForTesting(int percent) {
+        return dragSliderForTesting(getSliderForTesting(getString(R.string.stream_menu_opacity)),
+                percent, OPACITY_MIN, 100);
+    }
+
+    private boolean dragSliderForTesting(SeekBar slider, int percent, int min, int max) {
+        if (slider == null || slider.getWidth() <= 0) {
+            return false;
+        }
+
+        int wanted = Math.max(min, Math.min(max, percent));
+        int wantedProgress = Math.max(0, Math.min(slider.getMax(), wanted - min));
+
+        // The track of a slider starts and ends half a thumb in from its edges, so a touch aimed
+        // at a value has to be placed inside that, or it lands near the value instead of on it
+        int thumb = slider.getThumb() == null ? 0 : slider.getThumb().getBounds().width();
+        float track = Math.max(1, slider.getWidth() - thumb);
+
+        float x = thumb / 2f + track * wantedProgress / (float) Math.max(1, slider.getMax());
+        float y = slider.getHeight() / 2f;
+        long now = android.os.SystemClock.uptimeMillis();
+
+        // A slider that sits in a scrolling area only follows the finger once it has moved far
+        // enough to count as a drag, and a jump is not the same as a drag, so the finger is walked
+        // onto the value in small steps
+        float startX = Math.max(0, x - 60);
+        long time = now;
+
+        MotionEvent down = MotionEvent.obtain(time, time, MotionEvent.ACTION_DOWN, startX, y, 0);
+        slider.dispatchTouchEvent(down);
+        down.recycle();
+
+        int steps = 8;
+
+        for (int step = 1; step <= steps; step++) {
+            float stepX = startX + (x - startX) * step / (float) steps;
+
+            time = now + 16L * step;
+
+            MotionEvent move = MotionEvent.obtain(time, time, MotionEvent.ACTION_MOVE, stepX, y, 0);
+            slider.dispatchTouchEvent(move);
+            move.recycle();
+        }
+
+        MotionEvent up = MotionEvent.obtain(time, time, MotionEvent.ACTION_UP, x, y, 0);
+        slider.dispatchTouchEvent(up);
+        up.recycle();
+
+        return true;
+    }
+
+    /**
+     * Presses the row with this title, for the debug smoke test.
+     */
+    public boolean clickRowForTesting(String title) {
+        View row = findRow(content, title, true);
+
+        if (row == null) {
+            return false;
+        }
+
+        row.performClick();
+        return true;
+    }
+
+    /**
+     * The slider of the row with this label, for the debug smoke test.
+     */
+    public SeekBar getSliderForTesting(String label) {
+        View title = findText(content, label);
+
+        if (!(title instanceof TextView) || !(((TextView) title).getParent() instanceof ViewGroup)) {
+            return null;
+        }
+
+        ViewGroup row = (ViewGroup) ((TextView) title).getParent();
+
+        for (int i = 0; i < row.getChildCount(); i++) {
+            if (row.getChildAt(i) instanceof SeekBar) {
+                return (SeekBar) row.getChildAt(i);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Presses the switch that sits in the row with this label, for the debug smoke test.
+     */
+    public boolean clickSwitchInRowForTesting(String label) {
+        View title = findText(content, label);
+
+        if (!(title instanceof TextView) || !(((TextView) title).getParent() instanceof ViewGroup)) {
+            return false;
+        }
+
+        ViewGroup row = (ViewGroup) ((TextView) title).getParent();
+
+        for (int i = 0; i < row.getChildCount(); i++) {
+            if (row.getChildAt(i) instanceof android.widget.Switch) {
+                row.getChildAt(i).performClick();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private View findText(ViewGroup group, String label) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof TextView && !(child instanceof RadioButton)
+                    && ((TextView) child).getText().toString().equals(label)) {
+                return child;
+            }
+
+            if (child instanceof ViewGroup) {
+                View found = findText((ViewGroup) child, label);
+
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Presses the choice with this label, for the debug smoke test.
+     */
+    public boolean clickChoiceForTesting(String label) {
+        View choice = findRow(content, label, false);
+
+        if (choice == null) {
+            return false;
+        }
+
+        choice.performClick();
+        return true;
+    }
+
+    private View findRow(ViewGroup group, String label, boolean row) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof TextView) {
+                String text = ((TextView) child).getText().toString();
+
+                if (row && text.startsWith(label + ROW_SEPARATOR)) {
+                    return (View) child.getParent();
+                }
+
+                if (row && text.equals(label) && !(child instanceof RadioButton)) {
+                    // A row with nothing unfolded and no value. It may be the title itself that
+                    // is pressed, or the line around it, which is what makes a switch easier to
+                    // hit than the switch alone.
+                    View pressable = child;
+
+                    while (pressable != null && !pressable.isClickable()
+                            && pressable != content) {
+                        android.view.ViewParent parent = pressable.getParent();
+                        pressable = parent instanceof View ? (View) parent : null;
+                    }
+
+                    if (pressable != null && pressable.isClickable() && pressable != content) {
+                        return pressable;
+                    }
+                }
+
+                if (!row && child instanceof RadioButton && text.equals(label)) {
+                    return child;
+                }
+            }
+
+            if (child instanceof ViewGroup) {
+                View found = findRow((ViewGroup) child, label, row);
+
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The button that leaves the stream, for the debug smoke test.
+     */
+    public Button getExitButtonForTesting() {
+        return findButton(panel);
+    }
+
+    private Button findButton(ViewGroup group) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            // A radio button is a button as far as Java is concerned, so the choices of a row
+            // would be mistaken for this one without the second test
+            if (child instanceof Button && !(child instanceof android.widget.CompoundButton)) {
+                return (Button) child;
+            }
+
+            if (child instanceof ViewGroup) {
+                Button found = findButton((ViewGroup) child);
+
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The arrow of a row, for the debug smoke test.
+     */
+    public ImageView getArrowForTesting(String title) {
+        View row = findRow(content, title, true);
+
+        if (!(row instanceof ViewGroup)) {
+            return null;
+        }
+
+        ViewGroup group = (ViewGroup) row;
+
+        for (int i = group.getChildCount() - 1; i >= 0; i--) {
+            if (group.getChildAt(i) instanceof ImageView) {
+                return (ImageView) group.getChildAt(i);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The labels of the choices of a row, for the debug smoke test.
+     */
+    public List<String> getChoiceLabelsForTesting(String title) {
+        List<String> labels = new java.util.ArrayList<>();
+        View row = findRow(content, title, true);
+
+        if (row instanceof ViewGroup && ((ViewGroup) row).getParent() instanceof ViewGroup) {
+            collectChoices((ViewGroup) ((ViewGroup) row).getParent(), labels);
+        }
+
+        return labels;
+    }
+
+    private void collectChoices(ViewGroup group, List<String> labels) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof RadioButton) {
+                labels.add(((RadioButton) child).getText().toString());
+            }
+            else if (child instanceof ViewGroup) {
+                collectChoices((ViewGroup) child, labels);
+            }
+        }
+    }
+
+    /**
+     * How many groups the choices of a row are spread over. One is what makes them exclusive.
+     */
+    public int getChoiceGroupsForTesting(String title) {
+        View row = findRow(content, title, true);
+
+        if (!(row instanceof ViewGroup) || !(((ViewGroup) row).getParent() instanceof ViewGroup)) {
+            return 0;
+        }
+
+        ViewGroup holder = (ViewGroup) ((ViewGroup) row).getParent();
+        int groups = 0;
+
+        for (int i = 0; i < holder.getChildCount(); i++) {
+            if (holder.getChildAt(i) instanceof RadioGroup) {
+                groups++;
+            }
+        }
+
+        return groups;
+    }
+
+    /**
+     * How many choices of a row are marked. Only ever one.
+     */
+    public int getMarkedChoicesForTesting(String title) {
+        View row = findRow(content, title, true);
+
+        if (!(row instanceof ViewGroup) || !(((ViewGroup) row).getParent() instanceof ViewGroup)) {
+            return -1;
+        }
+
+        return countChecked((ViewGroup) ((ViewGroup) row).getParent());
+    }
+
+    private int countChecked(ViewGroup group) {
+        int checked = 0;
+
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof RadioButton && ((RadioButton) child).isChecked()) {
+                checked++;
+            }
+            else if (child instanceof ViewGroup) {
+                checked += countChecked((ViewGroup) child);
+            }
+        }
+
+        return checked;
+    }
+
+    /**
+     * The rows of the menu, for the debug smoke test and for checking that nothing was missed.
+     */
+    public List<String> getRowTitlesForTesting() {
+        List<String> titles = new java.util.ArrayList<>();
+
+        collectRows(content, titles);
+        return titles;
+    }
+
+    private void collectRows(ViewGroup group, List<String> titles) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+
+            if (child instanceof TextView && !(child instanceof RadioButton)
+                    && !(child instanceof Button)) {
+                titles.add(((TextView) child).getText().toString());
+            }
+            else if (child instanceof ViewGroup) {
+                collectRows((ViewGroup) child, titles);
+            }
+        }
+    }
+
+    /**
+     * The view the menu is built on, so a test can look at it on screen.
+     */
+    public View getView() {
+        return root;
+    }
+
+    public View getSheetForTesting() {
+        return root;
+    }
+
+    public Context getContext() {
+        return activity;
+    }
+}
