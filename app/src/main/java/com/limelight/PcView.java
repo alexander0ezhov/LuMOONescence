@@ -162,12 +162,20 @@ public class PcView extends Activity implements AdapterFragmentCallbacks {
                 HelpLauncher.launchSetupGuide(PcView.this);
             }
         });
-        layoutsButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(PcView.this, UniversalLayoutsActivity.class));
-            }
-        });
+        // A layout that does not carry this button must not bring the whole screen down: the
+        // landscape layout went without it in 1.0.0, and every tablet that opened the app in
+        // landscape crashed before it drew anything.
+        if (layoutsButton != null) {
+            layoutsButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(PcView.this, UniversalLayoutsActivity.class));
+                }
+            });
+        }
+        else {
+            android.util.Log.w("PcView", "The layouts button is missing from this layout");
+        }
 
         // Amazon review didn't like the help button because the wiki was not entirely
         // navigable via the Fire TV remote (though the relevant parts were). Let's hide

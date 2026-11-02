@@ -712,6 +712,7 @@ public class LayoutSmokeActivity extends Activity {
         checkLabelSizes();
         checkImportIsBounded();
         checkDelayedSequence();
+        checkEveryPcViewLayoutHasItsButtons();
         checkANewLayoutStartsEmpty();
         checkTheShippedArrangementIsPreinstalled();
     }
@@ -4651,6 +4652,40 @@ public class LayoutSmokeActivity extends Activity {
         check("a tap lets go of the first step at once", tapped.contains("key 65 down=false"));
         check("a tap still plays the step after the delay", tapped.contains("key 66 down=true"));
         check("a tap lets go of the last step", tapped.contains("key 66 down=false"));
+    }
+
+    /**
+     * Every layout of the PC screen has to carry the same buttons.
+     *
+     * A button that was added to the portrait layout only took the whole screen down in
+     * landscape, on a tablet, before it had drawn anything: the code that sets its listener had
+     * nothing to set it on.
+     */
+    private void checkEveryPcViewLayoutHasItsButtons() {
+        int[] ids = {R.id.settingsButton, R.id.manuallyAddPc, R.id.helpButton,
+                R.id.layoutsButton};
+
+        int[] orientations = {android.content.res.Configuration.ORIENTATION_PORTRAIT,
+                android.content.res.Configuration.ORIENTATION_LANDSCAPE};
+
+        String[] names = {"portrait", "landscape"};
+
+        for (int i = 0; i < orientations.length; i++) {
+            android.content.res.Configuration configuration =
+                    new android.content.res.Configuration(getResources().getConfiguration());
+            configuration.orientation = orientations[i];
+
+            android.content.Context context = createConfigurationContext(configuration);
+            android.view.View view = android.view.LayoutInflater.from(context)
+                    .inflate(R.layout.activity_pc_view, null);
+
+            for (int id : ids) {
+                String name = context.getResources().getResourceEntryName(id);
+
+                check("the " + names[i] + " PC screen has " + name,
+                        view.findViewById(id) != null);
+            }
+        }
     }
 
     /**
