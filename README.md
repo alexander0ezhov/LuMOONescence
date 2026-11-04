@@ -157,7 +157,19 @@ and older devices that need the rooted input driver; on newer devices it is not 
 ## Support the author
 
 The project is free, open source, and stays that way — nothing is behind a paywall and nothing will
-be. If you feel like saying thanks anyway, a voluntary transfer is welcome:
+be. If you feel like saying thanks anyway, a voluntary transfer is welcome.
+
+**Ozon Bank (SBP, tips)** — no card details to type, just scan the code with a banking app:
+
+<p align="center">
+  <img src="docs/screenshots/ozon-qr.png" alt="QR code for a transfer through Ozon Bank" width="240">
+</p>
+
+<p align="center">
+  <a href="https://finance.ozon.ru/apps/sbp/ozonbankpay/01a1a460-5092-7115-bde0-b09f11921a3b">Open in the banking app</a>
+</p>
+
+**YooMoney** — a transfer by link:
 
 <p align="center">
   <a href="https://yoomoney.ru/to/4100119676114070"><img alt="Support the author" src="https://img.shields.io/badge/Support%20the%20author-YooMoney-8b3ffd"></a>
@@ -167,8 +179,8 @@ be. If you feel like saying thanks anyway, a voluntary transfer is welcome:
   <code>https://yoomoney.ru/to/4100119676114070</code>
 </p>
 
-There is also a [support page](https://alexander0ezhov.github.io/LuMOONescence/donate.html) with the
-same transfer and the YooMoney widget.
+There is also a [support page](https://alexander0ezhov.github.io/LuMOONescence/donate.html) with both
+of them in one place.
 
 **This is a gift.** The transfer is voluntary and without any obligation: it is not a payment for a
 product, a service or a subscription, and it gives no extra features, priorities or advantages.

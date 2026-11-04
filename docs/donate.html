@@ -68,6 +68,10 @@
   footer a { color: var(--muted); }
   hr { border: 0; border-top: 1px solid var(--edge); margin: 26px 0; }
   .en { color: var(--muted); font-size: 14px; }
+  .qr { text-align: center; margin: 14px 0 10px; }
+  .qr img { border-radius: 12px; background: #fff; padding: 8px; }
+  .center { text-align: center; margin: 0; }
+  h2.left { text-align: left; margin-bottom: 12px; }
 </style>
 </head>
 <body>
@@ -75,10 +79,19 @@
   <header>
     <img src="screenshots/logo.png" alt="LuMOONescence">
     <h1>Поддержать автора</h1>
-    <p class="sub">Добровольный перевод на YooMoney</p>
+    <p class="sub">Добровольный перевод: СБП по QR-коду или YooMoney</p>
   </header>
 
+  <div class="card">
+    <h2>Озон Банк — по QR-коду</h2>
+    <p>Данные карты вводить не нужно: отсканируйте код банковским приложением или откройте ссылку,
+      если страница открыта на телефоне с Озон Банком.</p>
+    <p class="qr"><img src="screenshots/ozon-qr.png" alt="QR-код для перевода через Озон Банк" width="260" height="260"></p>
+    <p class="center"><a class="link" href="https://finance.ozon.ru/apps/sbp/ozonbankpay/01a1a460-5092-7115-bde0-b09f11921a3b">Открыть в приложении банка</a></p>
+  </div>
+
   <div class="card widget">
+    <h2 class="left">YooMoney</h2>
     <iframe src="https://yoomoney.ru/quickpay/fundraise/widget?billNumber=1LB2TR27UFF.261104&"
             width="500" height="480" allowtransparency="true" scrolling="no"
             title="Поддержать автора — YooMoney"></iframe>
