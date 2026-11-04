@@ -167,7 +167,7 @@ APK появится в `app/build/outputs/apk/nonRoot/release/`. Флейвор
   <code>https://yoomoney.ru/to/4100119676114070</code>
 </p>
 
-Есть и [страница поддержки](https://alexander0ezhov.github.io/moonlight-android/donate.html) — с тем же
+Есть и [страница поддержки](https://alexander0ezhov.github.io/LuMOONescence/donate.html) — с тем же
 переводом и виджетом ЮMoney.
 
 **Это подарок.** Перевод добровольный и безвозмездный: он не является оплатой товара, услуги или

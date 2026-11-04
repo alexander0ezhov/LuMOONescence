@@ -167,7 +167,7 @@ be. If you feel like saying thanks anyway, a voluntary transfer is welcome:
   <code>https://yoomoney.ru/to/4100119676114070</code>
 </p>
 
-There is also a [support page](https://alexander0ezhov.github.io/moonlight-android/donate.html) with the
+There is also a [support page](https://alexander0ezhov.github.io/LuMOONescence/donate.html) with the
 same transfer and the YooMoney widget.
 
 **This is a gift.** The transfer is voluntary and without any obligation: it is not a payment for a
