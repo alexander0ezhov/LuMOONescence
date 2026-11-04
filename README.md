@@ -159,14 +159,14 @@ and older devices that need the rooted input driver; on newer devices it is not 
 The project is free, open source, and stays that way — nothing is behind a paywall and nothing will
 be. If you feel like saying thanks anyway, a voluntary transfer is welcome.
 
-**Ozon Bank (SBP, tips)** — no card details to type, just scan the code with a banking app:
+**Ozon Bank (SBP, tips)**
 
 <p align="center">
-  <img src="docs/screenshots/ozon-qr.png" alt="QR code for a transfer through Ozon Bank" width="240">
+  <img src="docs/screenshots/ozon-qr.png" alt="QR code for a transfer through Ozon Bank" width="200">
 </p>
 
 <p align="center">
-  <a href="https://finance.ozon.ru/apps/sbp/ozonbankpay/01a1a460-5092-7115-bde0-b09f11921a3b">Open in the banking app</a>
+  <a href="https://finance.ozon.ru/apps/sbp/ozonbankpay/01a1a460-5092-7115-bde0-b09f11921a3b">Go to the transfer page</a>
 </p>
 
 **YooMoney** — a transfer by link:

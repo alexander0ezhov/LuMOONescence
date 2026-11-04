@@ -159,15 +159,14 @@ APK появится в `app/build/outputs/apk/nonRoot/release/`. Флейвор
 Проект бесплатный, с открытым кодом, и таким останется: ничего не спрятано за оплатой и не будет
 спрятано. Если всё же хочется сказать спасибо — добровольный перевод приветствуется.
 
-**Озон Банк (СБП, «чаевые»)** — данные карты вводить не нужно, достаточно отсканировать код
-банковским приложением:
+**Озон Банк (СБП, «чаевые»)**
 
 <p align="center">
-  <img src="docs/screenshots/ozon-qr.png" alt="QR-код для перевода через Озон Банк" width="240">
+  <img src="docs/screenshots/ozon-qr.png" alt="QR-код для перевода через Озон Банк" width="200">
 </p>
 
 <p align="center">
-  <a href="https://finance.ozon.ru/apps/sbp/ozonbankpay/01a1a460-5092-7115-bde0-b09f11921a3b">Открыть в приложении банка</a>
+  <a href="https://finance.ozon.ru/apps/sbp/ozonbankpay/01a1a460-5092-7115-bde0-b09f11921a3b">Перейти на страницу с переводом</a>
 </p>
 
 **YooMoney** — перевод по ссылке:
@@ -180,8 +179,7 @@ APK появится в `app/build/outputs/apk/nonRoot/release/`. Флейвор
   <code>https://yoomoney.ru/to/4100119676114070</code>
 </p>
 
-Есть и [страница поддержки](https://alexander0ezhov.github.io/LuMOONescence/donate.html) — оба способа
-в одном месте.
+[Страница поддержки](https://alexander0ezhov.github.io/LuMOONescence/donate.html)
 
 **Это подарок.** Перевод добровольный и безвозмездный: он не является оплатой товара, услуги или
 подписки и не даёт дополнительных функций, приоритетов или преимуществ. Переводить или нет и
