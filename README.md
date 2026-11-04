@@ -2,7 +2,11 @@
   <img src="docs/screenshots/logo.png" alt="LuMOONescence" width="720">
 </p>
 
-<h3 align="center">Your Android phone is the keyboard, the mouse and the gamepad for your PC.</h3>
+<p align="center">
+  <b>English</b> · <a href="README.ru.md">Русский</a>
+</p>
+
+<h3 align="center">Your smartphone is the one device you need to run your PC: a keyboard, a mouse and a gamepad in one.</h3>
 
 <p align="center">
   <a href="LICENSE.txt"><img alt="License: GPL v3" src="https://img.shields.io/badge/license-GPLv3-2f6bd8"></a>
@@ -15,52 +19,53 @@
   <img src="docs/screenshots/game.jpg" alt="A game being played with an on-screen layout of buttons and sticks">
 </p>
 
-**LuMOONescence** mirrors your Windows PC to your phone and gives you the controls to actually use it.
-It is a streaming client for a desktop and for the games on it, with an on-screen layout you design
-yourself: gamepad buttons, a full PC keyboard, mouse buttons, a trackpad, analog sticks — whatever
-the thing you are doing needs.
+**LuMOONescence** mirrors your PC on your phone and gives you controls that are actually usable. It is
+a streaming client for a desktop and for the games on it, with on-screen layouts you arrange
+yourself: gamepad buttons, PC keys, mouse buttons, a trackpad, sticks, native touch input — or all of
+them at once. Whatever the thing you are doing needs.
 
-There is nothing else to buy or carry. An Android device with a touchscreen is the whole controller.
+There is no pile of devices to carry around any more. An Android phone with a touchscreen is the
+whole controller.
 
 > Based on [Moonlight for Android](https://github.com/moonlight-stream/moonlight-android), which is
 > free software under the GPLv3. This is an independent project, not an official Moonlight build.
 
 ---
 
-## Why a phone is enough
+## What you can do
 
 | What you want to do | How it works here |
 |---|---|
-| Use the desktop of the PC | Trackpad, direct cursor, or a real on-screen PC keyboard with mouse buttons |
-| Play a game built for a gamepad | A layout of buttons and sticks over the video, drawn where your thumbs already are |
-| Play a shooter built for keyboard and mouse | Keys on the left, mouse buttons on the right — with a hold-and-drag fire button |
-| Set something up in the BIOS or launcher | The same, before anything is even running on the host |
-| Have a different layout per game | Layout sets, chosen in the menu or from the layouts screen, switched mid-stream |
+| Actually work on the PC | Trackpad, native touch input, text from the Android keyboard — or a real on-screen PC keyboard with mouse buttons |
+| Play games made for a gamepad | Buttons and sticks over the stream, drawn where your thumbs already are |
+| Play shooters built for keyboard and mouse | Keys and mouse buttons, with a hold-and-drag mode: fire and aim with one thumb at the same time |
+| Have a different layout per game | Layout sets switch on the fly, from the side menu or from the layouts screen |
 
-The host is somebody else's half of the story: [Sunshine](https://github.com/LizardByte/Sunshine) is
-the recommended one on Windows (open source, works with NVIDIA, AMD and Intel), and NVIDIA GameStream
-still works on hosts that have it.
+The host is the other half of the story: on Windows, [Sunshine](https://github.com/LizardByte/Sunshine)
+is the recommended one (open source, works with NVIDIA, AMD and Intel), and NVIDIA GameStream still
+works where it exists.
 
 ---
 
-## What the app brings
+## What the app does
 
 ### An editor, not a fixed set of buttons
 
-The layout is edited on the stream itself: drag a control, resize it from its corners, round its
-corners, set its opacity. What you see while editing is exactly where the control will be while
-playing, because the editor and the stream share the same screen coordinates.
+The layout is edited on the stream itself: the size and position of a control, its corner radius, its
+opacity, and the actions it sends, including combinations of them. The editor works on the same
+screen and in the same coordinates as the game, so a control sits exactly where it will sit while
+playing.
 
 <p align="center">
   <img src="docs/screenshots/layout-editor.jpg" alt="Editing a button: its actions, and the sequence of events a press sends">
 </p>
 
-- **Any input on any control**: a gamepad button, another stick's axis, a trigger, a keyboard key, a
-  mouse button, or a combination of them.
+- **Any input on any control**: a gamepad button, an axis, a trigger, a keyboard key, a mouse button —
+  and combinations of them. A stick can send keys as well, not only an axis deflection.
 - **Sequences with delays**: press once, and the control sends its steps one after another
   (`A`, wait 120 ms, then `B`). A tap plays the whole sequence; holding a control keeps it all down.
-- **Toggle** for controls that latch, and **pass through to touch** for controls that keep firing
-  while the same finger looks around.
+- **A toggle** for controls that have to stay on after a touch, and **pass through to touch** for
+  hold-and-drag.
 - **Layout sets**: as many as you like, exported and imported as a JSON file, so a layout can be
   shared or moved to another device.
 
@@ -68,36 +73,36 @@ playing, because the editor and the stream share the same screen coordinates.
   <img src="docs/screenshots/layouts-screen.jpg" alt="The layouts screen: pick, edit, share or import" width="360">
 </p>
 
-### Hold and drag: fire and aim with one thumb
-
-A control with *pass through to touch* keeps its own press while the same finger moves across the
-screen, so the shot keeps firing and the view keeps turning. It is the one thing a touchscreen
-genuinely cannot do on its own.
-
-<p align="center">
-  <img src="docs/screenshots/hold-and-drag.jpg" alt="Holding the fire button while the same finger turns the view">
-</p>
-
-### Touch that behaves how you need it to
+### Several input modes for a finger moving across the screen
 
 | Touch input | What the screen does |
 |---|---|
-| **Touchpad** | Moves the pointer like a laptop; a choice of *Trackpad*, *Direct cursor* or *No clicks* underneath |
-| **Touch native** (experimental) | Sends real touch events, for a host that takes them |
+| **Touchpad** | Moves the pointer like a laptop; three variants — *Trackpad*, *Direct cursor* (the cursor is where the finger is) and *No clicks* (handy in shooters, so nothing fires by accident) |
+| **Touch native** (experimental for now) | Sends real touch events, for a host that takes them |
 | **Right stick**, **Left stick** | A stick appears wherever the finger lands and is pushed by dragging away from it |
 | **Off** | The screen only carries the layout, nothing else |
 
 **Sensitivity** is a slider for the touchpad and for the sticks, separately, 20 % to 300 % — from
 quick turns with a short swipe to precise aim. **Vibration** passes the game's rumble to the phone.
 
-### A side menu instead of a trip to the settings
+### A side menu instead of the settings
 
-The back button opens a menu over the stream: keyboard, touch input, touchpad mode, sensitivity,
-on-screen controls, layout, opacity, extras and the way out. Everything in it applies at once, so a
-stream never has to be dropped to change how it feels.
+The back button opens a menu over the stream: keyboard (the Android one), touch input, touchpad
+mode, sensitivity, on-screen controls, the layout, opacity, extras. Everything in it applies at once,
+so a stream never has to be dropped.
 
 <p align="center">
   <img src="docs/screenshots/stream-menu.jpg" alt="The stream menu, over the desktop it is controlling">
+</p>
+
+### Hold and drag: fire and aim with one thumb
+
+A control with *pass through to touch* keeps its own press while the same finger moves across the
+screen, so the shot keeps firing and the view keeps turning. It works together with whichever touch
+mode is chosen in the side menu.
+
+<p align="center">
+  <img src="docs/screenshots/hold-and-drag.jpg" alt="Holding the fire button while the same finger turns the view">
 </p>
 
 ### Three layouts are there from the first launch
@@ -106,13 +111,19 @@ stream never has to be dropped to change how it feels.
 |---|---|
 | **Default (Controller)** | A whole gamepad: D-pad, face and shoulder buttons, triggers, both sticks |
 | **Default (kbd+mouse)** | Keys around a stick and mouse buttons under the right thumb — for a desktop and for keyboard-and-mouse games |
-| **PC Keyboard** | A full PC keyboard with mouse buttons where the thumb rests (88 keys) |
+| **PC Keyboard** | A PC keyboard with mouse buttons (88 keys) |
 
-All three can be edited, duplicated and deleted. The built-in one is always there to fall back to.
+All of them can be edited, duplicated and deleted. The built-in one is always there to fall back to.
 
 <p align="center">
   <img src="docs/screenshots/desktop-control.jpg" alt="Typing on the host with the on-screen keyboard">
 </p>
+
+---
+
+> **Before your first stream.** Open the settings and set the resolution and, above all, the bitrate
+> for your network: the higher the bitrate, the better the picture and the harder the network has to
+> work.
 
 ---
 
@@ -143,9 +154,25 @@ and older devices that need the rooted input driver; on newer devices it is not 
 
 ---
 
-## Support the project
+## Support the author
 
-*Coming soon.* A link will appear here for anyone who wants to keep the project going.
+The project is free, open source, and stays that way — nothing is behind a paywall and nothing will
+be. If you feel like saying thanks anyway, a voluntary transfer is welcome:
+
+<p align="center">
+  <a href="https://yoomoney.ru/to/4100119676114070"><img alt="Support the author" src="https://img.shields.io/badge/Support%20the%20author-YooMoney-8b3ffd"></a>
+</p>
+
+<p align="center">
+  <code>https://yoomoney.ru/to/4100119676114070</code>
+</p>
+
+There is also a [support page](https://alexander0ezhov.github.io/moonlight-android/donate.html) with the
+same transfer and the YooMoney widget.
+
+**This is a gift.** The transfer is voluntary and without any obligation: it is not a payment for a
+product, a service or a subscription, and it gives no extra features, priorities or advantages.
+Whether to send anything, and how much, is entirely up to you.
 
 ## License
 

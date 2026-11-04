@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Поддержать автора — LuMOONescence</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0a0d16;
+    --card: #131a2a;
+    --edge: #263149;
+    --text: #e8eaf0;
+    --muted: #9aa4bb;
+    --accent: #6ce2d6;
+    --violet: #8b3ffd;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 20px 56px;
+    background: radial-gradient(1100px 520px at 50% -10%, #16203a 0%, var(--bg) 60%);
+    color: var(--text);
+    font: 16px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 26px; }
+  header img { width: min(520px, 92%); height: auto; display: block; margin: 0 auto 18px; }
+  h1 { font-size: 26px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--edge);
+    border-radius: 16px;
+    padding: 22px;
+    margin: 22px 0;
+  }
+  .widget { display: flex; justify-content: center; }
+  iframe { max-width: 100%; border: 0; border-radius: 12px; }
+  .link {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: var(--violet);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    word-break: break-all;
+  }
+  .link:hover { filter: brightness(1.08); }
+  .fallback { text-align: center; }
+  code {
+    background: #0d1320;
+    border: 1px solid var(--edge);
+    border-radius: 8px;
+    padding: 3px 7px;
+    font-size: 14px;
+    word-break: break-all;
+  }
+  h2 { font-size: 17px; margin: 0 0 8px; }
+  p { margin: 0 0 10px; }
+  .muted { color: var(--muted); font-size: 14px; }
+  strong { color: #fff; }
+  a { color: var(--accent); }
+  footer { margin-top: 30px; text-align: center; color: var(--muted); font-size: 13px; }
+  footer a { color: var(--muted); }
+  hr { border: 0; border-top: 1px solid var(--edge); margin: 26px 0; }
+  .en { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="screenshots/logo.png" alt="LuMOONescence">
+    <h1>Поддержать автора</h1>
+    <p class="sub">Добровольный перевод на YooMoney</p>
+  </header>
+
+  <div class="card widget">
+    <iframe src="https://yoomoney.ru/quickpay/fundraise/widget?billNumber=1LB2TR27UFF.261104&"
+            width="500" height="480" allowtransparency="true" scrolling="no"
+            title="Поддержать автора — YooMoney"></iframe>
+  </div>
+
+  <div class="card fallback">
+    <p class="muted">Если виджет не открылся, перейдите по ссылке:</p>
+    <p><a class="link" href="https://yoomoney.ru/to/4100119676114070">yoomoney.ru/to/4100119676114070</a></p>
+    <p class="muted">или скопируйте адрес: <code>https://yoomoney.ru/to/4100119676114070</code></p>
+  </div>
+
+  <div class="card">
+    <h2>Это подарок</h2>
+    <p>Перевод <strong>добровольный и безвозмездный</strong>: он не является оплатой товара, услуги или
+      подписки и не даёт дополнительных функций, приоритетов или преимуществ. Переводить или нет и
+      сколько — целиком на ваше усмотрение.</p>
+    <p class="en">The transfer is voluntary and without any obligation. It is not a payment for a
+      product, a service or a subscription, and it gives no extra features, priorities or advantages.</p>
+  </div>
+
+  <div class="card">
+    <h2>Проект</h2>
+    <p>LuMOONescence — свободное ПО под <a href="https://github.com/alexander0ezhov/moonlight-android/blob/main/LICENSE.txt">GNU GPL v3</a>.
+      Он бесплатный и открытый, и таким останется: ничего не спрятано за оплатой и не будет спрятано.
+      Исходники — в <a href="https://github.com/alexander0ezhov/moonlight-android">репозитории</a>.</p>
+  </div>
+
+  <footer>
+    Независимый проект, не связан с NVIDIA и проектом Moonlight. Распространяется без гарантий.
+  </footer>
+</main>
+</body>
+</html>
