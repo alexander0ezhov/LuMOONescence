@@ -63,6 +63,11 @@ are distributed under the same GPL v3 as the rest of it. Artwork that comes from
 Android stays under the GPL v3 as well, with the original authorship intact. No third-party
 commercial artwork is used.
 
+Two of the pictures in `docs/screenshots` are illustrations made for this project rather than
+screenshots of a real game. The one screenshot of somebody else's work is of SuperTuxKart, whose
+artwork is CC BY-SA 4.0, so it carries its credit: [docs/screenshots/CREDITS.md](docs/screenshots/CREDITS.md)
+says what every picture in that folder is and under which licence it travels.
+
 ## Services the app talks to
 
 By default the app uses the public infrastructure of the Moonlight project:
