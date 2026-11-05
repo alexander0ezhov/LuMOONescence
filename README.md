@@ -19,13 +19,10 @@
   <img src="docs/screenshots/game.jpg" alt="A game being played with an on-screen layout of buttons and sticks">
 </p>
 
-**LuMOONescence** mirrors your PC on your phone and gives you controls that are actually usable. It is
-a streaming client for a desktop and for the games on it, with on-screen layouts you arrange
-yourself: gamepad buttons, PC keys, mouse buttons, a trackpad, sticks, native touch input — or all of
-them at once. Whatever the thing you are doing needs.
+**LuMOONescence** is a client for streaming your PC desktop and games to your phone. 
+It offers extensive PC control options—ranging from fully customizable on-screen layouts (including gamepad buttons, PC keys, mouse buttons, touchpads, and analog sticks) and native touch input, to a convenient toolbar that lets you switch between different layouts and input methods (such as an on-screen keyboard, direct touch input, touchpad mode, and more) without ever leaving your stream.
 
-There is no pile of devices to carry around any more. An Android phone with a touchscreen is the
-whole controller.
+No need to carry around a bunch of devices anymore. An Android smartphone with a touchscreen takes care of everything at once.
 
 > Based on [Moonlight for Android](https://github.com/moonlight-stream/moonlight-android), which is
 > free software under the GPLv3. This is an independent project, not an official Moonlight build.
